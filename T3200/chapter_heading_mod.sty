@@ -1,0 +1,10 @@
+\renewcommand{\@makechapterhead}[1]
+ { \vspace*{14pt} { \parindent 0pt \raggedright
+  \ifnum \c@secnumdepth >\m@ne \LARGE\bf \makebox[3ex][l]{\thechapter}\fi
+  \LARGE \bf \hangindent3ex #1\par
+  \nobreak \vskip 30pt } }
+ 
+\renewcommand{\@makeschapterhead}[1]
+ { \vspace*{14pt} { \parindent 0pt \raggedright
+  \LARGE \bf #1\par
+  \nobreak \vskip 30pt } }

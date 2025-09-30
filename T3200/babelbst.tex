@@ -1,0 +1,206 @@
+ % This is babelbst.tex for English.
+ % It should serve as a model for other languages.
+ % Alternatively, store it under a different name (e.g. englbst.tex)
+ % and then \input it with a command in babelbst.tex.
+
+%\ifcase\language \input{english.bst} \or \input{german.bst} 
+%  \else \input{english.bst} \fi
+%
+\let\captionsg\captionsgerman
+\let\captionsng\captionsngerman
+\let\captionse\captionsenglish
+\let\captionsr\captionsenglish
+\let\captionsfrench\captionsngerman
+\let\captionsd\captionsgerman
+
+\addto\captionsgerman{%
+\def\bbland{und}
+\def\bbleditors{Herausgeber}        \def\bbleds{Hrsg.}
+\def\bbleditor{Herausgeber}          \def\bbled{Hrsg.}
+%\def\bbledby{herausgegeben von}
+\def\bbledby{Hrsg.}
+\def\bbledition{Auf\/lage}        \def\bbledn{Aufl.}
+\def\bblvolume{Band}          \def\bblvol{Bd.}
+\def\bblof{von}
+\def\bblnumber{Nummer}          \def\bblno{Nr.}
+\def\bblin{in} 
+\def\bblpages{Seiten}            \def\bblpp{S.}
+\def\bblpage{Seite}              \def\bblp{S.}
+\def\bblchapter{Kapitel}        \def\bblchap{Kap.}
+\def\bbltechreport{Technischer Bericht}
+\def\bblintreport{Interner Bericht}
+\def\bbltechrep{Techn.\ Ber.}
+\def\bbltechrep{Interner Bericht}
+\def\bblintrep{Interner Bericht}
+\def\bblmthesis{Masterarbeit}
+\def\bblphdthesis{Dissertation}
+\def\bblfirst{Erste}            \def\bblfirsto{1.}
+\def\bblsecond{Zweite}          \def\bblsecondo{2.}
+\def\bblthird{Third}            \def\bblthirdo{3.}
+\def\bblfourth{Fourth}          \def\bblfourtho{4.}
+\def\bblfifth{Fifth}            \def\bblfiftho{5.}
+\def\bblst{.}  \def\bblnd{.}  \def\bblrd{.}
+\def\bblth{.}
+\def\bbljan{Jan.}  \def\bblfeb{Feb.}  \def\bblmar{M{\"a}rz}
+\def\bblapr{April}    \def\bblmay{Mai}       \def\bbljun{Juni}
+\def\bbljul{Juli}     \def\bblaug{Aug.}    \def\bblsep{Sept.}
+\def\bbloct{Okt.}  \def\bblnov{Nov.}  \def\bbldec{Dez.}
+}
+
+\addto\captionsngerman{%
+\def\bbland{und}
+\def\bbleditors{Herausgeber}        \def\bbleds{Hrsg.}
+\def\bbleditor{Herausgeber}          \def\bbled{Hrsg.}
+%\def\bbledby{herausgegeben von}
+\def\bbledby{Hrsg.}
+\def\bbledition{Auf\/lage}        \def\bbledn{Aufl.}
+\def\bblvolume{Band}          \def\bblvol{Bd.}
+\def\bblof{von}
+\def\bblnumber{Nummer}          \def\bblno{Nr.}
+\def\bblin{in} 
+\def\bblpages{Seiten}            \def\bblpp{S.}
+\def\bblpage{Seite}              \def\bblp{S.}
+\def\bblchapter{Kapitel}        \def\bblchap{Kap.}
+\def\bbltechreport{Technischer Bericht}
+\def\bblintreport{Interner Bericht}
+\def\bbltechrep{Techn.\ Ber.}
+\def\bblintrep{Interner Bericht}
+\def\bblmthesis{Masterarbeit}
+\def\bblphdthesis{Dissertation}
+\def\bblfirst{Erste}            \def\bblfirsto{1.}
+\def\bblsecond{Zweite}          \def\bblsecondo{2.}
+\def\bblthird{Third}            \def\bblthirdo{3.}
+\def\bblfourth{Fourth}          \def\bblfourtho{4.}
+\def\bblfifth{Fifth}            \def\bblfiftho{5.}
+\def\bblst{.}  \def\bblnd{.}  \def\bblrd{.}
+\def\bblth{.}
+\def\bbljan{Jan.}  \def\bblfeb{Feb.}  \def\bblmar{M{\"a}rz}
+\def\bblapr{April}    \def\bblmay{Mai}       \def\bbljun{Juni}
+\def\bbljul{Juli}     \def\bblaug{Aug.}    \def\bblsep{Sept.}
+\def\bbloct{Okt.}  \def\bblnov{Nov.}  \def\bbldec{Dez.}
+}
+
+
+\addto\captionsfrench{%
+\def\bbland{und}
+\def\bbleditors{Herausgeber}        \def\bbleds{Hrsg.}
+\def\bbleditor{Herausgeber}          \def\bbled{Hrsg.}
+%\def\bbledby{herausgegeben von}
+\def\bbledby{Hrsg.}
+\def\bbledition{Auf\/lage}        \def\bbledn{Aufl.}
+\def\bblvolume{Band}          \def\bblvol{Bd.}
+\def\bblof{von}
+\def\bblnumber{Nummer}          \def\bblno{Nr.}
+\def\bblin{in} 
+\def\bblpages{Seiten}            \def\bblpp{S.}
+\def\bblpage{Seite}              \def\bblp{S.}
+\def\bblchapter{Kapitel}        \def\bblchap{Kap.}
+\def\bbltechreport{Technischer Bericht}
+\def\bblintreport{Interner Bericht}
+\def\bbltechrep{Techn.\ Ber.}
+\def\bblintrep{Interner Bericht}
+\def\bblmthesis{Masterarbeit}
+\def\bblphdthesis{Dissertation}
+\def\bblfirst{Erste}            \def\bblfirsto{1.}
+\def\bblsecond{Zweite}          \def\bblsecondo{2.}
+\def\bblthird{Third}            \def\bblthirdo{3.}
+\def\bblfourth{Fourth}          \def\bblfourtho{4.}
+\def\bblfifth{Fifth}            \def\bblfiftho{5.}
+\def\bblst{.}  \def\bblnd{.}  \def\bblrd{.}
+\def\bblth{.}
+\def\bbljan{Jan.}  \def\bblfeb{Feb.}  \def\bblmar{M{\"a}rz}
+\def\bblapr{April}    \def\bblmay{Mai}       \def\bbljun{Juni}
+\def\bbljul{Juli}     \def\bblaug{Aug.}    \def\bblsep{Sept.}
+\def\bbloct{Okt.}  \def\bblnov{Nov.}  \def\bbldec{Dez.}
+}
+
+%  \def\refname{Literatur}%
+%  \def\abstractname{Zusammenfassung}%
+%  \def\bibname{Literaturverzeichnis}%
+%  \def\chaptername{Kapitel}%
+%  \def\appendixname{Anhang}%
+%  \def\contentsname{Inhaltsverzeichnis}%    % oder nur: Inhalt
+%  \def\listfigurename{Abbildungsverzeichnis}%
+%  \def\listtablename{Tabellenverzeichnis}%
+%  \def\indexname{Index}%
+%  \def\figurename{Abbildung}%
+%  \def\tablename{Tabelle}%                  % oder: Tafel
+%  \def\partname{Teil}%
+%  \def\enclname{Anlage(n)}%                 % oder: Beilage(n)
+%  \def\ccname{Verteiler}%                   % oder: Kopien an
+%  \def\headtoname{An}%
+%  \def\pagename{Seite}%
+%  \def\seename{siehe}%
+%  \def\alsoname{siehe auch}%
+%  \def\proofname{Beweis}%
+%  }
+
+\addto\captionsenglish{%
+\def\bbland{and}
+\def\bbleditors{editors}        \def\bbleds{eds.}
+\def\bbleditor{editor}          \def\bbled{ed.}
+\def\bbledby{ed.}
+\def\bbledition{edition}        \def\bbledn{edn.}
+\def\bblvolume{volume}          \def\bblvol{vol.}
+\def\bblof{of}
+\def\bblnumber{number}          \def\bblno{no.}
+\def\bblin{in} 
+\def\bblpages{pages}            \def\bblpp{pp.}
+\def\bblpage{page}              \def\bblp{p.}
+\def\bblchapter{chapter}        \def\bblchap{chap.}
+\def\bbltechreport{Technical Report}
+\def\bblintreport{Internal Report}
+\def\bbltechrep{Tech. Rep.}
+\def\bblintrep{Internal Report}
+\def\bblmthesis{Master's thesis}
+\def\bblphdthesis{Ph.D. thesis}
+\def\bblfirst{First}            \def\bblfirsto{1st}
+\def\bblsecond{Second}          \def\bblsecondo{2nd}
+\def\bblthird{Third}            \def\bblthirdo{3rd}
+\def\bblfourth{Fourth}          \def\bblfourtho{4th}
+\def\bblfifth{Fifth}            \def\bblfiftho{5th}
+\def\bblst{st}  \def\bblnd{nd}  \def\bblrd{rd}
+\def\bblth{th}
+\def\bbljan{Jan.}  \def\bblfeb{Feb.}  \def\bblmar{March}
+\def\bblapr{April}    \def\bblmay{May}       \def\bbljun{June}
+\def\bbljul{July}     \def\bblaug{Aug.}    \def\bblsep{Sept.}
+\def\bbloct{Oct.}  \def\bblnov{Nov.}  \def\bbldec{Dec.}
+}
+
+\addto\captionsUS{%
+\def\bbland{and}
+\def\bbleditors{editors}        \def\bbleds{eds.}
+\def\bbleditor{editor}          \def\bbled{ed.}
+\def\bbledby{ed.}
+\def\bbledition{edition}        \def\bbledn{edn.}
+\def\bblvolume{volume}          \def\bblvol{vol.}
+\def\bblof{of}
+\def\bblnumber{number}          \def\bblno{no.}
+\def\bblin{in} 
+\def\bblpages{pages}            \def\bblpp{pp.}
+\def\bblpage{page}              \def\bblp{p.}
+\def\bblchapter{chapter}        \def\bblchap{chap.}
+\def\bbltechreport{Technical Report}
+\def\bblintreport{Internal Report}
+\def\bbltechrep{Tech. Rep.}
+\def\bblintrep{Internal Report}
+\def\bblmthesis{Master's thesis}
+\def\bblphdthesis{Ph.D. thesis}
+\def\bblfirst{First}            \def\bblfirsto{1st}
+\def\bblsecond{Second}          \def\bblsecondo{2nd}
+\def\bblthird{Third}            \def\bblthirdo{3rd}
+\def\bblfourth{Fourth}          \def\bblfourtho{4th}
+\def\bblfifth{Fifth}            \def\bblfiftho{5th}
+\def\bblst{st}  \def\bblnd{nd}  \def\bblrd{rd}
+\def\bblth{th}
+\def\bbljan{Jan.}  \def\bblfeb{Feb.}  \def\bblmar{March}
+\def\bblapr{April}    \def\bblmay{May}       \def\bbljun{June}
+\def\bbljul{July}     \def\bblaug{Aug.}    \def\bblsep{Sept.}
+\def\bbloct{Oct.}  \def\bblnov{Nov.}  \def\bbldec{Dec.}
+}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: master
+%%% TeX-master: t
+%%% End: 

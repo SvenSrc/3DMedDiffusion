@@ -1,0 +1,48 @@
+%---------------------------------------------------------------------
+\chapter{Grundlagen}\label{Ch:Grundlagen}
+%---------------------------------------------------------------------
+
+
+%---------------------------------------------------------------------
+\section{Grundlagen der Akustik}
+%---------------------------------------------------------------------
+
+\button{CTRL}~\faPlus~\button{C}, dann \button{CTRL}~\faPlus~\button{V}, fertig.
+
+%---------------------------------------------------------------------
+\section{Grundlagen der Fourier}
+%---------------------------------------------------------------------
+
+\begin{equation}
+    X(k) = \sum_{n=0}^{N-1} x(n) \cdot e^{-i 2\pi n k / N}, \quad k = 0, 1, \dots, N-1
+    \label{Eq:dft} 
+\end{equation}
+
+\section{Verschiedene Algorithmen}
+Der implementierte BubbleSort-Algorithmus wird in Algorithmus~\ref{alg:bubblesort} dargestellt.
+Diese Implementation enthält zwei Optimierungen. 
+Zu Beginn jedes Durchlaufs wird in Zeile 2. die Boolean-Variable \texttt{swapped} 
+auf \textbf{false} gesetzt. Dies signalisiert dem Algorithmus, dass das Array bereits sortiert 
+ist, solange keine Vertauschungen mehr erfolgen. Eine weitere Modifikation findet sich in der 
+zweiten \texttt{for}-Schleife mit Bedingung \texttt{n - i - 2}.
+%
+\begin{algorithm}
+\caption{BubbleSort}
+\label{alg:bubblesort}
+\begin{algorithmic}[1]
+\Require Array $A$ mit $n$ Elementen
+\Ensure Sortiertes Array $A$
+\For{$i = 0$ to $n-1$}
+    \State Setze \textit{swapped} auf \textbf{false}
+    \For{$j = 0$ to $n-i-2$}
+        \If{$A[j] > A[j+1]$}
+            \State Vertausche $A[j]$ und $A[j+1]$
+            \State Setze \textit{swapped} auf \textbf{true}
+        \EndIf
+    \EndFor
+    \If{nicht \textit{swapped}}
+        \State \textbf{break}
+    \EndIf
+\EndFor
+\end{algorithmic}
+\end{algorithm}

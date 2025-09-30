@@ -1,0 +1,151 @@
+\documentclass[12pt,a4paper]{report} 
+% Um die Schriftgröße zu geht es hier, es geht nur 10pt, 11pt und 12pt
+% Fehler ignorieren
+
+%---------------------------------------------------------------------
+%-- Eigene Definitionen aus Datei mydefs.sty
+%---------------------------------------------------------------------
+\usepackage{mydefs}
+\usepackage{diagbox}
+
+\begin{document}
+  % Im Engl. ist ein zusätzlicher Abstand nach einem Punkt üblich.
+  % Mit \frenchspacing kann dieser extra Abstand deaktiviert werden.
+  % Da der extra Abstand im Dt. nicht üblich ist, wird \frenchspacing
+  % von babel/ngerman aktiviert. babel/french schaltet allerdings
+  % \frenchspacing wieder ab, wenn french nicht als Hauptsprache
+  % eingestellt ist. Hier werden die von ngerman definierten Extras
+  % (und damit auch \frenchspacing) explizit (wieder) aktiviert.
+  \extrasngerman 
+
+%---------------------------------------------------------------------
+%-- Titelblatt (aus titel.tex) 
+%---------------------------------------------------------------------
+
+  \pagenumbering{Roman}\setcounter{page}{1}
+
+% Titelseite in pdf-Inhaltsübersicht einfügen
+  \pdfbookmark[0]{Titelseite}{titlepage}
+
+  \include{metadata/title/titel_dhbw}  % Titel-Seite für DHBW-Studenten
+
+%------------------------------
+%-- Eigenständigkeitserklärung (aus eigenstaendigkeitserklaerung.tex)
+%-- (entsprechend Prüfungsordnung anzupassen)
+%------------------------------
+
+% Sperrvermerk
+  \pdfbookmark[0]{Sperrvermerk}{statement}
+
+  \include{metadata/restrictionNotice/restrictionNotice}
+
+% Eigenständigkeitserklärung in pdf-Inhaltsübersicht einfügen
+  \pdfbookmark[0]{Erklärung}{statement}
+
+  \include{metadata/declaration/declaration}
+
+  \include{metadata/declaration/declaration_ai}
+
+
+%------------------------------
+%-- Abstract
+%------------------------------
+
+% Abstract in pdf-Inhaltsübersicht einfügen
+  \pdfbookmark[0]{Abstract}{preface}
+
+  \include{content/abstract/abstract_en}
+
+  \pdfbookmark[0]{Zusammenfassung}{preface}
+
+  \include{content/abstract/abstract_de}
+
+%------------------------------
+%-- Inhaltsverzeichnis
+%------------------------------
+
+  % MUSS ANGEPASST WERDEN FALLS DIE NUMMERISCHE REIHENFOLGE NICHT STIMMT!!!
+  \setcounter{page}{7}
+  
+% Inhaltsverzeichnis in pdf-Inhaltsübersicht einfügen
+  \pdfbookmark[0]{Inhaltsverzeichnis}{tableofcontents}
+
+  \tableofcontents
+  \markboth{Inhaltsverzeichnis}{Inhaltsverzeichnis}
+
+%------------------------------
+%-- Abbildungsverzeichnis
+%------------------------------
+
+ \phantomsection
+ \addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
+ \listoffigures
+ \markboth{Abbildungsverzeichnis}{Abbildungsverzeichnis}
+
+
+%------------------------------
+%-- Tabellenverzeichnis
+%------------------------------
+
+ \phantomsection
+ \addcontentsline{toc}{chapter}{Tabellenverzeichnis}
+ \listoftables
+ \markboth{Tabellenverzeichnis}{Tabellenverzeichnis}
+
+
+%------------------------------
+%-- Nomenklatur (aus Datei nomenklatur.tex)
+%------------------------------
+
+% Akronyme kommen da rein
+  \include{content/nomenclature/nomenclature}
+
+%---------------------------------------------------------------------
+%-- "Hauptteil" - die einzelnen Kapitel
+%---------------------------------------------------------------------
+
+  \newcounter{Romanpages}
+  \setcounter{Romanpages}{\value{page}}
+
+  \pagenumbering{arabic}\setcounter{page}{1}
+
+  % Um weitere Kapitel einzufügen, müssen die innerhalb content/
+  % chapter/ sich befinden. Die Dateinamen sollen in Zahlen sein 01,
+  % 02, ..
+  \foreach \i in {01,02,03,04,05,06,07,08,09,...,99} {%
+      \edef\FileName{content/chapter/\i .tex}%
+      \IfFileExists{\FileName}{%
+        \input{\FileName}
+      }
+      {%
+        %				No chapter available
+      }
+    }
+
+  \clearpage
+
+%---------------------------------------------------------------------
+%-- Literaturverzeichnis
+%---------------------------------------------------------------------
+
+  \pagenumbering{Roman}
+  \setcounter{page}{\value{Romanpages}}
+
+
+
+  \phantomsection %% vergleiche: http://homepages.inf.ed.ac.uk/imurray2/compnotes/latex.html#hyperref
+  \addcontentsline{toc}{chapter}{Literaturverzeichnis}
+
+  % Literaturverzeichnis.
+  % Zitierweise kann in der mydef verändert werdne
+  \printbibliography
+
+%---------------------------------------------------------------------
+%-- Anhang
+%---------------------------------------------------------------------
+
+  \appendix
+
+  \include{content/appendix/appendix_A}
+
+\end{document}
