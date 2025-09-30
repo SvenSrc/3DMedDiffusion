@@ -48,5 +48,7 @@ build/
 *.png
 *.svg
 *.eps
+*.tps
+*.tcp
 
 # .pdf
