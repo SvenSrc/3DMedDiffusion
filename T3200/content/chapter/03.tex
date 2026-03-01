@@ -76,7 +76,14 @@ p(x_t \mid x_0, \ldots, x_{t-1}) = p(x_t \mid x_{t-1}), \quad t = 1, \ldots, T
 \label{eq:markov}
 \end{equation}
 %
-Hier bei gilt für $t$ als die Zeit und $x_t$ als der Zustand zum Zeitpunkt $t$~\cite[S. 153]{okadome_essentials_2025}~\cite[S. 608 f.]{bishop_pattern_2006}. Eine Markov-Kette wird in \autoref{fig:markov} dargestellt. Diese wird auch als eine Markov-Kette der ersten Ordnung beschrieben~\cite[S. 609]{bishop_pattern_2006}.
+Hier bei gilt für $t$ als die Zeit und $x_t$ als der Zustand zum Zeitpunkt $t$. Aufgrund der Markov-Eigenschaft kann die gemeinsame Wahrscheinlichkeit der gesamten Sequenz $x_{1:T}$ gegeben $x_0$ als Produkt der Übergangswahrscheinlichkeiten faktorisiert werden:~\cite[S. 153]{okadome_essentials_2025}~\cite[S. 608 f.]{bishop_pattern_2006}.
+%
+\begin{equation}
+q(x_{1:T} \mid x_0) = \prod_{t=1}^{T} q(x_t \mid x_{t-1})
+\label{eq:joint_markov}
+\end{equation}
+%
+Eine Markov-Kette wird in \autoref{fig:markov} dargestellt. Diese wird auch als eine Markov-Kette der ersten Ordnung beschrieben~\cite[S. 609]{bishop_pattern_2006}.
 %
 \begin{figure}[htbp]
     \centering
@@ -117,5 +124,23 @@ Nach genügend vielen Schritten ($L \to \infty$) ist das Originalbild vollständig
 \todo{neu durchlesen}
 
 \subsubsection{Sampling}
+
+\section{Convolutional Neural Network}
+
+
+
+\section{U-Net}
+U-Net ist eine \ac{CNN}-Architektur, die für die biomedizinische Bildsegmentierung entwickelt wurde. Trotz ihres ursprünglichen Anwendungsbereiches dient die Architektur eine zentrale Rolle im Denoising-Schritt in Diffusionsmodelle~\cite[S. 2]{ronneberger_u-net_2015}. Die U-Net Architektur erweist sich als vorteilhaft für die generative KI, da sie flexibel ist für verschiedene Datenmodellierungen. Dazu gehören Bild, Audio, Video, Text sowie 3D-volumetrische Daten~\cite[S. 2]{ignacio_revisiting_2025}.
+%
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./bilder/unet/unet-struktur.PNG}
+    \caption{U-Net Architektur~\cite[S. 2]{ronneberger_u-net_2015}}
+    \label{fig:unet-Architektur}
+\end{figure}
+%
+In~\autoref{fig:unet-Architektur} wird die Architektur dargestellt.
+Das Grundprinzip von U-Net basiert auf einer symmetrischen Encoder-Decoder-Struktur.
+Auf der linken Hälfte ist der Encoder. Der Encoder folgt dem Prinzip eines convo
 
 \section{Einsatzmöglichkeiten in der Medizin}

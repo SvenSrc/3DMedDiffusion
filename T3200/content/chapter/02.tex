@@ -2,5 +2,19 @@
 
 \section{Bildgebende Verfahren}
 
+\section{NIfTI}
+Das \ac{NIfTI}-Format (.nii, .nii.gz) wurde in den frühen 2000er Jahren vom \ac{NIH} entwickelt und hat sich als Standardformat in der neuroimaging-basierten Forschung etabliert. Es ist speziell für die Verarbeitung volumetrischer 3D-Bilddaten ausgelegt und daher geeignet für beispielsweise MRT-Gehirnuntersuchungen~\cite[S. 203]{rajagopal_artificial_2026}. \ac{NIfTI} ist ein Rasterformat, das Daten in dreidimensionaler Form als Voxel speichert also als Pixel mit einer definierten Breite, Höhe und Tiefe~\cite[S. 4]{elhadad_reduction_2024}. Dabei werden in den ersten drei Dimensionen die räumlichen Koordinaten x, y und z gespeichert, während die vierte Dimension für den Zeitpunkt $t$ reserviert ist~\cite[S. 76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}. Der Header einer \ac{NIfTI}-Datei umfasst im .nii-Format 352 Bytes~\cite[S. 76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}. In \autoref{fig:nifti-header} ist ein Beispiel-Header zu sehen, welcher zeigt, welche Metadaten gespeichert werden. So ist beispielsweise im Parameter \texttt{ImageSize} die Auflösung des MRT-Scans abzulesen, in diesem Fall \texttt{256x156x256}.
+%
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{./bilder/nifti/nifti-header.png}
+\caption{NIfTI-Header~\cite[S. 76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}}
+\label{fig:nifti-header}
+\end{figure}
+%
+Im Gegensatz zu Formaten wie JPEG, das eine verlustbehaftete Kompression verwendet und dadurch relevante Bildinformationen beeinträchtigen kann, unterstützt \ac{NIfTI} eine verlustfreie Kompression~\cite[S. 203]{rajagopal_artificial_2026}.
+% In der Hirntumorsegmentierung gilt NIfTI als das einzig geeignete Dateiformat, da es vollständig kompatibel mit gängigen Deep-Learning-Pipelines ist und die 3D-Raumstruktur der MRT-Daten vollständig erhält [9, 10].
+
+
 
 
