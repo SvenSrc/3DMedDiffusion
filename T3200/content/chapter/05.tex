@@ -1,5 +1,79 @@
-\chapter{Vorgehensweise}
+\chapter{Implementierung und experimenteller Aufbau}
+Das folgende Kapitel beschreibt die praktische Umsetzung der in dieser Arbeit untersuchten Modelle. Zunächst werden die eingesetzten Werkzeuge und die zugrunde liegende Hardware-Konfiguration vorgestellt. Anschließend wird auf die Architektur der einzelnen Modelle sowie die Wahl der jeweiligen Hyperparameter eingegangen und deren Einfluss auf das Trainingsverhalten erläutert.
 
-\section{Verwendete Werkzeuge}
 
-\section{Ergebnis}
+\section{Entwicklungsumgebung und Hardware}
+Das Training der Modelle wurde auf einem lokalen System durchgeführt. Dieses verfügt über eine NVIDIA GeForce GTX 1080 Ti mit 11 GB VRAM, einen AMD Athlon X4 860K Prozessor (4 Kerne, 3,7 GHz), 16 GB Arbeitsspeicher sowie ein Linux-Ubuntu-Desktop-Betriebssystem. Der Einsatz einer dedizierten GPU ermöglicht eine Reduktion der Trainingszeiten gegenüber einer reinen CPU-basierten Berechnung.
+\abschnitt
+Die Implementierung sämtlicher Modelle erfolgte in der Programmiersprache Python. Python besitzt eine umfangreiche Anzahl an Bibliotheken, wie Keras und TensorFlow, für maschinelles Lernen und hat sich als De-facto-Standard in diesem Bereich etabliert~\cite{geeksforgeeks2025python}. Als Entwicklungsumgebung wurde Visual Studio Code in Kombination mit Jupyter-Notebooks eingesetzt. Die Verwendung von Jupyter-Notebooks ermöglicht eine schrittweise Ausführung einzelner Code-Zellen, was bei der Entwicklung und dem Debugging von Vorteil ist. Für jedes Modell wurde ein separates Notebook angelegt, um eine klare Trennung der Experimente zu gewährleisten.
+\abschnitt
+Für den Modellaufbau wurde das Deep-Learning-Framework PyTorch eingesetzt. Die Diffusionslogik einschließlich des Noise Schedulers, des Sampling-Verfahrens und der Trainingsschleife wurde auf Basis von PyTorch implementiert. Für das Laden und Speichern der medizinischen Bilddaten im NIfTI-Format wurde die Bibliothek nibabel verwendet. Die Visualisierung der Ergebnisse erfolgte mit Matplotlib. Die Implementierung basiert auf Python 3.12.3 und PyTorch 2.7.1 mit CUDA 11.8. Die Wahl der CUDA-Version ergibt sich aus der Tatsache, dass die NVIDIA GeForce GTX 1080 Ti auf der Pascal-Architektur (Compute Capability 6.1) basiert, welche von neueren CUDA-Versionen nicht mehr vollständig unterstützt wird.
+
+
+\section{Datenvorverarbeitung}
+Vor dem Training wurden die MRT-Volumina des BraTS-2023-Datensatzes vorverarbeitet. Die Vorverarbeitung orientiert sich an der Datenverarbeitung von~\citeauthor{durrer_denoising_2024}~\cite[S. 6]{durrer_denoising_2024}. Es umfasst fünf Schritte, die im Folgenden beschrieben werden.
+
+\paragraph{Intensitätsbegrenzung.}
+Die Intensitätswerte werden auf das Intervall zwischen dem 0,5\%- und dem 99,5\%-Perzentil beschnitten. Dadurch werden extreme Ausreißer entfernt, die etwa durch Aufnahmeartefakte entstehen können, ohne relevante Bildinformationen zu verlieren.
+
+\paragraph{Hintergrundentfernung.}
+Anschließend wird der Hintergrund entfernt, der hauptsächlich aus Luft und leeren Voxeln besteht. Dazu wird die kleinste Bounding Box berechnet, die alle Voxel mit einem Intensitätswert größer null enthält. Das Volumen wird so auf den anatomisch relevanten Bereich zugeschnitten.
+
+\paragraph{Kubisches Padding.}
+Da die Volumina nach dem Cropping unterschiedliche Dimensionen aufweisen, werden sie durch symmetrisches Zero-Padding auf eine kubische Form gebracht. Im Gegensatz zu einer direkten Skalierung bleibt durch das Padding das Seitenverhältnis erhalten und es werden keine geometrischen Verzerrungen eingeführt.
+
+\paragraph{Resizing.}
+Das kubische Volumen wird mittels trilinearer Interpolation auf die Zielauflösung von 32\textsuperscript{3} oder 48\textsuperscript{3} Voxeln skaliert. Da das Volumen bereits kubisch ist, erfolgt die Skalierung in allen drei Raumrichtungen gleichmäßig.
+
+\paragraph{Normalisierung.}
+Abschließend werden die Intensitätswerte linear auf den Wertebereich $[-1, 1]$ normalisiert. Dies ist die gängige Konvention für Diffusionsmodelle, da der Rauschprozess auf einem standardisierten Wertebereich arbeitet.
+
+
+\section{Modellarchitektur}
+Als Architektur dient ein 3D-UNet, das dem in der DDPM-Literatur etablierten Aufbau folgt~\citeauthor{ho_denoising_2020}~\cite{ho_denoising_2020}. Die Architektur ist symmetrisch als Encoder-Decoder aufgebaut und besteht aus vier Auflösungsstufen mit Kanalbreiten von 96, 192, 384 und 384. Im Encoder wird die räumliche Auflösung schrittweise halbiert, während der Decoder sie über trilineare Interpolation wieder auf die Eingabegröße bringt. Zwischen den entsprechenden Stufen von Encoder und Decoder werden Skip-Connections eingesetzt, um räumliche Informationen direkt weiterzugeben.
+
+\paragraph{Residualblöcke und Zeiteinbettung}
+Auf jeder Auflösungsstufe befinden sich zwei Residualblöcke, die jeweils aus zwei 3D-Faltungsschichten mit GroupNorm und SiLU-Aktivierung bestehen. Der aktuelle Diffusions-Zeitschritt wird über sinusoidale Positionseinbettungen kodiert und über eine lineare Projektion in jeden Residualblock eingespeist, sodass das Netzwerk sein Verhalten an den jeweiligen Rauschgrad anpassen kann.
+
+\paragraph{Self-Attention.}
+Auf den beiden niedrigsten Auflösungsstufen werden zusätzlich Self-Attention-Schichten eingesetzt, die es dem Netzwerk ermöglichen, globale Abhängigkeiten zwischen räumlich entfernten Regionen zu modellieren. Auf höheren Auflösungen wird darauf verzichtet, da der Speicherbedarf mit der Voxelanzahl ansteigt.
+
+% \paragraph{Konfiguration.}
+% Das Modell umfasst rund 156 Millionen trainierbare Parameter, je nach Konfiguration. Zur Reduktion des GPU-Speicherverbrauchs wird Gradient Checkpointing eingesetzt, bei dem Zwischenergebnisse im Forward-Pass nicht dauerhaft gespeichert, sondern bei Bedarf im Backward-Pass neu berechnet werden.
+
+
+\section{Baseline-Konfiguration}
+Die Baseline-Konfiguration vereint mehrere Techniken, die sich in der aktuellen Literatur als Verbesserungen gegenüber dem ursprünglichen DDPM-Ansatz von Ho et al.~\cite{ho2020ddpm} etabliert haben. Sie dient als Referenzmodell, gegen das alle weiteren Experimente verglichen werden. 
+\abschnitt 
+Der Diffusionsprozess verwendet 250 Zeitschritte mit einem Cosine Schedule~\cite{nichol2021improved}. Im Vergleich zum linearen Schedule verteilt der Cosine Schedule das Signal-Rausch-Verhältnis gleichmäßiger über die Zeitschritte was insbesondere bei niedrigen Auflösungen zu einer höheren Bildqualität führt~\cite{nichol2021improved}. \abschnitt 
+Das Modell wird mit v-Prediction trainiert~\cite{salimans2022progressive}. Dabei sagt das Netzwerk weder das Rauschen $\epsilon$ noch das ursprüngliche Bild $x_0$ direkt vorher, sondern eine Kombination aus beiden, die als Velocity $v$ bezeichnet wird. Dieses Vorhersageziel hat sich als numerisch stabiler erwiesen, insbesondere bei niedrigen Signal-Rausch-Verhältnissen~\cite{salimans2022progressive}. 
+\abschnitt 
+Für die Gewichtung des Trainingsverlusts wird Min-SNR Weighting mit $\gamma = 5$ eingesetzt~\cite{hang2023minsnr}. Diese Strategie begrenzt den Einfluss von Zeitschritten mit hohem Signal-Rausch-Verhältnis auf den Gesamtverlust und sorgt so für ein ausgewogeneres Training über alle Zeitschritte hinweg.
+
+
+\section{Trainingsverfahren und Hyperparameter}
+Alle Modelle werden über 300 Epochen mit dem Adam-Optimizer und einer Lernrate von $2 \times 10^{-4}$ trainiert. Diese Lernrate entspricht dem in der DDPM-Literatur üblichen Wert~\cite{ho2020ddpm}. In den ersten 500 Iterationen wird die Lernrate linear von null auf den Zielwert erhöht (Warmup), um Instabilitäten zu Beginn des Trainings zu vermeiden. Die Batch Size beträgt 10, was dem verfügbaren GPU-Speicher von 11~GB geschuldet ist. \abschnitt 
+Zur Stabilisierung der Modellgewichte wird Exponential Moving Average (EMA) mit einem Decay-Faktor von 0,9999 eingesetzt~\cite{nichol2021improved}. Dabei wird parallel zu den trainierten Gewichten ein gleitender Durchschnitt geführt, der für die finale Evaluation und das Sampling verwendet wird. Zusätzlich wird Gradient Clipping mit einer maximalen Norm von 1,0 angewendet, um Gradientenexplosionen zu verhindern. 
+\abschnitt 
+Der Datensatz wird in 90\% Trainings- und 10\% Validierungsdaten aufgeteilt. Die Aufteilung erfolgt mit einem festen Random Seed, um die Reproduzierbarkeit sicherzustellen. Während des Trainings wird der Validierungsverlust nach jeder Epoche berechnet. 
+
+\section{Ablationsstudien} 
+Um den Einfluss einzelner Komponenten auf die Generierungsqualität zu untersuchen werden ausgehend von der Baseline-Konfiguration gezielt einzelne Variablen verändert. Pro Experiment wird jeweils nur eine Komponente angepasst, um deren isolierten Einfluss bewerten zu können. Die Ablationsstudien werden auf einer Auflösung von 32\textsuperscript{3} Voxeln durchgeführt. 
+
+\paragraph{Ohne Self-Attention.} 
+Die Self-Attention-Schichten auf den niedrigen Auflösungsstufen werden entfernt. Dadurch lässt sich untersuchen, welchen Beitrag die Modellierung globaler Abhängigkeiten zur Bildqualität leistet und ob die lokalen Informationen der Faltungsschichten allein ausreichen. 
+
+\paragraph{Linearer Schedule.} 
+Der Cosine Schedule wird durch einen linearen Schedule ersetzt, bei dem die Varianz gleichmäßig von $\beta_1 = 0{,}0001$ bis $\beta_T = 0{,}02$ ansteigt. Dies entspricht dem ursprünglichen Vorschlag von Ho et al.~\cite{ho2020ddpm}. 
+
+\paragraph{Noise-Prediction ($\epsilon$-Prediction).}
+Anstelle der v-Prediction wird das Modell darauf trainiert, das hinzugefügte Rauschen $\epsilon$ direkt vorherzusagen. Dies ist die ursprüngliche DDPM-Formulierung~\cite{ho2020ddpm} und dient als Vergleich zur moderneren v-Prediction. 
+
+\paragraph{Datenaugmentierung.} Die Trainingsdaten werden durch zufällige räumliche Transformationen augmentiert, um die effektive Datensatzgröße zu erhöhen und die Generalisierung zu verbessern. 
+
+\paragraph{Erhöhte Auflösung (48\textsuperscript{3}).} Zusätzlich wird die Baseline-Konfiguration auf einer Auflösung von 48\textsuperscript{3} Voxeln trainiert, um den Einfluss der räumlichen Auflösung auf die Bildqualität zu untersuchen. Aufgrund der deutlich längeren Trainingszeiten bei höherer Auflösung werden die übrigen Ablationen nur auf 32\textsuperscript{3} durchgeführt.
+
+\section{Aufgezeichnete Werte} 
+Während des Trainings werden für jede Epoche verschiedene Metriken protokolliert, um den Trainingsverlauf nachvollziehen zu können. Dazu gehören der Trainings- und Validierungsverlust, die aktuelle Lernrate, die Epochendauer sowie der GPU-Speicherverbrauch. Zusätzlich werden die Gradientennorm und die Anzahl der durch Gradient Clipping begrenzten Updates erfasst, um die Stabilität des Trainings beurteilen zu können. 
+\abschnitt 
+In regelmäßigen Abständen werden Samples generiert, um die visuelle Qualität der erzeugten Volumina im Trainingsverlauf zu überprüfen. Checkpoints werden an festgelegten Epochen gespeichert sowie für das Modell mit dem besten Validierungsverlust. Sämtliche Metriken werden nach jeder Epoche in einer JSON-Datei gesichert, sodass der Trainingsverlauf auch nachträglich vollständig analysiert werden kann.

@@ -30,8 +30,22 @@ Die Formel~\autoref{eq:fid} besteht aus zwei Teilen. Der erste Term  $\|\mu_{dat
 In~\autoref{fig:fid-prozess} wird der Prozess dargestellt. Der Generator $G$ erzeugt Bilder, die zusammen mit den Trainingsbildern durch das \ac{CNN} $D$ geleitet werden, um die statistischen Kenngrößen $\mu_{data}$, $\Sigma_{data}$, $\mu_g$ und $\Sigma_g$ zu extrahieren und daraus den \ac{FID}-Wert zu berechnen. Ein niedriger \ac{FID}-Wert zeigt an, dass beide Verteilungen eng beieinanderliegen, was auf hohe Bildqualität und ausreichende Diversität hindeutet~\cite[S. 130]{long_generative_2026}. 
 
 \subsection{SSIM}
-% Der \ac{SSIM} ist eine Metrik zur Bewertung von Bildqualität, die sich an der menschlichen Wahrnehmung orientiert~\cite[S. 1132]{maruyama_ssim_2023}. Im Gegensatz zur \ac{MSE}, der lediglich pixelweise Helligkeitsunterschiede misst, analysiert der \ac{SSIM}, wie ähnlich zwei Bilder in ihrer Struktur sind also in den Mustern und Abhängigkeiten benachbarter Pixel, die für das menschliche Auge relevant sind~\cite[S. 1]{wang_ssim_2003}. Dazu zerlegt SSIM den Bildvergleich in drei Teilkomponenten: Intensität, Kontrast und Struktur. Diese werden getrennt berechnet und anschließend multipliziert~\cite[S. 4--5]{wang_ssim_2003}. Die resultierende Formel lautet~\cite[S. 5]{wang_ssim_2003}:
-
+Der \ac{SSIM} ist eine Metrik zur Bewertung von Bildqualität, die sich an der menschlichen Wahrnehmung orientiert~\cite[S. 1131]{maruyama_properties_2023}~\cite[S. 6]{civicioglu_image_2025}. Im Gegensatz zur \ac{MSE}, der lediglich pixelweise Helligkeitsunterschiede misst, analysiert der \ac{SSIM}, wie ähnlich zwei Bilder in ihrer Struktur sind also in den Mustern und Abhängigkeiten benachbarter Pixel, die für das menschliche Auge relevant sind~\cite[S. 1]{zhou_wang_image_2004}. Dazu zerlegt SSIM den Bildvergleich in drei Teilkomponenten: Intensität, Kontrast und Struktur. Diese werden getrennt berechnet und anschließend multipliziert~\cite[S. 5 f.]{zhou_wang_image_2004}. Die resultierende Formel lautet~\cite[S. 2]{nilsson_understanding_2020}~\cite[S. 5]{zhou_wang_image_2004}~\cite[S. 6]{civicioglu_image_2025}~\cite[S. 1134]{maruyama_properties_2023}:
+%
+\begin{equation}
+\text{SSIM}(x, y) = \frac{(2\mu_x\mu_y + C_1)(2\sigma_{xy} + C_2)}{(\mu_x^2 + \mu_y^2 + C_1)(\sigma_x^2 + \sigma_y^2 + C_2)},
+\label{eq:ssim}
+\end{equation}
+%
+In~\autoref{eq:ssim} stehen $\mu_x$ und $\mu_y$ für die mittleren Helligkeitswerte, $\sigma_x^2$ und $\sigma_y^2$ für die lokalen Varianzen und $\sigma_{xy}$ für die Kovarianz also das Maß, wie ähnlich sich die Helligkeitsverläufe der beiden Bilder in einem lokalen Bereich verhalten. Die Konstanten $C_1$ und $C_2$ verhindern numerische Instabilitäten bei sehr kleinen Nennerwerten und sind als $C_1 = (K_1 L)^2$ und $C_2 = (K_2 L)^2$ definiert, wobei $L$ den Wertebereich der Pixel angibt und typischerweise $K_1 = 0{,}01$ sowie $3K_2 = 0{,}03$ gewählt werden~\cite[S. 1 f.]{nilsson_understanding_2020}~\cite[S. 5]{zhou_wang_image_2004}~\cite[S. 6]{civicioglu_image_2025}~\cite[S. 1134]{maruyama_properties_2023}. Der berechnete \ac{SSIM}-Wert eines Bildes ergibt sich als Mittelwert aller lokal berechneten Fensterwerte und liegt stets zwischen $0$ und $1$, wobei $1$ für eine vollständige Übereinstimmung bedeutet~\cite[S. 1131]{maruyama_properties_2023}. Jedoch ist der \ac{SSIM} eine \ac{FR}-Metrik und benötigt somit ein fehlerfreies Referenzbild~\cite[S. 1]{zhou_wang_image_2004}
+%
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./bilder/ssim/ssim.png}
+    \caption{Darstellung der \ac{SSIM}-Berechnung~\cite[S. 5]{zhou_wang_image_2004}}
+    \label{fig:ssid-prozess}
+\end{figure}
+%
 \subsection{PSNR}
 
 \subsection{LPIPS}

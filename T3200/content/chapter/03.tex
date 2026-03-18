@@ -62,28 +62,19 @@ Generative Model werden auch als \ac{DGM}s beziechnet. Unter ein \ac{DGM} wird e
 % Mathematisch formuliert versuchen generative Modelle, eine Approximation $p_\theta(x)$ der wahren Datenverteilung $p_{data}(x)$ zu lernen, wobei $\theta$ dieParameter des Modells darstellt. Durch Sampling aus dieser     
 % gelernten Verteilung können neue Datenpunkte erzeugt werden, die statistisch denTrainingsdaten ähneln, aber nicht identisch mit ihnen sind~\cite{prince_understanding_2023}.
 
-\subsection{GANs}
-
-\subsection{VAE}
-
-\subsection{Diffusion Model}
+%%
+\section{Diffusion Model}
 Ein \textit{Diffusion Model} oder auch \textit{Diffusions-Wahrscheinlichkeitsmodell} ist ein generatives Modell, das zur Klasse der latenten Variablenmodelle gehört~\cite[S. 153]{okadome_essentials_2025}~\cite[S. 114]{feuerriegel_generative_2024}. Das grundlegende Prinzip besteht darin, einen Diffusionsprozess umzukehren, bei dem schrittweise Rauschen zu den Daten hinzugefügt wird. Durch die Umkehrung dieses Prozesses kann das Modell aus verrauschten Signalen Daten rekonstruieren und so neue Daten generieren. Dafür wird eine parametrisierte Markov-Kette mittels Variationsinferenz trainiert, deren Übergänge lernen, den Diffusionsprozess umzukehren~\cite[S. 153]{okadome_essentials_2025}~\cite[S. 2]{ho_denoising_2020}.
-\abschnitt
-Eine Markov-Kette ist ein stochastischer Prozess, wo der zukünftige Zustand nur vom aktuellen Zustand abhängt und nicht von der Vergangenkeit. Somit kann eine Sequenz von zufälligen Variablen $x_0, x_1, ..., x_T$ beschrieben werden als: 
+ 
+\subsection{Markov-Ketten}
+Eine Markov-Kette ist ein stochastischer Prozess, bei dem der zukünftige Zustand ausschließlich vom aktuellen Zustand abhängt und nicht von der Vergangenheit. Diese Eigenschaft wird als \textit{Gedächtnislosigkeit} bezeichnet. Für eine Sequenz von Zufallsvariablen $x_0, x_1, \ldots, x_T$ lässt sich dies ausdrücken als:
 %
 \begin{equation}
-p(x_t \mid x_0, \ldots, x_{t-1}) = p(x_t \mid x_{t-1}), \quad t = 1, \ldots, T
-\label{eq:markov}
+    p(x_t \mid x_0, \ldots, x_{t-1}) = p(x_t \mid x_{t-1}), \quad t = 1, \ldots, T
+    \label{eq:markov}
 \end{equation}
 %
-Hier bei gilt für $t$ als die Zeit und $x_t$ als der Zustand zum Zeitpunkt $t$. Aufgrund der Markov-Eigenschaft kann die gemeinsame Wahrscheinlichkeit der gesamten Sequenz $x_{1:T}$ gegeben $x_0$ als Produkt der Übergangswahrscheinlichkeiten faktorisiert werden:~\cite[S. 153]{okadome_essentials_2025}~\cite[S. 608 f.]{bishop_pattern_2006}.
-%
-\begin{equation}
-q(x_{1:T} \mid x_0) = \prod_{t=1}^{T} q(x_t \mid x_{t-1})
-\label{eq:joint_markov}
-\end{equation}
-%
-Eine Markov-Kette wird in \autoref{fig:markov} dargestellt. Diese wird auch als eine Markov-Kette der ersten Ordnung beschrieben~\cite[S. 609]{bishop_pattern_2006}.
+Hierbei bezeichnet $t$ den Zeitschritt und $x_t$ den Zustand zum Zeitpunkt $t$. Eine solche Markov-Kette, bei der der aktuelle Zustand nur vom unmittelbar vorhergehenden abhängt, wird als Markov-Kette \textit{erster Ordnung} bezeichnet~\cite[S. 609]{bishop_pattern_2006}. In~\autoref{fig:markov} wird diese graphisch dargestellt.
 %
 \begin{figure}[htbp]
     \centering
@@ -92,45 +83,309 @@ Eine Markov-Kette wird in \autoref{fig:markov} dargestellt. Diese wird auch als 
     \label{fig:markov}
 \end{figure}
 %
-Hinzu wird die inverse von $x_0, x_1, ..., x_T$ mit $x_T, x_T-1, ..., x_0$ ebenfalls als eine Markov-Kette bezeichnet~\cite[S. 154]{okadome_essentials_2025}.
-Die Eigenschaft der Gedächtnisloskigkeit der Markov-Kette erweist sich als geeignet für Diffusionsprozesse, da jeder Diffusionsschritt nur vom vorherigen Zustand abhängt.
+Aufgrund der Markov-Eigenschaft kann die gemeinsame Wahrscheinlichkeit der gesamten Sequenz $x_{1:T}$ gegeben $x_0$ als Produkt der einzelnen Übergangswahrscheinlichkeiten faktorisiert werden:
+%
+\begin{equation}
+    p(x_{1:T} \mid x_0) = \prod_{t=1}^{T} p(x_t \mid x_{t-1})
+    \label{eq:joint_markov}
+\end{equation}
+%
+Diese Faktorisierung ist für Diffusionsmodelle von zentraler Bedeutung
+%Im Vorwärtsprozess wird die Notation $q$ verwendet, um die festen (nicht trainierbaren) Übergangswahrscheinlichkeiten zu kennzeichnen, während $p_\theta$ im Rückwärtsprozess die vom neuronalen Netz parametrisierten Übergänge bezeichnet
+~\cite[S. 153 f.]{okadome_essentials_2025}~\cite[S. 608 f.]{bishop_pattern_2006}. Die Gedächtnislosigkeit der Markov-Kette erweist sich als besonders geeignet für Diffusionsprozesse, da jeder Schritt sowohl beim Hinzufügen als auch beim Entfernen von Rauschen ausschließlich vom aktuellen Zustand abhängt. 
+%Diese Eigenschaft motiviert die Modellierung des Rückwärtsprozesses ebenfalls als Markov-Kette~\cite[S. 154]{okadome_essentials_2025}.
+%%
+
+\subsection{Noise-Schedule}
+Der \textit{Noise Schedule} definiert eine Sequenz von vorgegebene Werten $\beta_1, \beta_2, \ldots, \beta_T$ mit $\beta_t \in (0,1)$, die steuern wie viel Rauschen in jedem Schritt $t$ hinzugefügt wird. Aus diesen werden zwei Werte definiert~\cite[S. 43 f.]{lai_principles_2025}~\cite[S. 155 f.]{okadome_essentials_2025}:
+%
+\begin{equation}
+    \alpha_t = 1 - \beta_t, \qquad \bar{\alpha}_t = \prod_{k=1}^{t} \alpha_k
+    \label{eq:alpha_definition}
+\end{equation}
+%
+Dabei gibt $\alpha_t$ an, welcher Anteil des Signals aus dem vorherigen Schritt erhalten bleibt. Hingegen tut $\bar{\alpha}_t$ das kumulative Produkt über alle bisherigen Schritte darstellen. Mit steigendem $t$ nimmt $\bar{\alpha}_t$ monoton ab, sodass das ursprüngliche Signal zunehmend durch Rauschen überschrieben wird~\cite[S. 44]{lai_principles_2025}. Heißt, wenn für $t \to T$ gilt $\bar{\alpha}_T \approx 0$, was bedeutet, dass das Originalbild nahezu vollständig zerstört ist.
 \abschnitt
-Die \autoref{fig:markov-diffusion} stellt den Vorwärts- und Rückkwärtsprozess an einem Bild dar.
+Die Wahl des Noise Schedulers beinflusst die Qualität der generierten Daten. Der \textit{lineare Schedule}, der von Ho et al.~\cite[S. 5]{ho_denoising_2020} verwendet wird, definiert $\beta_t$ als lineare Interpolation zwischen einem Start- und Endwert:
+%
+\begin{equation}
+    \beta_t = \beta_1 + \frac{t-1}{T-1}(\beta_T - \beta_1)
+    \label{eq:linear_schedule}
+\end{equation}
+%
+% Typische Werte sind $\beta_1 = 10^{-4}$ und $\beta_T = 0{,}02$ bei $T = 1000$ Schritten~\cite{ho_denoising_2020}.
+Allerdings wurde beobachtet dass der lineare Schedule in den späten Schritten zu aggressiv rauscht. Nichol und Dhariwal~\cite[S. 4]{nichol_improved_2021} verwenden daher einen \textit{Cosine Schedule}, der $\bar{\alpha}_t$ direkt über eine Kosinusfunktion definiert:
+%
+\begin{equation}
+    \bar{\alpha}_t = \frac{f(t)}{f(0)}, \quad \text{mit} \quad f(t) = \cos\!\left(\frac{t/T + s}{1 + s} \cdot \frac{\pi}{2}\right)^2
+    \label{eq:cosine_schedule}
+\end{equation}
+%
+wobei $s$ ein kleiner Offset-Parameter ist, der verhindert, dass $\beta_t$ in der Nähe von $t = 0$ zu klein wird. Der Cosine Schedule führt zu einem gleichmäßigeren Rauschverlauf und verbessert die Bildqualität insbesondere bei niedrigen Auflösungen.
+
+\todo{Vllt. Bild hinzufügen aus Nichol?}
+
+\subsection{Vorwärtsprozess}
+Die \autoref{fig:markov-diffusion} stellt den Vorwärts- und Rückwärtsprozess an einem Bild dar.
 %
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{./bilder/Diffusion-Model/Markov-Diffusion.png}
-    \caption{Darstellung der Vorwärts- und Rückkwärtsprozesse}
+    \caption{Darstellung der Vorwärts- und Rückwärtsprozesse}
     \label{fig:markov-diffusion}
 \end{figure}
 %
-Der Vorwärtsprozess (engl. \textit{Forward Process}) ist fest vorgegeben und wird nicht trainiert und dient als Encoder. Er fügt einem Bild $x_0$ bis $x_T$ schrittweise Gaußsches Rauschen hinzu, bis am Ende nur noch reines Rauschen übrig ist. Dieses Rauschen wird in jedem Schritt $t$ etwas hinzugefügt und wird beschrieben mit
+Der Vorwärtsprozess (engl. \textit{Forward Process}) ist fest vorgegeben, wird nicht trainiert und dient als Encoder. Er fügt einem Signal $x_0$ schrittweise Gaußsches Rauschen hinzu bis am Ende reines Rauschen übrig ist. Die Übergangsverteilung für einen einzelnen Schritt ist definiert als~\cite[S. 155 f.]{okadome_essentials_2025}:
 %
 \begin{equation}
-x_t = \alpha_t x_{t-1} + \beta_t \epsilon_t,
-\label{eq:gausssches-verfahren}
+    q(x_t \mid x_{t-1}) = \mathcal{N}\!\left(x_t;\; \sqrt{1 - \beta_t}\, x_{t-1},\; \beta_t\, I\right)
+    \label{eq:forward_step}
 \end{equation}
 %
-wobei $\epsilon_i \sim \mathcal{N}(0, I)$ zufälliges Gaußsches Rauschen ist. Die Parameter $\alpha_i$ und $\beta_i$ steuern, wie viel vom vorherigen Bild erhalten bleibt und wie viel Rauschen hinzukommt.
-
-Der praktische Vorteil ist, dass wir $x_i$ direkt aus dem Originalbild $x_0$ berechnen können:
+Hierbei wird das Signal aus dem vorherigen Schritt mit dem Faktor $\sqrt{1 - \beta_t}$ skaliert und Gaußsches Rauschen mit Varianz $\beta_t$ hinzugefügt. Wobei eben $ 0 < \beta_1 < \beta_T < 1$ gilt. Da jeder Schritt nur vom vorherigen Zustand abhängt, kann die gemeinsame Verteilung des gesamten Vorwärtsprozesses gemäß der Markov-Eigenschaft  faktorisiert werden mit~\cite[S. 156]{okadome_essentials_2025}~\cite[S. 2]{ho_denoising_2020}:
+%
 \begin{equation}
-x_t = \bar{\alpha}_t x_0 + \sqrt{1-\bar{\alpha}_t^2}\, \epsilon,
+    q(x_{1:T} \mid x_0) = \prod_{t=1}^{T} q(x_t \mid x_{t-1})
+    \label{eq:forward_joint}
 \end{equation}
-mit $\bar{\alpha}_t = \prod_{k=1}^{t} \alpha_k$. Das bedeutet, wir müssen nicht alle Zwischenschritte durchlaufen, sondern können direkt zu einem beliebigen Rauschzustand springen.
+%
+Dies bedeutet, dass ein Bild $x_0$ nach $T$ schritten vollständig zerstört wird und das Ergebnis $x_T$ reinem Gaußschem Rauschen $\mathcal{N}(0, I)$ entspricht. Ein Vorteil des Vorwärtsprozesses ist, dass $x_t$ nicht iterativ berechnet werden muss. Mithilfe der Definitionen $\alpha_t = 1 - \beta_t$ und $\bar{\alpha}_t = \prod_{k=1}^{t} \alpha_k$  lässt sich $x_t$ direkt aus dem Originalbild $x_0$ berechnen~\cite[S. 156]{okadome_essentials_2025}~\cite[S. 2]{ho_denoising_2020}~\cite[S. 44 f.]{lai_principles_2025}:
+%
+\begin{equation}
+    q(x_t \mid x_0) = \mathcal{N}\!\left(x_t;\; \sqrt{\bar{\alpha}_t}\, x_0,\; (1 - \bar{\alpha}_t)\, I\right)
+    \label{eq:forward_closed}
+\end{equation}
+%
+% Vllt Reparaemtrisierungsformel?
+%
+Daraus ergibt sich die folgende Formel~\cite[S. 156]{okadome_essentials_2025}~\cite[S. 2]{ho_denoising_2020}~\cite[S. 44 f.]{lai_principles_2025}: 
+%
+\begin{equation}
+    x_t = \sqrt{\bar{\alpha}_t}\, x_0 + \sqrt{1 - \bar{\alpha}_t}\, \epsilon, \qquad \epsilon \sim \mathcal{N}(0, I)
+    \label{eq:reparametrization_forward}
+\end{equation}
+%
+Dadurch kann direkt zu einem beliebigen Rauschzustand $x_t$ gesprungen werden ohne alle Zwischenschritte $x_0, x_1, \ldots, x_{t-1}$ durchlaufen zu müssen.
+Dies ermöglicht dann ein effizientes, da zufällige Zeitschritte $t$ gesampelt werden können~\cite[S. 2 f.]{ho_denoising_2020}.
 
-Nach genügend vielen Schritten ($L \to \infty$) ist das Originalbild vollständig zerstört und wir erhalten eine Standardnormalverteilung $\mathcal{N}(0, I)$. Von diesem Punkt aus lernt dann das neuronale Netzwerk, den Prozess umzukehren. 
-% (lai_principles_2025 S.43)
-\todo{neu durchlesen}
+\subsection{Rückwärtsprozess}
+Der Rückwärtsprozess (engl. \textit{Reverse Process}) ist das Gegenstück zum Vorwärtsprozess und dient als lernbarer Decoder. Er startet bei reinem Rauschen $x_T \sim \mathcal{N}(0, I)$ und entfernt in jedem Schritt einen Teil des Rauschens, bis ein sinnvolles Datensample $x_0$ rekonstruiert ist. Auch dieser Prozess wird als Markov-Kette dargestellt~\cite[S. 2]{ho_denoising_2020}:
+%
+\begin{equation}
+    p_\theta(x_{0:T}) = p(x_T) \prod_{t=1}^{T} p_\theta(x_{t-1} \mid x_t)
+    \label{eq:reverse_joint}
+\end{equation}
+%
+Da die wahren Übergangswahrscheinlichkeiten $q(x_{t-1} \mid x_t)$ von der unbekannten Datenverteilung abhängen, wird jeder Rückwärtsschritt durch ein neuronales Netz mit Parametern $\theta$ approximiert~\cite[S. 2]{ho_denoising_2020}:
+%
+\begin{equation}
+    p_\theta(x_{t-1} \mid x_t) = \mathcal{N}\!\left(x_{t-1};\; \mu_\theta(x_t, t),\; \sigma_t^2\, I\right)
+    \label{eq:reverse_step}
+\end{equation}
+%
+\subsubsection{Parametrisierung des Mittelwerts}
+Anstatt den Mittelwert $\mu_\theta$ direkt zu schätzen, wird das Netzwerk darauf trainiert, das hinzugefügte Rauschen $\epsilon_\theta(x_t, t)$ vorherzusagen. Aus der \autoref{eq:reparametrization_forward} des Vorwärtsprozesses lässt sich der Mittelwert dann wie folgt berechnen~\cite[S. 4]{ho_denoising_2020}
+%
+\begin{equation}
+    \mu_\theta(x_t, t) = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}}\, \epsilon_\theta(x_t, t) \right)
+    \label{eq:mu_theta}
+\end{equation}
+%
+Diese Parametrisierung ist vorteilhaft, da die Vorhersage des Rauschens stabiler zu optimieren ist als die direkte Mittelwertschätzung. Damit ergibt sich der vollständige Sampling-Schritt im Rückwärtsprozess als~\cite[S. 4]{ho_denoising_2020}:
+%
+\begin{equation}
+    x_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}}\, \epsilon_\theta(x_t, t) \right) + \sigma_t\, z, \qquad z \sim \mathcal{N}(0, I)
+    \label{eq:sampling_step}
+\end{equation}
+%
+Die Varianz $\sigma_t^2$ wird üblicherweise als fester Wert gesetzt, wobei $\sigma_t^2 = \beta_t$ oder $\sigma_t^2 = \tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t} \beta_t$ verwendet wird und für $z$ entweder $z \sim \mathcal{N}(0, I)$ oder $z = 0$ gilt, wenn es für den letzten Schritt $t = 1$ gilt~\cite[S. 4]{ho_denoising_2020}.
 
-\subsubsection{Sampling}
+
+% % ============================================================
+% % 4. NEUER ABSCHNITT: Trainingsziel
+% %    Einfügen nach dem Rückwärtsprozess
+% % ============================================================
+ 
+% \subsection{Trainingsziel}
+% Das Trainingsziel wird über den \textit{variationellen Evidence Lower Bound} (ELBO) hergeleitet. Da die marginale Log-Likelihood $\log p_\theta(x_0)$ nicht direkt maximiert werden kann, wird stattdessen eine untere Schranke optimiert. Die negative ELBO lässt sich in einzelne Terme zerlegen~\cite[S. 3 f.]{ho_denoising_2020}:
+% %
+% \begin{equation}
+%     \mathcal{L} = \underbrace{D_{\text{KL}}\!\left(q(x_T \mid x_0) \;\|\; p(x_T)\right)}_{L_T}
+%     + \sum_{t=2}^{T} \underbrace{D_{\text{KL}}\!\left(q(x_{t-1} \mid x_t, x_0) \;\|\; p_\theta(x_{t-1} \mid x_t)\right)}_{L_{t-1}}
+%     - \underbrace{\log p_\theta(x_0 \mid x_1)}_{L_0}
+%     \label{eq:elbo_decomposition}
+% \end{equation}
+% %
+% Der Term $L_T$ vergleicht die Endverteilung des Vorwärtsprozesses mit der Prior-Verteilung $\mathcal{N}(0, I)$ und ist konstant, da der Vorwärtsprozess nicht trainiert wird. Die Terme $L_{t-1}$ für $t = 2, \ldots, T$ vergleichen den gelernten Rückwärtsschritt $p_\theta(x_{t-1} \mid x_t)$ mit der \textit{posteriori} Übergangsverteilung $q(x_{t-1} \mid x_t, x_0)$, die durch Bayes berechenbar und ebenfalls gaußförmig ist:
+% %
+% \begin{equation}
+%     q(x_{t-1} \mid x_t, x_0) = \mathcal{N}\!\left(x_{t-1};\; \tilde{\mu}_t(x_t, x_0),\; \tilde{\beta}_t\, I\right)
+%     \label{eq:posterior_forward}
+% \end{equation}
+% %
+% mit
+% %
+% \begin{equation}
+%     \tilde{\mu}_t(x_t, x_0) = \frac{\sqrt{\bar{\alpha}_{t-1}}\, \beta_t}{1 - \bar{\alpha}_t}\, x_0 + \frac{\sqrt{\alpha_t}\,(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t}\, x_t, \qquad
+%     \tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t}\, \beta_t
+%     \label{eq:posterior_params}
+% \end{equation}
+% %
+% Ho et al.~\cite{ho_denoising_2020} zeigten, dass die ELBO-Terme $L_{t-1}$ durch die Rauschvorhersage des Netzwerks direkt ausgedrückt werden können. Daraus ergibt sich ein vereinfachtes Trainingsziel, das in der Praxis bessere Ergebnisse liefert als die gewichtete ELBO:
+% %
+% \begin{equation}
+%     \mathcal{L}_{\text{simple}} = \mathbb{E}_{t \sim \mathcal{U}(1,T),\; x_0 \sim q(x_0),\; \epsilon \sim \mathcal{N}(0,I)} \left[ \left\| \epsilon - \epsilon_\theta(x_t, t) \right\|^2 \right]
+%     \label{eq:loss_simple}
+% \end{equation}
+% %
+% Hierbei wird ein zufälliger Zeitschritt $t$ gleichmäßig gesampelt, $x_t$ gemäß \autoref{eq:reparametrization_forward} berechnet und das Netzwerk $\epsilon_\theta$ trainiert, das hinzugefügte Rauschen $\epsilon$ zu schätzen. Dieses Ziel entspricht einem gewichteten Denoising-Score-Matching und hat sich als besonders trainsstabil erwiesen~\cite[S. 4]{ho_denoising_2020}.
+ 
+% \subsubsection{Trainingsalgorithmus.}
+% Der Trainingsprozess lässt sich zusammenfassen als:
+% %
+% \begin{enumerate}
+%     \item Ziehe ein Sample $x_0 \sim q(x_0)$ aus dem Trainingsdatensatz.
+%     \item Wähle einen zufälligen Zeitschritt $t \sim \mathcal{U}\{1, \ldots, T\}$.
+%     \item Ziehe Rauschen $\epsilon \sim \mathcal{N}(0, I)$.
+%     \item Berechne $x_t = \sqrt{\bar{\alpha}_t}\, x_0 + \sqrt{1 - \bar{\alpha}_t}\, \epsilon$.
+%     \item Berechne den Gradienten von $\left\| \epsilon - \epsilon_\theta(x_t, t) \right\|^2$ und aktualisiere $\theta$.
+% \end{enumerate}
+ 
+ 
+% % ============================================================
+% % 5. NEUER ABSCHNITT: Conditional Diffusion Models
+% % ============================================================
+ 
+% \subsection{Conditional Diffusion Models}
+% Standard-Diffusionsmodelle generieren Daten unkonditioniert, also ohne gezielte Steuerung des Outputs. In der Praxis ist es jedoch erforderlich, die Generierung durch zusätzliche Informationen $y$ zu steuern, beispielsweise durch Klassenlabels, Textbeschreibungen oder Referenzbilder. Conditional Diffusion Models erweitern den Rückwärtsprozess zu:
+% %
+% \begin{equation}
+%     p_\theta(x_{t-1} \mid x_t, y) = \mathcal{N}\!\left(x_{t-1};\; \mu_\theta(x_t, t, y),\; \sigma_t^2\, I\right)
+%     \label{eq:conditional_reverse}
+% \end{equation}
+% %
+% wobei die Bedingung $y$ als zusätzlicher Input in das Rauschvorhersage-Netzwerk einfließt~\cite[S. 46 ff.]{lai_principles_2025}.
+ 
+% \subsubsection{Classifier Guidance}
+% Dhariwal und Nichol~\cite{dhariwal_diffusion_2021} schlugen vor, einen separat trainierten Klassifikator $p_\phi(y \mid x_t)$ zu verwenden, um die Generierung in Richtung einer gewünschten Klasse $y$ zu lenken. Der modifizierte Score (Gradient der Log-Dichte) ergibt sich als:
+% %
+% \begin{equation}
+%     \nabla_{x_t} \log p(x_t \mid y) = \underbrace{\nabla_{x_t} \log p(x_t)}_{\text{unkonditionierter Score}} + \underbrace{s \cdot \nabla_{x_t} \log p_\phi(y \mid x_t)}_{\text{Classifier Guidance}}
+%     \label{eq:classifier_guidance}
+% \end{equation}
+% %
+% Der Skalierungsfaktor $s > 0$ (\textit{guidance scale}) steuert die Stärke der Konditionierung. Höhere Werte von $s$ erzeugen Samples, die stärker der Bedingung $y$ entsprechen, allerdings auf Kosten der Diversität. Der Nachteil dieses Ansatzes ist, dass ein separater Klassifikator auf verrauschten Daten $x_t$ trainiert werden muss, was zusätzlichen Aufwand erfordert~\cite{dhariwal_diffusion_2021}.
+ 
+% \subsubsection{Classifier-Free Guidance}
+% Ho und Salimans~\cite{ho_classifier-free_2022} stellten einen Ansatz vor, der keinen externen Klassifikator benötigt. Stattdessen wird ein einzelnes Netzwerk $\epsilon_\theta$ sowohl konditioniert als auch unkonditioniert trainiert, indem die Bedingung $y$ während des Trainings zufällig mit einer festen Wahrscheinlichkeit (z.\,B.\ 10--20\,\%) durch ein leeres Signal $\varnothing$ ersetzt wird. Beim Sampling wird die konditionierte Vorhersage durch Extrapolation verstärkt:
+% %
+% \begin{equation}
+%     \hat{\epsilon}_\theta(x_t, t, y) = \epsilon_\theta(x_t, t, \varnothing) + s \cdot \left(\epsilon_\theta(x_t, t, y) - \epsilon_\theta(x_t, t, \varnothing)\right)
+%     \label{eq:classifier_free_guidance}
+% \end{equation}
+% %
+% Für $s = 1$ entspricht dies der rein konditionierten Vorhersage, während $s > 1$ den Einfluss der Bedingung verstärkt. Classifier-Free Guidance hat sich in der Praxis als der dominierende Ansatz etabliert und wird unter anderem in DALL$\cdot$E~2, Stable Diffusion und Imagen eingesetzt, da es keine zusätzlichen Modellkomponenten erfordert und typischerweise bessere Ergebnisse in Bezug auf Bildqualität und Treue zur Konditionierung liefert~\cite{ho_classifier-free_2022}.
+ 
+ 
+% % ============================================================
+% % 6. NEUER ABSCHNITT: Sampling-Verfahren
+% % ============================================================
+ 
+% \subsubsection{Sampling}
+% Das Sampling beschreibt den Prozess der Datengenerierung, bei dem ausgehend von reinem Rauschen $x_T \sim \mathcal{N}(0, I)$ schrittweise der Rückwärtsprozess durchlaufen wird. Die Wahl des Sampling-Verfahrens beeinflusst sowohl die Qualität der generierten Daten als auch die benötigte Rechenzeit.
+ 
+% \paragraph{DDPM-Sampling.}
+% Das \textit{Denoising Diffusion Probabilistic Model} (DDPM) Sampling~\cite{ho_denoising_2020} folgt direkt dem stochastischen Rückwärtsprozess aus \autoref{eq:sampling_step}. Es durchläuft alle $T$ Zeitschritte (typischerweise $T = 1000$) und fügt bei jedem Schritt stochastisches Rauschen hinzu:
+% %
+% \begin{equation}
+%     x_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}}\, \epsilon_\theta(x_t, t) \right) + \sigma_t\, z, \qquad z \sim \mathcal{N}(0, I)
+%     \label{eq:ddpm_sampling}
+% \end{equation}
+% %
+% Dieses Verfahren liefert qualitativ hochwertige Ergebnisse, ist jedoch aufgrund der $T$ erforderlichen Netzwerkauswertungen rechenintensiv.
+ 
+% \paragraph{DDIM-Sampling.}
+% Song et al.~\cite{song_denoising_2022} zeigten, dass der Vorwärtsprozess auch als nicht-Markov-Prozess interpretiert werden kann, was zu einer deterministischen Sampling-Prozedur führt. Das \textit{Denoising Diffusion Implicit Model} (DDIM) definiert den Übergang:
+% %
+% \begin{equation}
+%     x_{t-1} = \sqrt{\bar{\alpha}_{t-1}} \underbrace{\left( \frac{x_t - \sqrt{1 - \bar{\alpha}_t}\, \epsilon_\theta(x_t, t)}{\sqrt{\bar{\alpha}_t}} \right)}_{\text{vorhergesagtes } x_0}
+%     + \sqrt{1 - \bar{\alpha}_{t-1} - \sigma_t^2}\, \epsilon_\theta(x_t, t)
+%     + \sigma_t\, z
+%     \label{eq:ddim_sampling}
+% \end{equation}
+% %
+% Für $\sigma_t = 0$ wird der Prozess vollständig deterministisch, d.\,h.\ derselbe Rauschvektor $x_T$ erzeugt immer dasselbe Bild. Der entscheidende Vorteil von DDIM ist, dass nicht alle $T$ Schritte durchlaufen werden müssen. Stattdessen kann eine Teilmenge $\tau = \{\tau_1, \ldots, \tau_S\} \subset \{1, \ldots, T\}$ mit $S \ll T$ gewählt werden, wobei das Sampling nur über diese $S$ Schritte erfolgt. In der Praxis genügen häufig $S = 50$ bis $100$ Schritte statt der vollen $T = 1000$, was die Generierungszeit um eine Größenordnung reduziert, bei vergleichbarer Bildqualität~\cite{song_denoising_2022}.
+ 
+ 
+% % ============================================================
+% % 7. OPTIONAL: Latent Diffusion Models
+% %    Als eigener Abschnitt nach Conditional Diffusion / Sampling
+% % ============================================================
+ 
+% \subsection{Latent Diffusion Models}
+% Rombach et al.~\cite{rombach_high-resolution_2022} stellten mit den \textit{Latent Diffusion Models} (LDMs) einen Ansatz vor, der den Diffusionsprozess nicht im hochdimensionalen Pixelraum, sondern in einem komprimierten \textit{latenten Raum} durchführt. Dafür wird zunächst ein Autoencoder mit Encoder $\mathcal{E}$ und Decoder $\mathcal{D}$ trainiert, der ein Bild $x$ in eine latente Repräsentation $z = \mathcal{E}(x)$ überführt und daraus rekonstruiert: $\tilde{x} = \mathcal{D}(z)$. Der Diffusionsprozess wird dann vollständig im latenten Raum durchgeführt:
+% %
+% \begin{equation}
+%     \mathcal{L}_{\text{LDM}} = \mathbb{E}_{t,\, \mathcal{E}(x_0),\, \epsilon} \left[ \left\| \epsilon - \epsilon_\theta(z_t, t, c) \right\|^2 \right]
+%     \label{eq:ldm_loss}
+% \end{equation}
+% %
+% wobei $z_t$ das verrauschte latente Sample zum Zeitschritt $t$ und $c$ eine optionale Konditionierung (z.\,B.\ Text-Embeddings) darstellt. Da der latente Raum typischerweise 4--16$\times$ kleiner als der Pixelraum ist, reduziert sich der Rechen- und Speicheraufwand erheblich, ohne die Generierungsqualität wesentlich zu beeinträchtigen~\cite{rombach_high-resolution_2022}. Dieser Ansatz bildet die Grundlage für Modelle wie Stable Diffusion und ist insbesondere für medizinische Anwendungen relevant, da hochauflösende Bilder mit begrenzten Rechenressourcen generiert werden können.
+% \abschnitt
+% Die Konditionierung $c$ wird im U-Net über \textit{Cross-Attention}-Mechanismen eingespeist. Dabei wird die Konditionierung $c$ zunächst durch einen domänenspezifischen Encoder $\tau_\theta$ projiziert, und die Attention-Operation ist definiert als:
+% %
+% \begin{equation}
+%     \text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d}}\right) \cdot V
+%     \label{eq:cross_attention}
+% \end{equation}
+% %
+% mit $Q = W_Q^{(l)} \cdot \varphi_l(z_t)$, $K = W_K^{(l)} \cdot \tau_\theta(c)$ und $V = W_V^{(l)} \cdot \tau_\theta(c)$, wobei $\varphi_l(z_t)$ die Feature-Map der $l$-ten U-Net-Schicht bezeichnet~\cite{rombach_high-resolution_2022}.
+
+\subsection{Sampling}
+
+
+\subsection{Conditional Diffusion Models}
 
 \section{Convolutional Neural Network}
+\ac{CNN} ist eine Klasse neuronaler Netzwerke, die speziell für die Verarbeitung von Bilddaten entwickelt wurde~\cite[S. 1]{oshea_introduction_2015}. Dies geschieht durch sogenannte Faltungsschichten (engl. \textit{convolutional layers}), die mithilfe von Filtern lokale Muster in der Datenstruktur erkennen. Diese Merkmalsextraktion ermöglicht es dem Modell, komplexe Strukturen mit hoher Genauigkeit zu identifizieren~\cite[S. 1170]{hoang_deep_2025}.
 
+Die Faltung (engl. \textit{convolution}) ist eine mathematische Operation, bei der ein Faltungskern (engl. \textit{kernel}) schrittweise über ein Bild geschoben wird. An jeder Position wird das elementweise Produkt zwischen Kernel und dem überdeckten Bildausschnitt aufsummiert. Formal ergibt sich für ein zweidimensionales 
+Bild $f$ mit Kernel $k$:
+%
+\begin{equation}
+    g(x, y) = \sum_{i}\sum_{j} f(x+i,\; y+j)\cdot k(i, j)
+    \label{eq:convulation}
+\end{equation}
+%
+Das Ergebnis ist eine \textit{Feature Map}, die beschreibt, wie stark ein bestimmtes Muster, wie eine Kante oder Textur an jeder Bildposition vorhanden 
+ist~\cite[S. 14]{shen_hands-computer_2026}.
+%
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./bilder/cnn/conv.png}
+    \caption{Convolutional~\cite[S. 6]{oshea_introduction_2015}}
+    \label{fig:conv}
+\end{figure}
+%
+In~\autoref{fig:cnn} wird ein \ac{CNN} dargestellt. Die Architektur basiert auf drei Schichttypen. In der Faltungsschicht, wird wie der Name es bezeichnet die Faltung durchgeführt und Merkmale extrahiert~\cite[S. 5 f.]{oshea_introduction_2015}. Parallel zu den Faltungsoperationen folgt eine Aktivierungsfunktion (ReLU). Diese führt eine Nichtlinearität hinzu und reduziert das Vanishing-Gradient-Problem~\cite[S. 1169]{hoang_deep_2025}. Als Aktivierungsfunktion wird standardmäßig die \ac{ReLU} mit $f(x) = \max(0, x)$ eingesetzt, die ein schnelleres Training als traditionelle Funktionen wie $\tanh(x)$ ermöglicht~\cite[S. 3]{krizhevsky_imagenet_2017}.
 
+Darauf folgt die \textit{Pooling-Schicht}. Diese reduziert die räumliche Auflösung, typischerweise durch Max-Pooling mit $2\times2$-Fenstern, wodurch die Aktivierungskarte auf 25\% ihrer Größe verkleinert wird. Damit werden die Anzahl der Parameter sowie die Rechenkomplexität des Modells schrittweise reduziert~\cite[S. 8]{oshea_introduction_2015}. 
+
+Die \textit{Fully-Connected-Schicht} am Ende des Netzwerks verbindet jeden Neuron direkt mit allen Neuronen der benachbarten Schichten, analog zur klassischen \ac{ANN}-Architektur. Dadurch werden die extrahierten Merkmale zu Klassenwahrscheinlichkeiten verarbeitet~\cite[S. 8]{oshea_introduction_2015}.
+%
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./bilder/cnn/cnn.png}
+    \caption{CNN}
+    \label{fig:cnn}
+\end{figure}
+%
+Im Gegensatz zu traditionellen \ac{ANN}, bei denen jedes Neuron mit allen Neuronen der vorherigen Schicht verbunden ist, verbinden sich Neuronen in \ac{CNN} nur mit einem kleinen lokalen Bereich der Eingabe~\cite[S. 6]{oshea_introduction_2015}. Diese lokale Konnektivität reduziert die Anzahl der Parameter erheblich und macht das Training effizienter~\cite[S. 2--3]{oshea_introduction_2015}.
+
+Eine typische \ac{CNN}-Architektur stapelt mehrere Faltungs- und Pooling-Schichten, wobei frühe Schichten einfache Merkmale und tiefere Schichten zunehmend komplexe, abstrakte Repräsentationen lernen~\cite[S. 8--9]{oshea_introduction_2015}. Diese hierarchische Merkmalsextraktion bildet die Grundlage für den Encoder-Pfad in Architekturen wie U-Net~\cite[S. 6]{ignacio_revisiting_2025}.
 
 \section{U-Net}
-U-Net ist eine \ac{CNN}-Architektur, die für die biomedizinische Bildsegmentierung entwickelt wurde. Trotz ihres ursprünglichen Anwendungsbereiches dient die Architektur eine zentrale Rolle im Denoising-Schritt in Diffusionsmodelle~\cite[S. 2]{ronneberger_u-net_2015}. Die U-Net Architektur erweist sich als vorteilhaft für die generative KI, da sie flexibel ist für verschiedene Datenmodellierungen. Dazu gehören Bild, Audio, Video, Text sowie 3D-volumetrische Daten~\cite[S. 2]{ignacio_revisiting_2025}.
+U-Net ist eine \ac{CNN}-Architektur, die für die biomedizinische Bildsegmentierung entwickelt wurde. Trotz ihres ursprünglichen Anwendungsbereiches dient die Architektur eine zentrale Rolle im Denoising-Schritt in Diffusionsmodelle~\cite[S. 2]{ronneberger_u-net_2015}. 
 %
 \begin{figure}[htbp]
     \centering
@@ -140,7 +395,45 @@ U-Net ist eine \ac{CNN}-Architektur, die für die biomedizinische Bildsegmentieru
 \end{figure}
 %
 In~\autoref{fig:unet-Architektur} wird die Architektur dargestellt.
-Das Grundprinzip von U-Net basiert auf einer symmetrischen Encoder-Decoder-Struktur.
-Auf der linken Hälfte ist der Encoder. Der Encoder folgt dem Prinzip eines convo
+Das Grundprinzip von U-Net basiert auf einer symmetrischen Encoder-Decoder-Struktur. Der Encoder, auch als \textit{Contracting Path} bezeichnet, folgt dem Prinzip eines typischen \ac{CNN}s und besteht aus wiederholten Blöcken von zwei 3$\times$3-Faltungen (unpadded) mit anschließender \ac{ReLU}-Aktivierung sowie einem 2$\times$2 Max-Pooling mit Schrittweite 2 zum Downsampling~\cite[S. 4]{ronneberger_u-net_2015}. Mit jeder Downsampling-Stufe verdoppelt sich die Anzahl der Feature-Kanäle, während die räumliche Auflösung schrittweise reduziert wird~\cite[S. 4]{ronneberger_u-net_2015}. Dieser Prozess ermöglicht es dem Netzwerk, zunehmend abstrakte semantische Merkmale zu extrahieren und hierarchische Repräsentationen zu erlernen~\cite[S. 6]{ignacio_revisiting_2025}.
+
+Der Decoder, auch \textit{Expansive Path} genannt, spiegelt diese Struktur symmetrisch und besteht aus Upsampling-Schritten mittels 2$\times$2-Up-Convolutions, gefolgt von zwei 3$\times$3-Faltungen mit \ac{ReLU}~\cite[S. 4]{ronneberger_u-net_2015}. Das zentrale Merkmal der U-Net-Architektur sind die sogenannten Skip Connections, dargestellt als graue Pfeile in~\autoref{fig:unet-Architektur}. Diese verbinden korrespondierende Encoder- und Decoder-Ebenen direkt miteinander, indem die Feature-Maps konkateniert werden~\cite[S. 4]{ronneberger_u-net_2015}~\cite[S. 9]{ignacio_revisiting_2025}. Dadurch können feinkörnige räumliche Informationen, die beim Downsampling verloren gehen, im Decoder wiederhergestellt werden. Die finale Schicht verwendet eine 1$\times$1-Faltung, um die Feature-Vektoren auf die gewünschte Anzahl von Klassen abzubilden~\cite[S. 4]{ronneberger_u-net_2015}.
+
+Mathematisch lässt sich ein einzelner Faltungsschritt beschreiben als:
+%
+\begin{equation}
+    \mathbf{x}^{(l+1)} = \sigma\!\left(W^{(l)} * \mathbf{x}^{(l)} + b^{(l)}\right),
+\label{eq:unet-conv}
+\end{equation}
+%
+wobei $W^{(l)}$ den Faltungsfilter, $\mathbf{x}^{(l)}$ die Eingabe-Feature-Map, $b^{(l)}$ den Bias und $\sigma$ die \ac{ReLU}-Aktivierungsfunktion der $l$-ten Schicht bezeichnen. Die Skip Connection im Decoder lässt sich formal als $\mathcal{F}^{(l)}_x = \operatorname{Concat}(\mathcal{E}^{(l)}_x, \mathcal{D}^{(l)}_x)$ beschreiben, wobei $\mathcal{E}^{(l)}_x$ und $\mathcal{D}^{(l)}_x$ die Feature-Maps von Encoder und Decoder auf Ebene $l$ repräsentieren und $\mathcal{F}^{(l)}_x$ die fusionierte Feature-Map darstellt~\cite[S. 9]{ignacio_revisiting_2025}. Diese Konkatenation ermöglicht es, hochauflösende strukturelle Details aus dem Encoder mit den abstrakten semantischen Repräsentationen des Decoders zu verbinden.
+
+Im Kontext von Diffusionsmodellen wird U-Net eingesetzt, um bei jedem Denoising-Schritt das Rauschen $\epsilon_\theta(\mathbf{x}_t, t)$ zu schätzen, wobei der Zeitschritt $t$ als zusätzliche Konditionierungsinformation in die Architektur einfließt. Die Vielseitigkeit von U-Net zeigt sich nicht nur in der Anwendung über verschiedene Domänen hinweg, sondern auch in der Integration in unterschiedliche Modelltypen wie Diffusionsmodelle, \ac{GANs} und autoregressive Architekturen. Durch die Flexibilität der symmetrischen Encoder-Decoder-Struktur mit Skip Connections hat sich U-Net als Standardarchitektur in modernen Diffusionsmodellen für verschiedene Datenmodalitäten etabliert, darunter Bild-, Audio-, Video- und 3D-Generierung~\cite[S. 2]{ignacio_revisiting_2025}.
+
+Die U-Net-Architektur bietet mehrere Vorteile für generative Aufgaben. Die hierarchische Encoder-Decoder-Struktur ermöglicht eine Merkmalsextraktion auf mehreren Auflösungsebenen, wodurch sowohl globaler Kontext als auch lokale Details erfasst werden können. Die Skip Connections behalten detaillierte räumliche, temporale und strukturelle Details, die bei herkömmlichen Autoencoder-Architekturen durch das Downsampling verloren gehen würden. Darüber hinaus besitzt U-Net eine hohe Recheneffizienz, da die faltungsbasierten Operationen parallelisiert werden können und im Gegensatz zu Transformer-Modellen linear mit der Eingabegröße skalieren. Weitere Stärken umfassen die Robustheit gegenüber verrauschten oder unvollständigen Eingabedaten sowie die Flexibilität zur Integration von Attention-Mechanismen und Residual Connections~\cite[S. 34 ff.]{ignacio_revisiting_2025}.
+
+Trotz dieser Vorteile weist U-Net auch Limitationen auf. Eine wesentliche Einschränkung ist die begrenzte Fähigkeit von globalem Kontext, da die faltungsbasierte Struktur primär auf lokale räumliche Merkmale spezialisiert ist. Bei hochauflösenden generativen Aufgaben steigt der Speicherbedarf erheblich, während das rezeptive Feld der Faltungsschichten proportional kleiner wird. Zudem kann die Generalisierungsfähigkeit bei domänenfremden Daten oder multimodalen Aufgaben wie Text-zu-Bild-Generierung eingeschränkt sein, da U-Net auf pixelbasierte Transformationen ausgelegt ist. Schließlich operiert U-Net wie viele tiefe neuronale Architekturen als Black-Box, was die Interpretierbarkeit der gelernten Repräsentationen erschwert~\cite[S. 32 f.]{ignacio_revisiting_2025}~\cite[S. 40 f.]{ignacio_revisiting_2025}.
+
+
 
 \section{Einsatzmöglichkeiten in der Medizin}
+
+\subsection{GANs}
+\ac{GAN}s bestehen aus zwei neuronalen Netzwerken, die gegeneinander trainiert werden: einem \textit{Generator} $G$ und einem \textit{Diskriminator} $D$. Der Generator erzeugt aus einem zufälligen Rauschen $z \sim p_z(z)$ synthetische Daten $G(z)$, während der Diskriminator lernt, echte Daten $x \sim p_{data}(x)$ von gefälschten zu unterscheiden. Dieses Wettbewerbsprinzip wird als \textit{Minimax-Spiel} bezeichnet und durch folgende Zielfunktion beschrieben:
+%
+\begin{equation}
+    \min_G \max_D \; \mathbb{E}_{x \sim p_{data}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
+    \label{eq:gan}
+\end{equation}
+%
+Der Diskriminator $D$ versucht, $D(x) \approx 1$ für echte und $D(G(z)) \approx 0$ für gefälschte Daten zu erreichen. Der Generator $G$ hingegen versucht, den Diskriminator zu täuschen, sodass $D(G(z)) \approx 1$. Im Idealfall konvergiert das Training zu einem Nash-Gleichgewicht, bei dem $G$ die wahre Datenverteilung $p_{data}$ approximiert.
+
+\subsection{VAE}
+Ein \ac{VAE} ist ein generatives Modell, das Daten in einen komprimierten \textit{latenten Raum} $z$ kodiert und aus diesem neue Daten rekonstruiert. Im Gegensatz zu klassischen Autoencodern kodiert der \ac{VAE} nicht einen festen Punkt, sondern eine Wahrscheinlichkeitsverteilung $q_\phi(z \mid x) = \mathcal{N}(\mu, \sigma^2 I)$, aus der dann Samples gezogen werden. Das Training minimiert die folgende Verlustfunktion, den \textit{Evidence Lower Bound} (ELBO):
+%
+\begin{equation}
+    \mathcal{L}_{\text{VAE}} = \underbrace{\mathbb{E}_{q_\phi(z|x)}\left[\log p_\theta(x \mid z)\right]}_{\text{Rekonstruktionsfehler}} - \underbrace{D_{\text{KL}}\left(q_\phi(z \mid x) \;\|\; p(z)\right)}_{\text{Regularisierung}}
+    \label{eq:vae}
+\end{equation}
+%
+Der erste Term minimiert den Rekonstruktionsfehler – das Modell soll die Eingabe $x$ möglichst gut wiederherstellen. Der zweite Term, die \textit{KL-Divergenz}, zwingt den latenten Raum nah an eine Standardnormalverteilung $\mathcal{N}(0, I)$ zu bleiben, sodass neue Daten durch einfaches Sampling aus $p(z)$ generiert werden können.
