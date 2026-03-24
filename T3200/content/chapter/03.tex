@@ -66,6 +66,10 @@ Generative Model werden auch als \ac{DGM}s beziechnet. Unter ein \ac{DGM} wird e
 \section{Diffusion Model}
 Ein \textit{Diffusion Model} oder auch \textit{Diffusions-Wahrscheinlichkeitsmodell} ist ein generatives Modell, das zur Klasse der latenten Variablenmodelle gehört~\cite[S. 153]{okadome_essentials_2025}~\cite[S. 114]{feuerriegel_generative_2024}. Das grundlegende Prinzip besteht darin, einen Diffusionsprozess umzukehren, bei dem schrittweise Rauschen zu den Daten hinzugefügt wird. Durch die Umkehrung dieses Prozesses kann das Modell aus verrauschten Signalen Daten rekonstruieren und so neue Daten generieren. Dafür wird eine parametrisierte Markov-Kette mittels Variationsinferenz trainiert, deren Übergänge lernen, den Diffusionsprozess umzukehren~\cite[S. 153]{okadome_essentials_2025}~\cite[S. 2]{ho_denoising_2020}.
  
+\section{Test}
+
+Sehr viel Text
+
 \subsection{Markov-Ketten}
 Eine Markov-Kette ist ein stochastischer Prozess, bei dem der zukünftige Zustand ausschließlich vom aktuellen Zustand abhängt und nicht von der Vergangenheit. Diese Eigenschaft wird als \textit{Gedächtnislosigkeit} bezeichnet. Für eine Sequenz von Zufallsvariablen $x_0, x_1, \ldots, x_T$ lässt sich dies ausdrücken als:
 %

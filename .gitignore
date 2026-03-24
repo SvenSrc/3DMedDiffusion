@@ -45,7 +45,6 @@
 .mtc
 build/
 
-*.png
 *.svg
 *.eps
 *.tps
