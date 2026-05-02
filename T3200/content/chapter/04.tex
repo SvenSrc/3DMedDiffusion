@@ -1,53 +1,7 @@
-\chapter{Datenqualität und ethische Aspekte}
+\chapter{Stand der Forschung}
 
-\section{Kriterien für realistische Bilddaten}
+\todo{Benötigt?}
 
-\section{Risiken und Grenzen synthetischer Daten}
+\section{Generative Modelle in der medizinischen Bildgebung}
 
-\section{Datenschutz}
-
-\section{Bewertungsmetriken}
-Um die Qualität von durch generativen Modelle erstellten Bildern objektiv zu beurteilen kommen sogenannte \ac{IQMs} zum Einsatz. \ac{IQMs} erlauben einen objektiven Rahmen zur Bewertung von Eigenschaften wie Auflösung, Rauschen und Artefakte. Gegenüber subjektive Bewertungen durch Menschen haben \ac{IQMs} den Vorteil, dass sie standardisiert, quantifizierbar und reproduzierbar sind und somit einen systematischen Vergleich verschiedener generativer Modelle ermöglicht. \ac{IQMs} lassen sich in drei verschieden Kategorien einordnern: \ac{FR}, \ac{RR} und \ac{NR}. Diese Unterscheidung ist im Kontext von Diffusionsmodellen besonders wichtig. Bei Aufgaben wie Bildrekonstruktion oder Denoising, bei denen ein Originalbild als Referenz vorliegt, kommen \ac{FR}-Metriken wie \ac{SSIM} oder \ac{PSNR} zum Einsatz. Bei der freien Text-to-Image-Generierung hingegen existiert kein eindeutiges Referenzbild, weshalb hier häufig auf NR-Metriken oder semantische Maße wie den \ac{FID} oder den CLIP-Score zurückgegriffen wird~\cite[S. 1]{civicioglu_image_2025}.
-\todo{mehr quelle zu IQM finden}
-
-\subsection{Fréchet Inception Distance}
-Die \ac{FID} ist eine Metrik zur Bewertung der Qualität \ac{GANs} und wurde 2017 von Heusel et al. eingeführt. Sie stellt eine Weiterentwicklung des \ac{IS} dar, dessen Schwachpunkt darin besteht, dass er die statistische Verteilung realer Bilder nicht in die Bewertung einbezieht~\cite[S. A1]{heusel_gans_2018}.Die Berechnung der FID erfolgt in zwei Schritten. Zunächst werden sowohl reale als auch generierte Bilder durch ein vortrainiertes \ac{CNN} geleitet~\cite[S. 2]{szegedy_rethinking_2015}. Aus einer intermediären Schicht dieses Netzwerks werden abstrakte Merkmalsvektoren gewonnen, die als visuelle Repräsentationen der Bilder dienen~\cite[S. 130]{long_generative_2026}. Im zweiten Schritt werden diese Merkmale statistisch beschrieben. Für die realen Bilder wird der Mittelwert $\mu_{data}$ also der durchschnittliche Merkmalsvektor sowie die Kovarianzmatrix $\Sigma_{data}$ berechnet, welche beschreibt, wie stark die Merkmale untereinander variieren. Dasselbe geschieht für die generierten Bilder, die durch $\mu_{g}$ und $\Sigma_{g}$ beschrieben werden~\cite[S. 130]{long_generative_2026}~\cite[S. A1]{heusel_gans_2018}. Anschließend wird die Fréchet Distanz zwischen den beiden so beschriebenen Verteilungen berechnet~\cite[S. 2]{dowson1982frechet}:
-%
-\begin{equation}
-\text{FID} = \|\mu_{data} - \mu_g\|^2 + \text{Tr}\left(\Sigma_{data} + \Sigma_g - 2\left(\Sigma_{data}\Sigma_g\right)^{1/2}\right),
-\label{eq:fid}
-\end{equation}
-%
-Die Formel~\autoref{eq:fid} besteht aus zwei Teilen. Der erste Term  $\|\mu_{data} - \mu_g\|^2$ misst, wie weit die durchschnittlichen Merkmale realer und generierter Bilder voneinander abweichen. Der zweite Term vergleicht die Kovarianzmatrizen beider Verteilungen und erfasst damit, ob die generierten Bilder eine ähnliche Vielfalt und Struktur aufweisen wie die realen~cite~\cite[S. 2]{dowson1982frechet}. 
-%
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.8\textwidth]{./bilder/fid/fid-prozess.png}
-    \caption{Darstellung der \ac{FID}-Berechnung~\cite[S. 130]{long_generative_2026}}
-    \label{fig:fid-prozess}
-\end{figure}
-%
-In~\autoref{fig:fid-prozess} wird der Prozess dargestellt. Der Generator $G$ erzeugt Bilder, die zusammen mit den Trainingsbildern durch das \ac{CNN} $D$ geleitet werden, um die statistischen Kenngrößen $\mu_{data}$, $\Sigma_{data}$, $\mu_g$ und $\Sigma_g$ zu extrahieren und daraus den \ac{FID}-Wert zu berechnen. Ein niedriger \ac{FID}-Wert zeigt an, dass beide Verteilungen eng beieinanderliegen, was auf hohe Bildqualität und ausreichende Diversität hindeutet~\cite[S. 130]{long_generative_2026}. 
-
-\subsection{SSIM}
-Der \ac{SSIM} ist eine Metrik zur Bewertung von Bildqualität, die sich an der menschlichen Wahrnehmung orientiert~\cite[S. 1131]{maruyama_properties_2023}~\cite[S. 6]{civicioglu_image_2025}. Im Gegensatz zur \ac{MSE}, der lediglich pixelweise Helligkeitsunterschiede misst, analysiert der \ac{SSIM}, wie ähnlich zwei Bilder in ihrer Struktur sind also in den Mustern und Abhängigkeiten benachbarter Pixel, die für das menschliche Auge relevant sind~\cite[S. 1]{zhou_wang_image_2004}. Dazu zerlegt SSIM den Bildvergleich in drei Teilkomponenten: Intensität, Kontrast und Struktur. Diese werden getrennt berechnet und anschließend multipliziert~\cite[S. 5 f.]{zhou_wang_image_2004}. Die resultierende Formel lautet~\cite[S. 2]{nilsson_understanding_2020}~\cite[S. 5]{zhou_wang_image_2004}~\cite[S. 6]{civicioglu_image_2025}~\cite[S. 1134]{maruyama_properties_2023}:
-%
-\begin{equation}
-\text{SSIM}(x, y) = \frac{(2\mu_x\mu_y + C_1)(2\sigma_{xy} + C_2)}{(\mu_x^2 + \mu_y^2 + C_1)(\sigma_x^2 + \sigma_y^2 + C_2)},
-\label{eq:ssim}
-\end{equation}
-%
-In~\autoref{eq:ssim} stehen $\mu_x$ und $\mu_y$ für die mittleren Helligkeitswerte, $\sigma_x^2$ und $\sigma_y^2$ für die lokalen Varianzen und $\sigma_{xy}$ für die Kovarianz also das Maß, wie ähnlich sich die Helligkeitsverläufe der beiden Bilder in einem lokalen Bereich verhalten. Die Konstanten $C_1$ und $C_2$ verhindern numerische Instabilitäten bei sehr kleinen Nennerwerten und sind als $C_1 = (K_1 L)^2$ und $C_2 = (K_2 L)^2$ definiert, wobei $L$ den Wertebereich der Pixel angibt und typischerweise $K_1 = 0{,}01$ sowie $3K_2 = 0{,}03$ gewählt werden~\cite[S. 1 f.]{nilsson_understanding_2020}~\cite[S. 5]{zhou_wang_image_2004}~\cite[S. 6]{civicioglu_image_2025}~\cite[S. 1134]{maruyama_properties_2023}. Der berechnete \ac{SSIM}-Wert eines Bildes ergibt sich als Mittelwert aller lokal berechneten Fensterwerte und liegt stets zwischen $0$ und $1$, wobei $1$ für eine vollständige Übereinstimmung bedeutet~\cite[S. 1131]{maruyama_properties_2023}. Jedoch ist der \ac{SSIM} eine \ac{FR}-Metrik und benötigt somit ein fehlerfreies Referenzbild~\cite[S. 1]{zhou_wang_image_2004}
-%
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.8\textwidth]{./bilder/ssim/ssim.png}
-    \caption{Darstellung der \ac{SSIM}-Berechnung~\cite[S. 5]{zhou_wang_image_2004}}
-    \label{fig:ssid-prozess}
-\end{figure}
-%
-\subsection{PSNR}
-
-\subsection{LPIPS}
-
-\subsection{}
+\section{Vergleich bestehender Ansätze}

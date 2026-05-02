@@ -1,215 +1,99 @@
-\chapter{Ergebnis}
+\chapter{Datenqualität und ethische Aspekte}
+Das Konzept der Generierung synthetischer Daten lässt sich auf die Arbeiten von~\citeauthor{Metropolis01091949} im Jahr~\citeyear{Metropolis01091949} zurückführen, die mit der Entwicklung der Monte-Carlo-Simulationsmethoden den Grundstein für die rechnergestützte Erzeugung künstlicher Datenpunkte legten~\cite[S. 335 f.]{Metropolis01091949}. Seitdem haben sich die Methoden zur synthetischen Datenerzeugung weiterentwickelt und finden heute in verschiedenen Anwendungsbereichen Einsatz, wovon eines davon in der Medizin ist. In diesem Kapitel werden die Aspekte der Datenqualität sowie die ethischen Herausforderungen behandelt, die mit der Nutzung synthetischer Daten einhergehen.
 
-\section{Trainingsergebnisse}
+\section{Definition synthetischer Daten} 
+Bevor auf die Erzeugung und Anwendung synthetischer Daten eingegangen wird, ist zunächst eine Definition nötig, um zu verstehen was synthetische Daten sind. \citeauthor{jordon2022syntheticdatawhat} von der Royal Society und dem Alan Turing Institute definieren den Begriff wie folgt:
+%
+\begin{displayquote}
+\textit{``Synthetic data is data that has been generated using a purpose-built mathematical model or algorithm, with the aim of solving a (set of) data science task(s).''}~\cite[S.~5]{jordon2022syntheticdatawhat}
+\end{displayquote}
+%
+Aus dieser Definition lassen sich zwei Aspekte ableiten: Zum einen werden synthetische Daten nicht zufällig erzeugt, sondern gezielt durch mathematische Modelle oder Algorithmen generiert. Darunter fallen beispielsweise \ac{GAN}, \ac{VAE} oder Diffusionsmodelle, die jeweils unterschiedliche Strategien zur Datenerzeugung verfolgen. Zum anderen sind synthetische Daten immer zweckgebunden. Das heißt, sie werden gezielt eingesetzt, um datengetriebene Aufgaben wie Klassifikation, Vorhersage oder den Schutz sensibler Informationen zu lösen.
+\abschnitt
+Unabhängig von der Erzeugungsmethode lassen sich synthetische Daten in partiell und vollständig synthetische Daten unterteilen~\cite[vgl.][S.~2]{giuffre_harnessing_2023}. Partiell synthetische Daten kombinieren reale Datensätze mit synthetisch erzeugten Elementen, wobei gezielt Variablen mit hohem Offenlegungsrisiko ersetzt werden, während die restlichen Merkmale erhalten bleiben. Im medizinischen Bereich wird dieser Ansatz etwa genutzt, um die Privatsphäre von Patientinnen und Patienten zu schützen, um dennoch aussagekräftige Analysen zu erlauben~\cite[vgl.][S.~7]{loong_disclosure_2013}. Vollständig synthetische Daten hingegen werden komplett durch statistische Modelle erzeugt, ohne dass die Originaldaten preisgegeben werden. Dabei kommt das Verfahren der multiplen Imputation zum Einsatz, bei dem alle nicht erhobenen Werte als fehlend betrachtet und wiederholt durch plausible Werte ersetzt werden~\cite[vgl.][S.~2]{raghunathan_multiple_nodate}. Beide Ansätze können dazu beitragen, Probleme wie Datenknappheit oder Datenschutzanforderungen anzugehen.
+%~\cite[vgl.][S.~2]{giuffre_harnessing_2023}
+Mehr dazu in~\autoref{Ch:ethical}.
 
-Dieses Kapitel präsentiert die während des Trainings erfassten Metriken für drei Diffusionsmodelle unterschiedlicher Volumengröße und Konfiguration. Die Ergebnisse zeigen den Lernfortschritt über 300 Epochen anhand von Trainings- und Validierungsverlust.
+\section{Ethische Aspekte synthetischer medizinischer Daten}\label{Ch:ethical}
+Obwohl synthetische Daten von rechnergestützten Systemen generiert werden und keine unmittelbaren Patienteninformationen enthalten, ergeben sich durch ihre Erzeugung und Nutzung im medizinischen Umfeld ethische Herausforderungen. Da generative Modelle auf realen Patientendaten trainiert werden, können sich Probleme des Datenschutzes und der Verantwortung auch auf den synthetischen Datenraum übertragen.
+\abschnitt
+Medizinische Bilddaten zählen zu den schützenswerten personenbezogenen Daten. Art. 9 Abs. 1 DSGVO legt fest, dass die Verarbeitung von \enquote{Gesundheitsdaten [\dots] einer natürlichen Person [\dots] untersagt} ist. Von diesem Verarbeitungsverbot darf nur unter engen Voraussetzungen, wie einer ausdrücklichen Einwilligung ausgewichen werden~\cite{DSGVO_Art9}.Dies schränkt die Entwicklung KI-basierter Verfahren in der medizinischen Bildverarbeitung ein, da der Zugang zu Trainingsdaten begrenzt ist. Synthetische Daten bieten einen Lösungsansatz, da sie keine direkten Bezüge zu realen Personen enthalten und daher außerhalb des Anwendungsbereichs der DSGVO liegen.
+\abschnitt
+Ergänzend stellt die KI-Verordnung Anforderungen an die Datenbasis KI-basierter Anwendungen in der Medizin, die nach Art. 6 Abs. 1 AI Act als Hochrisiko-KI-Systeme gelten~\cite{AIAct_Art6}. So fordert Art. 10 AI Act, dass Trainings-, Validierungs- und Testdatensätze \enquote{relevant, hinreichend repräsentativ und so weit wie möglich fehlerfrei und vollständig} sind~\cite{AIAct_Art10}. Besonders die Forderung nach Repräsentativität ist aus ethischer Sicht von Bedeutung, da sie für eine gerechte und diskriminierungsfreie Anwendung medizinischer KI-Systeme bildet. Hieraus ergibt sich das Problem, dass die Verzerrungen (auch \textit{Bias} genannt) in den Daten vermieden werden müssen. Denn es besteht bei der Generierung synthetischer Daten das Risiko, dass identifizierbare Merkmale erhalten bleiben und sensible Informationen indirekt preisgegeben werden. Zwar können sensible Daten vor dem Training anonymisiert werden, eine zu starke Anonymisierung verringert jedoch den analytischen Wert der Daten~\cite[vgl.][S. 192]{nisevic_synthetic_2025}. Somit besteht ein Kompromiss zwischen Anonymität und Wert der Daten.
+%%%
+% Einwilligung der Patienten
+% Die Patienten, deren Daten für das Training generativer Modelle verwendet werden, haben meist in eine medizinische Behandlung eingewilligt – nicht zwangsläufig in die Verwendung ihrer Daten für KI-Training. Daraus ergibt sich eine ethische Fragestellung zur Zweckbindung der Datennutzung.
+% Verantwortung und Vertrauen
+% Wenn medizinische KI-Systeme auf synthetischen Daten basieren, stellt sich die Frage, wer die Verantwortung für Fehldiagnosen trägt und wie das Vertrauen von Ärzten und Patienten in solche Systeme gewährleistet werden kann.
+% Transparenz und Kennzeichnung
+% Synthetische Daten sollten in Forschung und Anwendung als solche gekennzeichnet sein, um Nachvollziehbarkeit und Reproduzierbarkeit sicherzustellen.
+%%%
 
-\subsection{Modellkonfigurationen}
+\section{Risiken und Grenzen synthetischer Daten}
+Neben den ethischen Fragestellungen weisen synthetische Daten auch technische und methodische Grenzen auf. 
+% Diese betreffen die Qualität der generierten Daten, ihre Generalisierbarkeit sowie den Bedarf an geeigneten Bewertungsverfahren.
+Eine Herausforderung liegt in der medizinischen Plausibilität synthetischer Daten. Generative Modelle können visuell gute Ergebnisse liefern, dabei jedoch anatomisch fehlerhafte oder medizinisch unrealistische Strukturen erzeugen. Diese Daten werden als Halluzinationen bezeichnet. Diese Halluzinationen führen dazu, dass die synthetischen Bilder bei der Auswertung irreführende Ergebnisse liefern und somit die Zuverlässigkeit des KI-Models verringert~\cite[vgl.][S. 10]{wang_generative_2025}. Hinzu kommt, dass \acp{GAN} häufig unter Mode Collapse leiden, wodurch die Vielfalt der generierten Bilder eingeschränkt wird. Jedoch wird dieses Problem durch die Verwendung von beispielsweise Diffusions Modellen verringert~\cite[vgl.][S.~5]{wang_generative_2025}~\cite[vgl.][S. 1]{khader_medical_2023}.
+\abschnitt
+Dazu zählt aber jedoch das Problem der Generalisierbarkeit. Modelle für medizinische Bilddaten lernen die Muster ihrer Trainingsdaten. Jedoch kann diese Fähigkeit aber nicht zwangsläufig auf neue, abweichende Bildmuster übertragen. Beispielweise ein Klassifikationsmodell für die Hautläsion, das überwiegend mit Bildern heller Hauttypen trainiert wurde, liefert bei dunkleren Hauttypen schlechtere Ergebnisse~\cite[vgl.][S.~18]{wang_ai_2019}. Da generative Modelle die Eigenschaften ihrer Trainingsdaten übernehmen, werden solche Verzerrungen auch in synthetischen Daten weitergegeben. Hinzu kommt, dass generative Modelle für ihr initiales Training selbst auf reale klinische Bilddaten angewiesen sind~\cite[vgl.][S. 10]{wang_generative_2025}. Synthetische Daten bieten somit nur eine Teillösung für den Mangel an medizinischen Trainingsdaten und können reale Patientendaten nicht komplett ersetzen.
 
-Alle Modelle teilen eine gemeinsame Basis-Architektur und Trainingsinfrastruktur, die nachfolgend erl\"autert wird.
+\section{Qualitätskriterien für synthetische medizinische Bilddaten}
+Um die Eignung synthetischer Bilddaten für medizinische Anwendungen beurteilen zu können, sind verlässliche Qualitätskriterien erforderlich. Diese lassen sich in visuelle und mathematische Bewertungsverfahren unterteilen, die im Folgenden näher beschrieben werden.
 
-\subsubsection*{Gemeinsame Hyperparameter und Techniken}
+\subsection{Visuelle Bewertungskriterien}
+Die visuelle Bewertung synthetischer medizinischer Bilder erfolgt im besten Fall durch medizinische Fachkräfte. Diese Form der Beurteilung ist deshalb relevant, weil rein mathematische Metriken medizinisches Fachwissen nicht abbilden können und daher nicht zur Beurteilung der medizinisches Plausibilität geeignet sind~\cite[vgl.][S.~6]{sun_aligning_2023}~\cite[vgl.][S.~6]{schuit_perceptual_2025}.
+\abschnitt
+In einer Studie von~\citeauthor{schuit_perceptual_2025} wurde eine solche Reader Study mit drei Radiologen durchgeführt. Die Teilnehmer sollten sowohl zwischen realen und synthetischen Röntgenaufnahmen unterscheiden als auch die Konsistenz zwischen Bildmerkmalen und Zielpathologie bewerten. Die Ergebnisse zeigen, dass insbesondere Diffusionsmodelle visuell realistische Röntgenaufnahmen erzeugen können~\cite[vgl.][S.~1]{schuit_perceptual_2025}.
+\abschnitt
+Dennoch weist die visuelle Bewertung Einschränkungen auf. Sie subjektiv und von der Erfahrung der beurteilenden Person abhängig. Zudem lässt sie sich schwer auf große Datenmengen skalieren, weshalb die Bewertung durch mathematische Metriken ergänzt werden kann.
 
-\begin{itemize}
-    \item \textbf{Epochen:} 300 -- Eine Epoche bezeichnet einen vollst\"andigen Durchlauf des gesamten Trainingsdatensatzes. Nach 300 Epochen hat das Modell jeden Scan hunderte Male in verschiedenen Rauschzust\"anden gesehen.
+\subsection{Mathematische Bewertungsmetriken}
+Um die Qualität von durch generativen Modelle erstellten Bildern objektiv zu beurteilen kommen sogenannte \ac{IQMs} zum Einsatz. \ac{IQMs} erlauben einen objektiven Rahmen zur Bewertung von Eigenschaften wie Auflösung, Rauschen und Artefakte. Gegenüber subjektive Bewertungen durch Menschen haben \ac{IQMs} den Vorteil, dass sie standardisiert, quantifizierbar und reproduzierbar sind und somit einen systematischen Vergleich verschiedener generativer Modelle ermöglicht. \ac{IQMs} lassen sich in drei verschieden Kategorien einordnern: \ac{FR}, \ac{RR} und \ac{NR}. Diese Unterscheidung ist im Kontext von Diffusionsmodellen besonders wichtig. Bei Aufgaben wie Bildrekonstruktion oder Denoising, bei denen ein Originalbild als Referenz vorliegt, kommen \ac{FR}-Metriken wie \ac{SSIM} oder \ac{PSNR} zum Einsatz. Bei der freien Text-to-Image-Generierung hingegen existiert kein eindeutiges Referenzbild, weshalb hier häufig auf NR-Metriken oder semantische Maße wie den \ac{FID} oder den CLIP-Score zurückgegriffen wird~\cite[S. 1]{civicioglu_image_2025}.
+\todo{mehr quelle zu IQM finden}
 
-    \item \textbf{Batch-Gr\"o\ss e:} Gibt an, wie viele Trainingsvolumen gleichzeitig in den Grafikkartensp eicher geladen und verarbeitet werden. Gr\"o\ss ere Batches stabilisieren den Gradienten, ben\"otigen aber mehr VRAM. Bei 32\textsuperscript{3} wurden 10 Volumen pro Schritt verarbeitet; bei 48\textsuperscript{3} musste die Batch-Gr\"o\ss e auf 3 reduziert werden, da jedes Volumen 3.4$\times$ mehr Speicher belegt ($48^3 / 32^3 \approx 3.4$).
+\subsubsection{\acl{FID}}
+Die \ac{FID} ist eine Metrik zur Bewertung der Qualität \ac{GANs} und wurde 2017 von Heusel et al. eingeführt. Sie stellt eine Weiterentwicklung des \ac{IS} dar, dessen Schwachpunkt darin besteht, dass er die statistische Verteilung realer Bilder nicht in die Bewertung einbezieht~\cite[S. A1]{heusel_gans_2018}.Die Berechnung der FID erfolgt in zwei Schritten. Zunächst werden sowohl reale als auch generierte Bilder durch ein vortrainiertes \ac{CNN} geleitet~\cite[S. 2]{szegedy_rethinking_2015}. Aus einer intermediären Schicht dieses Netzwerks werden abstrakte Merkmalsvektoren gewonnen, die als visuelle Repräsentationen der Bilder dienen~\cite[S. 130]{long_generative_2026}. Im zweiten Schritt werden diese Merkmale statistisch beschrieben. Für die realen Bilder wird der Mittelwert $\mu_{data}$ also der durchschnittliche Merkmalsvektor sowie die Kovarianzmatrix $\Sigma_{data}$ berechnet, welche beschreibt, wie stark die Merkmale untereinander variieren. Dasselbe geschieht für die generierten Bilder, die durch $\mu_{g}$ und $\Sigma_{g}$ beschrieben werden~\cite[S. 130]{long_generative_2026}~\cite[S. A1]{heusel_gans_2018}. Anschließend wird die Fréchet Distanz zwischen den beiden so beschriebenen Verteilungen berechnet~\cite[S. 2]{dowson1982frechet}:
+%
+\begin{equation}
+\text{FID} = \|\mu_{data} - \mu_g\|^2 + \text{Tr}\left(\Sigma_{data} + \Sigma_g - 2\left(\Sigma_{data}\Sigma_g\right)^{1/2}\right),
+\label{eq:fid}
+\end{equation}
+%
+Die Formel~\autoref{eq:fid} besteht aus zwei Teilen. Der erste Term  $\|\mu_{data} - \mu_g\|^2$ misst, wie weit die durchschnittlichen Merkmale realer und generierter Bilder voneinander abweichen. Der zweite Term vergleicht die Kovarianzmatrizen beider Verteilungen und erfasst damit, ob die generierten Bilder eine ähnliche Vielfalt und Struktur aufweisen wie die realen~cite~\cite[S. 2]{dowson1982frechet}. 
+%
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./bilder/fid/fid-prozess.png}
+    \caption{Darstellung der \ac{FID}-Berechnung~\cite[S. 130]{long_generative_2026}}
+    \label{fig:fid-prozess}
+\end{figure}
+%
+In~\autoref{fig:fid-prozess} wird der Prozess dargestellt. Der Generator $G$ erzeugt Bilder, die zusammen mit den Trainingsbildern durch das \ac{CNN} $D$ geleitet werden, um die statistischen Kenngrößen $\mu_{data}$, $\Sigma_{data}$, $\mu_g$ und $\Sigma_g$ zu extrahieren und daraus den \ac{FID}-Wert zu berechnen. Ein niedriger \ac{FID}-Wert zeigt an, dass beide Verteilungen eng beieinanderliegen, was auf hohe Bildqualität und ausreichende Diversität hindeutet~\cite[S. 130]{long_generative_2026}. 
 
-    \item \textbf{Lernrate (Learning Rate):} Steuert, wie stark die Gewichte nach jedem Schritt angepasst werden. Zu gro\ss e Lernraten f\"uhren zu Instabilit\"at, zu kleine zu langsamem Lernen. Es wird ein Warmup von der initialen Rate auf den Peak von $2 \times 10^{-4}$ verwendet, gefolgt von kosinus-annealing Abk\"uhlung auf 0.
+\subsubsection{\acl{SSIM}}
+Der \ac{SSIM} ist eine Metrik zur Bewertung von Bildqualität, die sich an der menschlichen Wahrnehmung orientiert~\cite[S. 1131]{maruyama_properties_2023}~\cite[S. 6]{civicioglu_image_2025}. Im Gegensatz zur \ac{MSE}, der lediglich pixelweise Helligkeitsunterschiede misst, analysiert der \ac{SSIM}, wie ähnlich zwei Bilder in ihrer Struktur sind also in den Mustern und Abhängigkeiten benachbarter Pixel, die für das menschliche Auge relevant sind~\cite[S. 1]{zhou_wang_image_2004}. Dazu zerlegt SSIM den Bildvergleich in drei Teilkomponenten: Intensität, Kontrast und Struktur. Diese werden getrennt berechnet und anschließend multipliziert~\cite[S. 5 f.]{zhou_wang_image_2004}. Die resultierende Formel lautet~\cite[S. 2]{nilsson_understanding_2020}~\cite[S. 5]{zhou_wang_image_2004}~\cite[S. 6]{civicioglu_image_2025}~\cite[S. 1134]{maruyama_properties_2023}:
+%
+\begin{equation}
+\text{SSIM}(x, y) = \frac{(2\mu_x\mu_y + C_1)(2\sigma_{xy} + C_2)}{(\mu_x^2 + \mu_y^2 + C_1)(\sigma_x^2 + \sigma_y^2 + C_2)},
+\label{eq:ssim}
+\end{equation}
+%
+In~\autoref{eq:ssim} stehen $\mu_x$ und $\mu_y$ für die mittleren Helligkeitswerte, $\sigma_x^2$ und $\sigma_y^2$ für die lokalen Varianzen und $\sigma_{xy}$ für die Kovarianz also das Maß, wie ähnlich sich die Helligkeitsverläufe der beiden Bilder in einem lokalen Bereich verhalten. Die Konstanten $C_1$ und $C_2$ verhindern numerische Instabilitäten bei sehr kleinen Nennerwerten und sind als $C_1 = (K_1 L)^2$ und $C_2 = (K_2 L)^2$ definiert, wobei $L$ den Wertebereich der Pixel angibt und typischerweise $K_1 = 0{,}01$ sowie $3K_2 = 0{,}03$ gewählt werden~\cite[S. 1 f.]{nilsson_understanding_2020}~\cite[S. 5]{zhou_wang_image_2004}~\cite[S. 6]{civicioglu_image_2025}~\cite[S. 1134]{maruyama_properties_2023}. Der berechnete \ac{SSIM}-Wert eines Bildes ergibt sich als Mittelwert aller lokal berechneten Fensterwerte und liegt stets zwischen $0$ und $1$, wobei $1$ für eine vollständige Übereinstimmung bedeutet~\cite[S. 1131]{maruyama_properties_2023}. Jedoch ist der \ac{SSIM} eine \ac{FR}-Metrik und benötigt somit ein fehlerfreies Referenzbild~\cite[S. 1]{zhou_wang_image_2004}
+%
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./bilder/ssim/ssim.png}
+    \caption{Darstellung der \ac{SSIM}-Berechnung~\cite[S. 5]{zhou_wang_image_2004}}
+    \label{fig:ssid-prozess}
+\end{figure}
+%
 
-    \item \textbf{v-Prediction:} Anstatt direkt das Rauschen $\epsilon$ vorherzusagen (standard DDPM), sagt das Modell eine Kombination aus Signal und Rauschen voraus -- die sogenannte \textit{velocity} $v$. Dies f\"uhrt zu numerisch stabileren Gradienten und besserer Qualit\"at bei kleinen Rauschst\"arken.
+\subsection{\acl{PSNR}}
+Eine weitere Metrik ist die \ac{PSNR}. \ac{PSNR} bewertet die Bildqualität in dem sie das generierte Bild mit dem original Bild vergleicht~\cite[text]{keylist}. 
 
-    \item \textbf{Kosinus-Annealing Schedule (Noise Schedule):} Definiert, wie viel Rauschen bei jedem Diffusionsschritt hinzugef\"ugt wird. Ein Kosinus-Verlauf sorgt f\"ur einen glatteren \"Ubergang zwischen reinem Signal und reinem Rauschen im Vergleich zu einem linearen Schedule, was die Lernstabilit\"at verbessert.
+Ein hoher \ac{PSNR} Wert deutet auf eine hohe Bildqualität und und desto kleiner ist die Differenz der beiden vergleichen Bilder~\cite[vgl.][S. 137]{long_generative_2026}. Allerdings tut diese Metrik nicht die menschliche Wahrnehmung abbilden, da sie lediglich sich nur auf die Pixeldifferenzen bezieht. So kann bereits eine kleine räumliche Verschiebung der Pixel zu einer Verschlechterung des \ac{PSNR}-Wertes führen, obwohl die subjektiv wahrgenommene Bildqualität keinen Unterschied erkennt. Daher erzielen Modelle mit pixelbasiertem Trainingsziel höhere \ac{PSNR}-Werte als generative Modelle~\cite[vgl.][S. 3]{moser_diffusion_2025}. Die \ac{PSNR} kein ausreichendes Qualitätsmaß und sollte im Kontext generativer Modelle durch wahrnehmungsbasierte Metriken ergänzt werden.
 
-    \item \textbf{Min-SNR Weighting:} Eine Gewichtungsstrategie f\"ur den Trainingsloss. Diffusionsschritte mit sehr niedrigem oder sehr hohem Signal-Rausch-Verh\"altnis (SNR) werden weniger stark gewichtet, da sie schwieriger zu lernen sind und den Gradienten destabilisieren k\"onnen. Dies verbessert die Trainingseffizienz und Stabilit\"at.
+Die PSNR ist daher zwar ein etabliertes, aber kein ausreichendes Qualitätsmaß und sollte im Kontext generativer Modelle stets durch wahrnehmungsbasierte Metriken (z. B. LPIPS, FID) ergänzt werden.
 
-    \item \textbf{EMA (Exponential Moving Average):} Zus\"atzlich zu den eigentlichen Modellgewichten werden parallel gemittelte Gewichte mitgef\"uhrt: $\theta_{\text{EMA}} = \alpha \cdot \theta_{\text{EMA}} + (1-\alpha) \cdot \theta$ mit Decay $\alpha = 0.9999$. Die EMA-Gewichte reagieren tr\"ager auf kurzfristige Schwankungen und liefern daher stabilere, qualitativ bessere Generierungsergebnisse. F\"ur die Inferenz werden ausschlie\ss lich die EMA-Gewichte verwendet.
+\subsection{\acl{LPIPS}}
 
-    \item \textbf{Optimizer (AdamW):} Adaptiver Optimierer, der individuelle Lernraten pro Parameter berechnet und zus\"atzlich L2-Regularisierung (Weight Decay) anwendet, um \"Uberanpassung zu reduzieren.
-
-    \item \textbf{Gradient Clipping:} Wenn Gradienten w\"ahrend des Backward Pass einen Schwellwert \"uberschreiten, werden sie auf diesen begrenzt. Dies verhindert explodierende Gradienten, die das Training destabilisieren oder zum Absturz bringen k\"onnen.
-\end{itemize}
-
-\subsubsection*{Experiment 1: 32\textsuperscript{3} Baseline}
-
-\begin{itemize}
-    \item \textbf{Volumengr\"o\ss e:} $32 \times 32 \times 32$ Voxel
-    \item \textbf{Trainingsdauer:} 56h 2m 46s (56.05 GPU-Stunden)
-    \item \textbf{Batch-Gr\"o\ss e:} 10
-    \item \textbf{Trainings-/Validierungssamples:} 1126 / 125
-    \item \textbf{Beste Epoche:} 45 (niedrigster Validierungs-Loss)
-    \item \textbf{Besonderheit:} Referenzkonfiguration ohne Augmentierung
-\end{itemize}
-
-\vspace{0.3cm}
-\textbf{Trainingsmetriken:}
-\begin{itemize}
-    \item Initialer Trainings-Loss (Epoch 0): $0.438$
-    \item Finaler Trainings-Loss (Epoch 299): $0.00051$
-    \item Minimaler Trainings-Loss: $0.00046$
-    \item Reduktion: 99.88\%
-\end{itemize}
-
-\vspace{0.3cm}
-\textbf{Validierungsmetriken:}
-\begin{itemize}
-    \item Initialer Validierungs-Loss: $0.320$
-    \item Finaler Validierungs-Loss: $0.109$
-    \item Minimaler Validierungs-Loss: $0.0573$ (beste Performance, Epoch 45)
-    \item Reduktion: 65.91\%
-\end{itemize}
-
-\subsubsection*{Experiment 2: 32\textsuperscript{3} Data Augmentation}
-
-\begin{itemize}
-    \item \textbf{Volumengr\"o\ss e:} $32 \times 32 \times 32$ Voxel
-    \item \textbf{Trainingsdauer:} 55h 47m 51s (55.80 GPU-Stunden)
-    \item \textbf{Batch-Gr\"o\ss e:} 10
-    \item \textbf{Trainings-/Validierungssamples:} 1126 / 125
-    \item \textbf{Beste Epoche:} 102 (niedrigster Validierungs-Loss)
-    \item \textbf{Besonderheit:} On-the-fly zuf\"allige links-rechts Flip-Augmentierung (p=0.5)
-\end{itemize}
-
-\vspace{0.3cm}
-\textbf{Trainingsmetriken:}
-\begin{itemize}
-    \item Initialer Trainings-Loss: $0.438$
-    \item Finaler Trainings-Loss: $0.00164$
-    \item Minimaler Trainings-Loss: $0.00156$
-    \item Reduktion: 99.63\%
-\end{itemize}
-
-\vspace{0.3cm}
-\textbf{Validierungsmetriken:}
-\begin{itemize}
-    \item Initialer Validierungs-Loss: $0.353$
-    \item Finaler Validierungs-Loss: $0.104$
-    \item Minimaler Validierungs-Loss: $0.0612$ (beste Performance, Epoch 102)
-    \item Reduktion: 70.60\%
-\end{itemize}
-
-\subsubsection*{Experiment 3: 48\textsuperscript{3} Baseline}
-
-\begin{itemize}
-    \item \textbf{Volumengr\"o\ss e:} $48 \times 48 \times 48$ Voxel
-    \item \textbf{Trainingsdauer:} 187h 24m 26s (187.41 GPU-Stunden)
-    \item \textbf{Batch-Gr\"o\ss e:} 3 (reduziert aufgrund h\"oherer Speicheranforderungen)
-    \item \textbf{Trainings-/Validierungssamples:} 1077 / 119
-    \item \textbf{Beste Epoche:} 276 (direkt nach dem Loss-Spike bei Epoch 275)
-    \item \textbf{Besonderheit:} H\"ohere r\"aumliche Aufl\"osung, keine Augmentierung
-\end{itemize}
-
-\vspace{0.3cm}
-\textbf{Trainingsmetriken:}
-\begin{itemize}
-    \item Initialer Trainings-Loss: $0.344$
-    \item Finaler Trainings-Loss: $0.0082$
-    \item Minimaler Trainings-Loss: $0.0046$
-    \item Reduktion: 97.62\%
-\end{itemize}
-
-\vspace{0.3cm}
-\textbf{Validierungsmetriken:}
-\begin{itemize}
-    \item Initialer Validierungs-Loss: $0.214$
-    \item Finaler Validierungs-Loss: $0.0611$
-    \item Minimaler Validierungs-Loss: $0.0445$ (beste Performance, Epoch 275)
-    \item Reduktion: 71.46\%
-\end{itemize}
-
-\subsection{Wichtigste Erkenntnisse}
-
-\paragraph{1. Generalisierungsverhalten}
-Der initiale Validierungs-Loss ist in allen Modellen deutlich niedriger als der Trainings-Loss (32\textsuperscript{3} Baseline: 0.32 vs. 0.44; 48\textsuperscript{3} Baseline: 0.21 vs. 0.34). Dies deutet darauf hin, dass die Trainings- und Validierungsverteilungen \"ahnlich sind und das Modell nicht stark \"uberanpasst. Der Trainings-Loss sinkt kontinuierlich bis nahe Null, w\"ahrend der Validierungs-Loss ein Plateau erreicht, was typisches Verhalten f\"ur gut regulierte Diffusionsmodelle ist.
-
-\paragraph{2. Auswirkung von Datenaugmentierung}
-Die Data-Augmentation (32\textsuperscript{3} Baseline vs. 32\textsuperscript{3} DA) zeigt folgende Effekte:
-\begin{itemize}
-    \item Trainings-Loss ist leicht h\"oher (0.00051 vs. 0.00164), da die augmentierten Daten mehr Variabilit\"at aufweisen
-    \item Validierungs-Loss-Reduktion ist st\"arker (65.91\% vs. 70.60\%), was bessere Generalisierung andeutet
-    \item Beste Epoche liegt sp\"ater (45 vs. 102), was auf langsamere, aber robustere Konvergenz hindeutet
-    \item Das 32\textsuperscript{3} DA Modell zeigt ab Epoche 132 erste Anzeichen von \"Uberanpassung
-\end{itemize}
-Die Augmentierung verbessert die Robustheit des Modells durch Exposition gegen\"uber r\"aumlichen Variationen und f\"ordert das Erlernen invarianter Merkmale.
-
-\paragraph{3. Effekt der Volumengr\"o\ss e}
-Der Vergleich 32\textsuperscript{3} vs. 48\textsuperscript{3} zeigt:
-\begin{itemize}
-    \item 48\textsuperscript{3} trainiert 3.3$\times$ l\"anger (187.41 GPU-h vs. 56.05 GPU-h) aufgrund der h\"oheren r\"aumlichen Komplexit\"at
-    \item Batch-Gr\"o\ss e musste von 10 auf 3 reduziert werden, um in den VRAM zu passen
-    \item Initialer Loss ist niedriger (0.344 vs. 0.438 f\"ur Trainings-Loss), was auf effizientere Initialisierung hindeutet
-    \item Finaler Validierungs-Loss ist besser (0.0445 vs. 0.0573), was zeigt, dass gr\"o\ss ere Volumen mit mehr Kontextinformation profitieren
-    \item Die h\"ohere Aufl\"osung erm\"oglicht feinere anatomische Details in der Generierung und bessere r\"aumliche Koh\"arenz
-\end{itemize}
-
-\paragraph{4. Lernkurven und Konvergenz}
-Alle Modelle zeigen generell stabile, monoton fallende Lernkurven \"uber 300 Epochen. Die exponentielle Abnahme des Trainings-Loss gegen\"uber der sublinearen Abnahme des Validierungs-Loss ist typisch f\"ur Diffusionsmodelle.
-
-\textbf{Anomalien - Loss Spikes:}
-\begin{itemize}
-    \item \textbf{32\textsuperscript{3} DA, Epoch 4:} Fr\"uher Loss-Spike (Train: 0.0807, Val: 0.1883) zu Beginn des Trainings, danach stabile Konvergenz.
-    \item \textbf{48\textsuperscript{3} Baseline, Epoch 7:} Zweiter fr\"uher Spike (Train: 0.0708, Val: 0.1939), typisch f\"ur die Eingewöhnungsphase.
-    \item \textbf{48\textsuperscript{3} Baseline, Epoch 275:} Hauptanomalie -- Trainings-Loss springt von 0.00457 auf 0.0322 (ca. 600\% Anstieg). Paradoxerweise sinkt der Validierungs-Loss gleichzeitig auf sein globales Minimum (0.0445). Das Modell stabilisiert sich ab Epoch 276 vollst\"andig.
-\end{itemize}
-
-\textbf{Interpretation des Epoch-275-Ereignisses:} Der Crash ist nicht kritisch. Das Modell erholt sich vollst\"andig und erreicht danach sogar die beste Validierungsperformance (beste Epoche: 276). Dies k\"onnte ein kritischer Reorganisationspunkt sein, an dem das Modell seinen internen Repr\"asentationsraum neu strukturiert. Keine NaN/Inf-Ereignisse wurden beim 32\textsuperscript{3}-Modell registriert; beim 48\textsuperscript{3}-Modell traten 5 isolierte NaN/Inf-Ereignisse auf, die jedoch keine unkontrollierte numerische Instabilit\"at verursachten. \"Ahnliche Ph\"anomene wurden in Deep Learning beobachtet, insbesondere bei gro\ss en 3D-Modellen mit komplexem Gradientenfluss.
-
-\subsection{Detaillierte Metriken-Analyse}
-
-Neben den Loss-Kurven wurden weitere kritische Trainings-Metriken analysiert:
-
-\subsubsection*{Computational Efficiency - Timing Breakdown}
-
-Ein Trainingsschritt besteht aus drei Phasen, deren Zeitanteile gemessen wurden:
-
-\begin{itemize}
-    \item \textbf{Forward Pass} bezeichnet die Vorw\"artsberechnung: Das ver\"auschte Volumen wird durch alle Schichten des Netzwerks geleitet, um die vorhergesagte Velocity $v$ zu berechnen. Dies entspricht reiner Modell-Inferenz und ist verh\"altnism\"a\ss ig schnell ($\sim$1--2\% bei 32\textsuperscript{3}, $\sim$2.5\% bei 48\textsuperscript{3}).
-
-    \item \textbf{Backward Pass} berechnet die Gradienten durch R\"uckw\"artspropagation (Backpropagation): F\"ur jeden der Millionen Modellparameter wird bestimmt, wie stark er den Loss beeinflusst. Bei 3D-Architekturen mit vielen Schichten und 3D-Faltungen ist dies rechnerisch sehr aufwendig und dominiert die Trainingszeit (32\textsuperscript{3}: $\sim$72\%, 48\textsuperscript{3}: $\sim$60\%).
-
-    \item \textbf{Data Loading} umfasst das Lesen der NIfTI-Volumina von Disk, Normalisierung und Rausch-Sampling. Der geringe Zeitanteil ($<$1\%) zeigt, dass die Datenpipeline nicht der Flaschenhals ist -- die GPU wartet nicht auf Daten.
-\end{itemize}
-
-Der relativ niedrigere Backward-Pass-Anteil beim 48\textsuperscript{3}-Modell (60\% vs. 72\%) erkl\"art sich durch den proportional gr\"o\ss eren Forward Pass bei h\"oherer r\"aumlicher Aufl\"osung.
-
-\subsubsection*{Gradient \& Stability Metrics}
-
-Stabilit\"ats-Indikatoren zeigen die numerische Robustheit w\"ahrend des Trainings:
-
-\begin{itemize}
-    \item \textbf{Gradient Clipping Events:} Z\"ahlt, wie oft der Gradient in einem Trainingsschritt den definierten Schwellwert \"uberschritt und begrenzt wurde. Hohe Werte (617 bei 32\textsuperscript{3} Baseline, 888 bei 32\textsuperscript{3} DA, 442 bei 48\textsuperscript{3}) sind bei Diffusionsmodellen normal und zeigen, dass der Mechanismus aktiv arbeitet. Die h\"ohere Anzahl beim DA-Modell ist auf die gr\"o\ss ere Variabilit\"at durch die Augmentierung zur\"uckzuf\"uhren.
-
-    \item \textbf{NaN/Inf Events:} Treten auf, wenn eine Berechnung numerisch undefiniert wird (z.\,B. Division durch Null oder Overflow). 0 Ereignisse bei den 32\textsuperscript{3}-Modellen zeigen vollst\"andige numerische Stabilit\"at. Die 5 isolierten Ereignisse beim 48\textsuperscript{3}-Modell f\"uhrten zu keiner Destabilisierung -- das Modell konnte sich selbst korrigieren.
-
-    \item \textbf{Loss Spikes:} Pl\"otzliche sprunghafte Anstiege des Loss \"uber mehrere Standardabweichungen hinaus. 0 Spikes beim 32\textsuperscript{3} Baseline best\"atigen stabiles Training; 1 fr\"uher Spike beim 32\textsuperscript{3} DA-Modell (Epoch 4) ist in der Anfangsphase mit Augmentierung typisch; die 2 Spikes beim 48\textsuperscript{3}-Modell (Epochen 7 und 275) wurden vollst\"andig \"uberwunden.
-
-    \item \textbf{Durchschnittliche Gradienten-Norm:} Ma\ss  f\"ur die Gesamt-Gr\"o\ss e des Gradienten \"uber alle Parameter. Ein konsistenter Wert ($\sim$0.19--0.24) \"uber das Training zeigt, dass das Modell stabil lernt und weder zu aggressiv noch zu zaghaft aktualisiert wird. Werte nahe Null am Ende ($\sim$0.019--0.025) deuten auf Konvergenz hin.
-
-    \item \textbf{EMA Divergence:} Misst den Abstand zwischen den aktuellen Modellgewichten und den EMA-Gewichten. Ein moderater, stabiler Wert ($\sim$45--49) zeigt, dass die EMA-Gewichte dem Training folgen, ohne zu stark zu divergieren -- ein Zeichen f\"ur gesunde Lernfortschritte.
-\end{itemize}
-
-Das Training war insgesamt stabil mit nur isolierten, vollst\"andig \"uberwundenen Anomalien.
-
-\subsubsection*{Ressourcennutzung}
-
-\begin{itemize}
-    \item \textbf{32\textsuperscript{3} Modelle:} $\sim$56 GPU-Stunden, Peak Memory $\sim$10.7 GB (91\% der GTX 1080 Ti VRAM), Batch-Gr\"o\ss e 10
-    \item \textbf{48\textsuperscript{3} Modell:} $\sim$187 GPU-Stunden, Peak Memory $\sim$10.1 GB, Batch-Gr\"o\ss e 3 (durch VRAM-Beschr\"ankung)
-    \item \textbf{Speicherauslastung:} Alle Modelle nutzen den verf\"ugbaren VRAM (11.7 GB) nahezu vollst\"andig aus
-\end{itemize}
-
-\subsection{Fazit}
-
-Die Trainingsergebnisse demonstrieren, dass alle drei Konfigurationen erfolgreich trainieren und stabile Lernkurven aufweisen. Die 48\textsuperscript{3}-Aufl\"osung bietet sowohl bessere Validierungsmetriken als auch h\"ohere Pr\"azision f\"ur medizinische Bildgenerierung, rechtfertigt jedoch die 3.3$\times$ l\"angere Trainingsdauer und erfordert eine deutlich reduzierte Batch-Gr\"o\ss e (3 statt 10). Datenaugmentierung verbessert die Generalisierung messbar, f\"uhrt aber zu sp\"aterer Konvergenz (Epoche 102 statt 45) und ersten Anzeichen von \"Uberanpassung ab Epoche 132. Alle Loss-Spikes wurden vollst\"andig \"uberwunden, wobei der Spike bei 48\textsuperscript{3} in Epoch 275 paradoxerweise zum besten Validierungsergebnis f\"uhrte.
-
-\subsection*{Visualisierungen}
-
-Zwei zentrale Visualisierungen zeigen die Trainings-Performance:
-
-\begin{enumerate}
-    \item \textbf{Loss Curves (Abbildung 01):} Zeigt den Verlauf von Trainings- (blau, solid) und Validierungs-Loss (orange, gestrichelt) \"uber 300 Epochen f\"ur alle drei Modelle. Deutlich sichtbar sind die Loss-Spikes, insbesondere bei 48\textsuperscript{3} in Epoch 275.
-
-    \item \textbf{Training Time (Abbildung 05):} Horizontales Balken-Diagramm der GPU-Stunden zeigt die drastisch h\"ohere Trainingszeit des 48\textsuperscript{3} Modells (187h vs. 56h f\"ur 32\textsuperscript{3}).
-\end{enumerate}
-
-Diese Visualisierungen dienen als direkte Referenzen f\"ur die oben beschriebenen analytischen Ergebnisse.
+\subsection{Dice}
