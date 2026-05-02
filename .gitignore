@@ -44,10 +44,10 @@
 .bak 
 .mtc
 build/
-
 *.svg
 *.eps
 *.tps
 *.tcp
+
 
 # .pdf
