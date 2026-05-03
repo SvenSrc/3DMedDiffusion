@@ -26,28 +26,28 @@ def plot_orthogonal_slices(volume, title="volume", cmap="gray"):
 
 def plot_preprocessing_steps(volume, target_size):
     # walk through the pipeline and show the center axial slice at each stage
-    steps = [("original", volume)]
+    stages = [("original", volume)]
 
     v = percentile_clip(volume)
-    steps.append(("clipped", v))
+    stages.append(("clipped", v))
     v = crop_foreground(v)
-    steps.append(("cropped", v))
+    stages.append(("cropped", v))
     v = pad_to_cubic(v)
-    steps.append(("padded", v))
+    stages.append(("padded", v))
     v = resize_volume(v, target_size)
-    steps.append(("resized", v))
+    stages.append(("resized", v))
     v = normalize_to_range(v)
-    steps.append(("normalized", v))
+    stages.append(("normalized", v))
 
-    fig, axes = plt.subplots(1, len(steps), figsize=(3 * len(steps), 4))
-    for ax, (name, vol) in zip(axes, steps):
-        center = vol.shape[0] // 2
-        ax.imshow(vol[center], cmap="gray")
+    fig, axes = plt.subplots(1, len(stages), figsize=(3 * len(stages), 4))
+    for ax, (name, vol) in zip(axes, stages):
+        c = vol.shape[0] // 2
+        vmin, vmax = (-1, 1) if name == "normalized" else (None, None)
+        ax.imshow(vol[c], cmap="gray", vmin=vmin, vmax=vmax)
         ax.set_title(f"{name}\n{vol.shape}")
         ax.axis("off")
     plt.tight_layout()
     plt.show()
-
 
 def print_volume_stats(volume, name="volume"):
     print(f"{name}: shape={volume.shape}, dtype={volume.dtype}, "

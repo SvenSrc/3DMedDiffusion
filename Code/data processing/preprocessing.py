@@ -4,7 +4,7 @@ import numpy as np
 from scipy import ndimage
 from tqdm import tqdm
 
-from nifti_io import load_nifti, save_nifti, find_brats_t1n_files
+from nifti import load_nifti, save_nifti, find_t1n_files
 
 
 # Pipeline: percentile clip -> crop foreground -> pad to cubic -> resize -> normalize to [-1, 1].
@@ -64,7 +64,7 @@ def preprocess_volume(volume, target_size, lower=0.5, upper=99.5):
 
 def process_brats_dataset(input_dir, output_dir, target_size, lower=0.5, upper=99.5):
     os.makedirs(output_dir, exist_ok=True)
-    files = find_brats_t1n_files(input_dir)
+    files = find_t1n_files(input_dir)
     print(f"found {len(files)} T1N volumes, target size {target_size}")
 
     written = []
