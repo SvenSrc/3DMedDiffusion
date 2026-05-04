@@ -4,7 +4,7 @@ import numpy as np
 from scipy import ndimage
 from tqdm import tqdm
 
-from nifti import load_nifti, save_nifti, find_t1n_files
+from nifti import load_nifti, save_nifti, find_t1n_files, find_seg_files
 
 
 # Pipeline: percentile clip -> crop foreground -> pad to cubic -> resize -> normalize to [-1, 1].
@@ -17,21 +17,24 @@ def percentile_clip(volume, lower=0.5, upper=99.5):
         return volume
     lo, hi = np.percentile(foreground, [lower, upper])
     out = np.clip(volume, lo, hi)
-    out[volume == 0] = 0   # don't drag background up to the lower percentile
+    out[volume == 0] = 0
     return out
 
 
-def crop_foreground(volume, threshold=0.0, margin=2):
+def foreground_bbox(volume, threshold=0.0, margin=2):
     coords = np.array(np.where(volume > threshold))
     if coords.size == 0:
-        return volume
+        return tuple(slice(0, s) for s in volume.shape)
     mins = coords.min(axis=1)
     maxs = coords.max(axis=1) + 1
-    slices = tuple(
+    return tuple(
         slice(max(0, lo - margin), min(size, hi + margin))
         for lo, hi, size in zip(mins, maxs, volume.shape)
     )
-    return volume[slices]
+
+
+def crop_foreground(volume, threshold=0.0, margin=2):
+    return volume[foreground_bbox(volume, threshold, margin)]
 
 
 def pad_to_cubic(volume, value=0.0):
@@ -62,6 +65,16 @@ def preprocess_volume(volume, target_size, lower=0.5, upper=99.5):
     return volume
 
 
+def preprocess_seg(t1n, seg, target_size, lower=0.5, upper=99.5):
+    # crop seg with the bbox computed from t1n so the two stay aligned
+    t1n_clipped = percentile_clip(t1n, lower, upper)
+    bbox = foreground_bbox(t1n_clipped)
+    seg = seg[bbox]
+    seg = pad_to_cubic(seg)
+    seg = resize_volume(seg, target_size, order=0)   # nearest-neighbor preserves labels
+    return seg
+
+
 def process_brats_dataset(input_dir, output_dir, target_size, lower=0.5, upper=99.5):
     os.makedirs(output_dir, exist_ok=True)
     files = find_t1n_files(input_dir)
@@ -79,4 +92,25 @@ def process_brats_dataset(input_dir, output_dir, target_size, lower=0.5, upper=9
             print(f"  skipped {subject_id}: {e}")
 
     print(f"done: {len(written)}/{len(files)} written to {output_dir}")
+    return written
+
+
+def process_brats_seg_dataset(input_dir, output_dir, target_size, lower=0.5, upper=99.5):
+    os.makedirs(output_dir, exist_ok=True)
+    pairs = find_seg_files(input_dir)
+    print(f"found {len(pairs)} (T1N, seg) pairs, target size {target_size}")
+
+    written = []
+    for subject_id, t1n_path, seg_path in tqdm(pairs, desc="preprocessing seg"):
+        try:
+            t1n, _ = load_nifti(t1n_path)
+            seg, _ = load_nifti(seg_path)
+            seg = preprocess_seg(t1n, seg, target_size, lower, upper)
+            out_path = os.path.join(output_dir, f"{subject_id}.nii.gz")
+            save_nifti(seg, out_path, spacing=(1.0, 1.0, 1.0), dtype=np.int16)
+            written.append(out_path)
+        except Exception as e:
+            print(f"  skipped {subject_id}: {e}")
+
+    print(f"done: {len(written)}/{len(pairs)} written to {output_dir}")
     return written

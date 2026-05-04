@@ -8,7 +8,6 @@ import nibabel as nib
 def load_nifti(path):
     nii = nib.load(path)
     vol = nii.get_fdata().astype(np.float32)
-    # some BraTS files come in as 4D with a single timepoint
     if vol.ndim == 4:
         vol = vol[..., 0]
     meta = {
@@ -18,13 +17,13 @@ def load_nifti(path):
     return vol, meta
 
 
-def save_nifti(volume, path, affine=None, spacing=None):
+def save_nifti(volume, path, affine=None, spacing=None, dtype=np.float32):
     if affine is None:
         affine = np.eye(4)
         if spacing is not None:
             affine[:3, :3] = np.diag(spacing)
 
-    nii = nib.Nifti1Image(volume.astype(np.float32), affine)
+    nii = nib.Nifti1Image(volume.astype(dtype), affine)
     if spacing is not None:
         nii.header.set_zooms(spacing)
 
@@ -35,11 +34,21 @@ def save_nifti(volume, path, affine=None, spacing=None):
 
 
 def find_t1n_files(root):
-    # BraTS folder layout: root / BraTS-GLI-XXXXX-NNN / BraTS-GLI-XXXXX-NNN-t1n.nii.gz
-    
     files = []
     for path in Path(root).glob("**/*-t1n.nii.gz"):
         subject_id = path.stem.replace("-t1n.nii", "")
         files.append((subject_id, str(path)))
     files.sort()
     return files
+
+
+def find_seg_files(root):
+    # returns (subject_id, t1n_path, seg_path) — only subjects that have both files
+    pairs = []
+    for seg_path in Path(root).glob("**/*-seg.nii.gz"):
+        subject_id = seg_path.stem.replace("-seg.nii", "")
+        t1n_path = seg_path.parent / f"{subject_id}-t1n.nii.gz"
+        if t1n_path.exists():
+            pairs.append((subject_id, str(t1n_path), str(seg_path)))
+    pairs.sort()
+    return pairs
