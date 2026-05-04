@@ -163,17 +163,10 @@ Die Varianz $\sigma_t^2$ wird üblicherweise als fester Wert gesetzt, wobei $\sig
 Das Sampling beschreibt den Prozess der Datengenerierung, bei dem von reinem Rauschen $x_T \sim \mathcal{N}(0, I)$ schrittweise der Rückwärtsprozess durchlaufen wird~\cite[S. 4]{ho_denoising_2020}. Die Wahl des Sampling-Verfahrens beeinflusst sowohl die Qualität der generierten Daten als auch die benötigte Rechenzeit.
  
 \subsubsection{DDPM-Sampling}
-Das \ac{DDPM}-Sampling folgt direkt dem stochastischen Rückwärtsprozess aus \autoref{eq:sampling_step}. Es durchläuft alle $T$ Zeitschritte (meistens $T = 1000$~\cite[S. 5]{ho_denoising_2020}) und fügt bei jedem Schritt stochastisches Rauschen hinzu:
-%
-\begin{equation}
-    x_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}}\, \epsilon_\theta(x_t, t) \right) + \sigma_t\, z, \qquad z \sim \mathcal{N}(0, I)
-    \label{eq:ddpm_sampling}
-\end{equation}
-%
-Dieses Verfahren liefert qualitativ hochwertige Ergebnisse, ist jedoch aufgrund der $T$ erforderlichen Netzwerkauswertungen rechenintensiv\cite[S. 3]{song_denoising_2022}.
+Sofern nicht anders angegeben, beziehen sich die folgenden Aussagen auf \textcite[S. 3 ff.]{ho_denoising_2020}. Das \ac{DDPM}-Sampling implementiert den stochastischen Rückwärtsprozess aus \autoref{eq:sampling_step} und entspricht damit der ursprünglichen Sampling-Prozedur von \citeauthor{ho_denoising_2020}. Ausgehend von reinem Gaussschen Rauschen $x_T \sim \mathcal{N}(0, I)$ wird in jedem Schritt $t \to t-1$ eine kleine Menge des im Bild enthaltenen Rauschens entfernt, wobei das trainierte Netzwerk $\epsilon_\theta(x_t, t)$ diese Rauschkomponente vorhersagt. Der erste Klammerausdruck aus \autoref{eq:sampling_step} entspricht dem geschätzten Mittelwert der Rückwärtsverteilung $p_\theta(x_{t-1} \mid x_t)$, während über das hinzugefügte Rauschen $\sigma_t\, z$ mit $z \sim \mathcal{N}(0, I)$ die für den Markov-Prozess charakteristische Stochastizität eingebracht wird. Für die Varianz wird typischerweise $\sigma_t^2 = \beta_t$ gewählt. Der Prozess durchläuft alle $T$ Zeitschritte, wobei in der Praxis $T = 1000$ mit einem linearen $\beta$-Schedule von $\beta_1 = 10^{-4}$ bis $\beta_T = 0{,}02$ verwendet wird. Da bei jedem dieser Schritte eine vollständige Auswertung des Neuronalen Netzes erforderlich ist, liefert das Verfahren zwar qualitativ hochwertige Ergebnisse, ist jedoch rechenintensiv und in der Praxis deutlich langsamer als alternative generative Modelle~\cite[vgl.][S. 3]{song_denoising_2022}.
  
 \subsubsection{DDIM-Sampling}
-Im Gegensatz zum \ac{DDPM}-Sampling müssen beim \ac{DDIM}-Sampling nicht alle $T$ Schritte durchlaufen werden. Dies wird dadurch ermöglicht, dass der Vorwärtsprozess auch als nicht-Markov-Prozess interpretiert werden kann, was zu einer deterministischen Sampling-Prozedur führt~\cite[S. 4 f.]{song_denoising_2022}. Das \ac{DDIM}-Sampling wird wie folgt beschrieben:
+Sofern nicht anders angegeben, beziehen sich die folgenden Aussagen auf \textcite[S. 3 ff.]{song_denoising_2022}. Im Gegensatz zum \ac{DDPM}-Sampling müssen beim \ac{DDIM}-Sampling nicht alle $T$ Schritte durchlaufen werden. Dies wird dadurch ermöglicht, dass der Vorwärtsprozess auch als nicht-Markov-Prozess interpretiert werden kann, was zu einer deterministischen Sampling-Prozedur führt. Das \ac{DDIM}-Sampling wird wie folgt beschrieben:
 %
 \begin{equation}
     x_{t-1} = \sqrt{\bar{\alpha}_{t-1}} 
@@ -183,13 +176,17 @@ Im Gegensatz zum \ac{DDPM}-Sampling müssen beim \ac{DDIM}-Sampling nicht alle $T
     \label{eq:ddim_sampling}
 \end{equation}
 %
-Für $\sigma_t = 0$ wird der Prozess deterministisch, das heißt derselbe Startpunkt $x_T$ erzeugt immer dasselbe Ergebnis~\cite[S. 5]{song_denoising_2022}. 
-% Ein weiterer Vorteil von \ac{DDIM} ist, dass eine Teilmenge $\tau = \{\tau_1, \ldots, \tau_S\} \subset \{1, \ldots, T\}$ mit $S \ll T$ gewählt werden kann, wobei das Sampling nur über diese $S$ Schritte erfolgt~\cite[S. 5]{song_denoising_2022}. 
-In der Praxis reichen häufig 50 bis 100 Schritte statt für $T = 1000$, was eine 10- bis 50-fache Beschleunigung bei vergleichbarer Bildqualität ermöglicht~\cite[S. 7]{song_denoising_2022}.
+Der erste Term 
+%$\sqrt{\bar{\alpha}_{t-1}} \left( (x_t - \sqrt{1 - \bar{\alpha}_t}\, \epsilon_\theta(x_t, t)) / \sqrt{\bar{\alpha}_t} \right)$
+entspricht der Vorhersage des sauberen Bildes $x_0$ ausgehend vom verrauschten Zustand $x_t$, der zweite Term 
+%$\sqrt{1 - \bar{\alpha}_{t-1} - \sigma_t^2}\, \epsilon_\theta(x_t, t)$
+stellt die deterministische Richtung dar, die zurück auf $x_{t-1}$ zeigt, und der letzte Term $\sigma_t\, z$ mit $z \sim \mathcal{N}(0, I)$ steuert über $\sigma_t$ den Grad der Stochastizität des Verfahrens. Für $\sigma_t = 0$ wird der Prozess deterministisch, das heißt derselbe Startpunkt $x_T$ erzeugt immer dasselbe Ergebnis. In der Praxis reichen häufig 50 bis 100 Schritte statt $T = 1000$, was eine 10- bis 50-fache Beschleunigung bei vergleichbarer Bildqualität ermöglicht~\cite[S. 7]{song_denoising_2022}.
  
 \subsubsection{DPM-Solver++}
+Der folgenden Abschnitt bezieht sich aus
 
-\subsection{UniPC}
+
+\subsubsection{UniPC}
 
 % % ============================================================
 % % 4. NEUER ABSCHNITT: Trainingsziel
