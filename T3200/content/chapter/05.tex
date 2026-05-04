@@ -198,6 +198,18 @@ In der Praxis kommt überwiegend die Multistep-Variante zweiter Ordnung DPM-Solve
 Der erste Iterationsschritt wird durch eine Aktualisierung erster Ordnung initialisiert, die dem deterministischen \ac{DDIM}-Sampling entspricht~\cite[vgl.][S. 9]{lu_dpm-solver_2025}. Aus der Forschung erzeugt DPM-Solver++(2M) bereits in 15 bis 20 Schritten Bilder vergleichbarer Qualität wie ein \ac{DDIM}-Sampling mit mehreren hundert Schritten~\cite[vgl.][S. 11]{lu_dpm-solver_2025}.
 
 \subsubsection{UniPC}
+Sofern nicht anders angegeben, beziehen sich die folgenden Aussagen auf \textcite[S. 1 ff.]{zhao_unipc_nodate}. \ac{UniPC} ist ein trainingsfreies Sampling-Verfahren, das insbesondere bei sehr wenigen Schritten (< 10) eine bessere Sampling-Qualität als vergleichbare Verfahren erreicht. Die Grundidee besteht darin, jeden Sampling-Schritt in zwei Teilschritte aufzuteilen. Zuerst erzeugt der Prädiktor (UniP) analog zum DPM-Solver++ eine erste Schätzung des nachfolgenden Zustands $\tilde{x}_{t_i}$. Anschließend verbessert der Korrektor (UniC) diese Schätzung zu einem korrigierten Wert $\tilde{x}^{c}_{t_i}$, indem die Modellauswertung am vorhergesagten Punkt als zusätzlicher Stützpunkt einbezogen wird. Dadurch erhöht sich die Genauigkeitsordnung des Verfahrens um eins. Der wesentliche Unterschied zu klassischen Predictor-Corrector-Verfahren aus der Mathematik liegt darin, dass UniC keine zusätzlichen Auswertungen des Neuronalen Netzes benötigt. Die im Korrekturschritt berechnete Modellauswertung wird im darauffolgenden Sampling-Schritt wiederverwendet, sodass pro Iteration nur eine einzige Netzauswertung erforderlich ist.
+\abschnitt
+Wie der DPM-Solver++ basiert \ac{UniPC} auf der Lösung der Diffusion-\ac{ODE} im log-SNR-Bereich. Mit der Schrittweite $h_i := \lambda_{t_i} - \lambda_{t_{i-1}}$ und den Differenzen $D_m$ aus zusätzlichen Modellauswertungen ergibt sich der Korrekturschritt UniC-p zu:
+%
+\begin{equation}
+    \tilde{x}^{c}_{t_i} = \frac{\alpha_{t_i}}{\alpha_{t_{i-1}}}\, \tilde{x}^{c}_{t_{i-1}} 
+    - \sigma_{t_i}(e^{h_i} - 1)\, \epsilon_\theta(\tilde{x}_{t_{i-1}}, t_{i-1}) 
+    - \sigma_{t_i}\, B(h_i) \sum_{m=1}^{p} \frac{a_m}{r_m}\, D_m
+    \label{eq:unipc}
+\end{equation}
+%
+Die ersten beiden Terme entsprechen einer Aktualisierung erster Ordnung, die dem deterministischen \ac{DDIM}-Sampling entspricht. Der Summenterm bringt die Korrektur höherer Ordnung ein, indem die Differenzen $D_m$ vorangegangener Modellauswertungen mit den Koeffizienten $a_m$ gewichtet kombiniert werden. Der Prädiktor UniP-p ergibt sich aus \autoref{eq:unipc} durch Weglassen des Terms $D_p$, da dieser die im Prädiktorschritt noch nicht verfügbare Modellauswertung am aktuellen Zeitschritt voraussetzt. Die Kombination beider Komponenten erreicht eine Genauigkeitsordnung von $p+1$. Da Prädiktor und Korrektor derselben analytischen Form folgen, lassen sich beliebige Ordnungen einheitlich formulieren, während der DPM-Solver++ nur bis zur dritten Ordnung explizit angegeben werden kann.
 
 % % ============================================================
 % % 4. NEUER ABSCHNITT: Trainingsziel
