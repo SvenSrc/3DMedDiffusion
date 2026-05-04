@@ -49,5 +49,6 @@ build/
 *.tps
 *.tcp
 
+__pycache__
 
 # .pdf
