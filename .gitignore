@@ -48,6 +48,6 @@ build/
 *.eps
 *.tps
 *.tcp
-
+*.pyc
 
 # .pdf
