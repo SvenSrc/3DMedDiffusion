@@ -135,3 +135,24 @@ Generative Model werden auch als \ac{DGM}s beziechnet. Unter ein \ac{DGM} wird e
 % gelernten Verteilung können neue Datenpunkte erzeugt werden, die statistisch denTrainingsdaten ähneln, aber nicht identisch mit ihnen sind~\cite{prince_understanding_2023}.
 
 %%
+
+\section{Arten der Generierung}
+Generative Modelle lassen sich dahingehend unterscheiden, ob der Generierungsprozess durch zusätzliche Informationen gesteuert wird. In diesem Zusammenhang wird zwischen \textit{unconditional} und \textit{conditional} Generierung differenziert.
+
+\subsection{Unconditional}
+Bei der \textit{unconditional} Generierung lernt ein generatives Modell die Datenverteilung $p(\mathbf{x})$ ohne Annotationen. Dabei werden Samples allein aus der erlernten Datenverteilung gezogen. Allerdings schneidet die unbedingte Generierung schlechter ab, da im konditionalen Fall durch menschliche Annotationen zusätzliche semantische Information bereitgestellt wird~\cite[S.~3]{li_return_2024}. Methodisch bildet die unbedingte Generierung zugleich die Grundlage konditionaler Modelle, da diese auf denselben Trainings- und Sampling-Mechanismen aufbauen~\cite[S.~16.]{chen_overview_2024}.
+
+\subsection{Conditional}
+Bei der \textit{conditional} Generierung wird der Generierungsprozess durch eine zusätzliche Information $\mathbf{y}$ gesteuert, sodass das Modell die bedingte Verteilung $p(\mathbf{x} \mid \mathbf{y})$ lernt. Als Konditionierung dienen je nach Anwendungsfall beispielsweise textuelle Beschreibungen oder Bilder~\cite[vgl.][S.~5 ff.]{chen_overview_2024}.
+\abschnitt
+Jeodch ist das einfache Konditionieren auf $\mathbf{y}$ häufig nicht ausreichend, um eine deutliche Ausrichtung der erzeugten Samples an der Bedingung zu erzielen. Deshalb wird der Einfluss der Konditionierung beim Sampling künstlich verstärkt. Dieses Vorgehen wird als \textit{Guidance} bezeichnet~\cite[vgl.][S.~17]{chen_overview_2024}. Dabei gibt es zwei Verfahren: \textit{Classifier Guidance}~\cite{dhariwal_diffusion_2021} und \textit{Classifier-Free Guidance}~\cite{ho_classifier-free_2022}. Classifier Guidance verwendet hierfür den Gradienten $\nabla_{\mathbf{x}_t} \log p_\phi(\mathbf{y} \mid \mathbf{x}_t)$ eines separat auf verrauschten Daten trainierten Classifiers, was allerdings das aufwendige Training eines zusätzlichen Modells erfordert. Der so gewonnene Gradient wird beim Sampling zur geschätzten Score-Funktion addiert und lenkt den Prozess in Richtung der Bedingung $\mathbf{y}$~\cite[vgl.][S.~6 f.]{dhariwal_diffusion_2021}.
+\abschnitt
+\textit{Classifier-Free Guidance} kommt ohne einen weiteren Classifier aus. Ein einzelnes Netzwerk wird gemeinsam für die bedingte und die unbedingte Schätzung trainiert, indem die Bedingung $\mathbf{y}$ während des Trainings mit einer festen Wahrscheinlichkeit durch ein Null-Token $\emptyset$ ersetzt wird~\cite[vgl.][S.~4]{ho_classifier-free_2022}. Beim Sampling werden die bedingte und die unbedingte Rauschvorhersage linear kombiniert~\cite[S.~5]{ho_classifier-free_2022}:
+%
+\begin{equation}
+    \tilde{\boldsymbol{\epsilon}}_\theta(\mathbf{x}_t, \mathbf{y}) = (1 + w)\,\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, \mathbf{y}) - w\,\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, \emptyset),
+\end{equation}
+%
+wobei $w \geq 0$ die Guidance-Stärke bezeichnet. Über die Bayes-Beziehung $\nabla_{\mathbf{x}_t}\log p(\mathbf{y} \mid \mathbf{x}_t) = \nabla_{\mathbf{x}_t}\log p(\mathbf{x}_t \mid \mathbf{y}) - \nabla_{\mathbf{x}_t}\log p(\mathbf{x}_t)$ lässt sich diese Linearkombination als implizite Approximation des Classifier-Gradienten interpretieren, sodass auf ein zusätzliches Modell verzichtet werden kann~\cite[vgl.][S.~2]{ho_classifier-free_2022}~\cite[vgl.][S. 18]{chen_overview_2024}. Aufgrund dieser Einfachheit wird Classifier-Free Guidance heute häufig für das Training konditionaler Diffusionsmodelle von Grund auf eingesetzt. Jedoch ist das Verfahren wegen des damit verbundenen Rechenaufwands nicht für die Adaption oder das Fine-Tuning bereits trainierter Modelle geeignet~\cite[vgl.][S. 17]{chen_overview_2024}.
+\abschnitt
+Die Guidance-Stärke $w$ steuert dabei das Ergebnis. Bei $w = 0$ entspricht das Sampling der rein bedingten Vorhersage, während größere Werte die Treue zur Bedingung erhöhen, jedoch mit einer Reduktion der Sample-Diversität einhergehen~\cite[vgl.][S.~17 ff.]{chen_overview_2024}.

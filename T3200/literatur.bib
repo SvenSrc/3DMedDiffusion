@@ -1010,3 +1010,73 @@ Conclusion: Technologies have enabled the development of AI-assisted approaches 
   address   = {Cambridge, MA, USA},
   year      = {2002}
 }
+
+
+@misc{chen_overview_2024,
+	title = {An {Overview} of {Diffusion} {Models}: {Applications}, {Guided} {Generation}, {Statistical} {Rates} and {Optimization}},
+	shorttitle = {An {Overview} of {Diffusion} {Models}},
+	url = {http://arxiv.org/abs/2404.07771},
+	doi = {10.48550/arXiv.2404.07771},
+	abstract = {Diffusion models, a powerful and universal generative AI technology, have achieved tremendous success in computer vision, audio, reinforcement learning, and computational biology. In these applications, diffusion models provide flexible high-dimensional data modeling, and act as a sampler for generating new samples under active guidance towards task-desired properties. Despite the significant empirical success, theory of diffusion models is very limited, potentially slowing down principled methodological innovations for further harnessing and improving diffusion models. In this paper, we review emerging applications of diffusion models, understanding their sample generation under various controls. Next, we overview the existing theories of diffusion models, covering their statistical properties and sampling capabilities. We adopt a progressive routine, beginning with unconditional diffusion models and connecting to conditional counterparts. Further, we review a new avenue in high-dimensional structured optimization through conditional diffusion models, where searching for solutions is reformulated as a conditional sampling problem and solved by diffusion models. Lastly, we discuss future directions about diffusion models. The purpose of this paper is to provide a well-rounded theoretical exposure for stimulating forward-looking theories and methods of diffusion models.},
+	language = {en},
+	urldate = {2026-05-05},
+	publisher = {arXiv},
+	author = {Chen, Minshuo and Mei, Song and Fan, Jianqing and Wang, Mengdi},
+	month = apr,
+	year = {2024},
+	note = {arXiv:2404.07771 [cs]},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning, Mathematics - Statistics Theory},
+	file = {PDF:C\:\\Users\\Sven\\Zotero\\storage\\RF8E45HE\\Chen et al. - 2024 - An Overview of Diffusion Models Applications, Guided Generation, Statistical Rates and Optimization.pdf:application/pdf},
+}
+
+
+@misc{li_return_2024,
+	title = {Return of {Unconditional} {Generation}: {A} {Self}-supervised {Representation} {Generation} {Method}},
+	shorttitle = {Return of {Unconditional} {Generation}},
+	url = {http://arxiv.org/abs/2312.03701},
+	doi = {10.48550/arXiv.2312.03701},
+	abstract = {Unconditional generationâ€”the problem of modeling data distribution without relying on human-annotated labelsâ€”is a long-standing and fundamental challenge in generative models, creating a potential of learning from large-scale unlabeled data. In the literature, the generation quality of an unconditional method has been much worse than that of its conditional counterpart. This gap can be attributed to the lack of semantic information provided by labels. In this work, we show that one can close this gap by generating semantic representations in the representation space produced by a self-supervised encoder. These representations can be used to condition the image generator. This framework, called Representation-Conditioned Generation (RCG), provides an effective solution to the unconditional generation problem without using labels. Through comprehensive experiments, we observe that RCG significantly improves unconditional generation quality: e.g., it achieves a new state-of-the-art FID of 2.15 on ImageNet 256Ã—256, largely reducing the previous best of 5.91 by a relative 64\%. Our unconditional results are situated in the same tier as the leading class-conditional ones. We hope these encouraging observations will attract the communityâ€™s attention to the fundamental problem of unconditional generation. Code is available at https://github.com/LTH14/rcg.},
+	language = {en},
+	urldate = {2026-05-05},
+	publisher = {arXiv},
+	author = {Li, Tianhong and Katabi, Dina and He, Kaiming},
+	month = nov,
+	year = {2024},
+	note = {arXiv:2312.03701 [cs]},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+	file = {PDF:C\:\\Users\\Sven\\Zotero\\storage\\AWCFG5NP\\Li et al. - 2024 - Return of Unconditional Generation A Self-supervised Representation Generation Method.pdf:application/pdf},
+}
+
+
+@misc{dhariwal_diffusion_2021,
+	title = {Diffusion {Models} {Beat} {GANs} on {Image} {Synthesis}},
+	url = {http://arxiv.org/abs/2105.05233},
+	doi = {10.48550/arXiv.2105.05233},
+	abstract = {We show that diffusion models can achieve image sample quality superior to the current state-of-the-art generative models. We achieve this on unconditional image synthesis by ?nding a better architecture through a series of ablations. For conditional image synthesis, we further improve sample quality with classi?er guidance: a simple, compute-ef?cient method for trading off diversity for ?delity using gradients from a classi?er. We achieve an FID of 2.97 on ImageNet 128×128, 4.59 on ImageNet 256×256, and 7.72 on ImageNet 512×512, and we match BigGAN-deep even with as few as 25 forward passes per sample, all while maintaining better coverage of the distribution. Finally, we ?nd that classi?er guidance combines well with upsampling diffusion models, further improving FID to 3.94 on ImageNet 256×256 and 3.85 on ImageNet 512×512. We release our code at https://github.com/openai/guided-diffusion.},
+	language = {en},
+	urldate = {2026-05-07},
+	publisher = {arXiv},
+	author = {Dhariwal, Prafulla and Nichol, Alex},
+	month = jun,
+	year = {2021},
+	note = {arXiv:2105.05233 [cs]},
+	keywords = {Computer Science - Artificial Intelligence, Computer Science - Computer Vision and Pattern Recognition, Computer Science - Machine Learning, Statistics - Machine Learning},
+	file = {PDF:C\:\\Users\\User\\Zotero\\storage\\PYSDL9TA\\Dhariwal und Nichol - 2021 - Diffusion Models Beat GANs on Image Synthesis.pdf:application/pdf},
+}
+
+
+@misc{ho_classifier-free_2022,
+	title = {Classifier-{Free} {Diffusion} {Guidance}},
+	url = {http://arxiv.org/abs/2207.12598},
+	doi = {10.48550/arXiv.2207.12598},
+	abstract = {Classi?er guidance is a recently introduced method to trade off mode coverage and sample ?delity in conditional diffusion models post training, in the same spirit as low temperature sampling or truncation in other types of generative models. Classi?er guidance combines the score estimate of a diffusion model with the gradient of an image classi?er and thereby requires training an image classi?er separate from the diffusion model. It also raises the question of whether guidance can be performed without a classi?er. We show that guidance can be indeed performed by a pure generative model without such a classi?er: in what we call classi?er-free guidance, we jointly train a conditional and an unconditional diffusion model, and we combine the resulting conditional and unconditional score estimates to attain a trade-off between sample quality and diversity similar to that obtained using classi?er guidance.},
+	language = {en},
+	urldate = {2026-05-07},
+	publisher = {arXiv},
+	author = {Ho, Jonathan and Salimans, Tim},
+	month = jul,
+	year = {2022},
+	note = {arXiv:2207.12598 [cs]},
+	keywords = {Computer Science - Artificial Intelligence, Computer Science - Machine Learning},
+	file = {PDF:C\:\\Users\\User\\Zotero\\storage\\FAPVB7L7\\Ho und Salimans - 2022 - Classifier-Free Diffusion Guidance.pdf:application/pdf},
+}
