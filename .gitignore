@@ -50,4 +50,6 @@ build/
 *.tcp
 *.pyc
 
+__pycache__
+
 # .pdf
