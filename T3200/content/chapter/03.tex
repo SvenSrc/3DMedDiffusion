@@ -58,17 +58,19 @@ Ein einzelner künstlicher Neuron kann wird mathematisch wie folgt beschrieben:
 \todo{Feedforward und Recurrent Neural Network}
 
 \subsection{Perceptron}
-Das Perceptron wurde eingeführt von~\citeauthor{rosenblatt1957perceptron} im Jahr~\citeyear{rosenblatt1957perceptron} und gilt als die einfachste Form eines~\ac{ANN}. Es handelt sich um einen elektronischen Mechanismus, der dazu fähig ist, Muster zu erkennen. Seine Ausgaben hängen von Wahrscheinlichkeiten ab statt von einem deterministischen Prozess. Ein Modell, das optische bzw.\ visuelle Muster erkennt, wird als \textit{Photoperceptron} bezeichnet~\cite[S. 2]{rosenblatt1957perceptron}. Mathematisch wird ein Perceptron wie folgt dargestellt~\cite[S. 39]{li_machine_2024}:
+Das Perceptron wurde von~\citeauthor{rosenblatt1957perceptron} im Jahr~\citeyear{rosenblatt1957perceptron} eingeführt und gilt als die einfachste Form eines~\ac{ANN}. Es handelt sich um einen Mechanismus zur Mustererkennung, dessen Ausgaben nicht auf einem rein deterministischen Prozess, sondern auf Wahrscheinlichkeiten beruhen. Ein Modell, das speziell visuelle Muster verarbeitet, wird als \textit{Photoperceptron} bezeichnet~\cite[vgl.][S.~2]{rosenblatt1957perceptron}.
+\abschnitt
+Mathematisch ist das Perceptron ein lineares Klassifikationsmodell und gehört zu den diskriminativen Modellen~\cite[vgl.][S.~40]{li_machine_2024}. Es nimmt einen Eingabevektor $x \in \mathbb{R}^n$ entgegen, gewichtet ihn mit einem Gewichtsvektor $w \in \mathbb{R}^n$ und addiert einen Bias-Term $b \in \mathbb{R}$. Auf die resultierende Summe wird eine Aktivierungsfunktion angewendet, sodass sich die Klassifikationsfunktion ergibt zu~\cite[vgl.][S.~39]{li_machine_2024}:
 %
 \begin{equation}
     f(x) = \text{sign}(w \cdot x + b)
     \label{eq:perceptron}
 \end{equation}
 %
-Dabei bezeichnen $w \subseteq \mathbb{R}^n$ den Gewichtsvektor und $b \in \mathbb{R}$ den Bias-Term. Das Produkt $w \cdot x$ verknüpft den Gewichtsvektor mit dem Eingabevektor. Die Aktivierungsfunktion $\text{sign}$ ist eine Vorzeichenfunktion, die wie folgt definiert ist~\cite[S.~40]{li_machine_2024}:
+Die Aktivierungsfunktion $\text{sign}$ ist dabei als Vorzeichenfunktion definiert~\cite[vgl.][S.~40]{li_machine_2024}:
 %
 \begin{equation}
-    \text{sign}(x) = 
+    \text{sign}(x) =
     \begin{cases}
         +1, & x \geq 0 \\
         -1, & x < 0
@@ -76,30 +78,22 @@ Dabei bezeichnen $w \subseteq \mathbb{R}^n$ den Gewichtsvektor und $b \in \mathb
     \label{eq:sign}
 \end{equation}
 %
-% Geometrisch entspricht die Gleichung $w \cdot x + b = 0$ einer Hyperebene im Raum $\mathbb{R}^n$, die diesen in zwei Klassen unterteilt~\cite[S. 86]{mitchell_machine_2013}.
-Das Perceptron ist ein lineares Klassifikationsmodell und gehört zu den diskriminativen Modellen~\cite[S. 40]{li_machine_2024}.
+Geometrisch entspricht die Gleichung $w \cdot x + b = 0$ einer Hyperebene im Raum $\mathbb{R}^n$, die diesen in zwei Klassen unterteilt~\cite[vgl.][S.~86]{mitchell_machine_2013}.
 \abschnitt
-Somit kann ein einzelnes Perceptron als Boolesche Funktion verwendet werden und die logischen Operationen \text{AND}, \text{OR}, \text{NAND} und \text{NOR} darstellen. Dabei lassen sich \text{AND} und \text{OR} als sogenannter \textit{m-of-n}-Funktionen auffassen, bei denen mindestens $m$ von $n$ Eingaben wahr sein müssen. Damit ein Perceptron als ein \text{AND} dargestellt wird können... ~\cite[S. 87]{mitchell_machine_2013}. Allerdings kann die Boolesche Funktionen \text{XOR} nicht von einem einzelnen Perceptron dargestellt werden~\cite[S. 87]{mitchell_machine_2013}. 
-% Die Ausgabe eines Perceptron ist nur dann $1$, wenn genau eine der beiden Eingaben wahr ist. Da die Klassen hierbei nicht linear separierbar sind, kann keine einzelne Hyperebene die Ausgaben korrekt trennen~\cite[S.~87]{mitchell_machine_2013}.
-\todo{nochmal durchlesen}
-Diese Einschränkung wird durch ein \ac{MLP} überwunden. Jede Boolesche Funktion lässt sich durch ein Netzwerk aus Perceptronen mit lediglich zwei Schichten darstellen, wobei die Eingaben zunächst an mehrere Einheiten weitergeleitet und deren Ausgaben anschließend in einer zweiten Stufe zusammengeführt werden~\cite[S.~88]{mitchell_machine_2013}.
-
-Eine wesentliche Einschränkung des Perceptrons besteht darin, dass es ausschließlich \textit{linear separierbare} Probleme lösen kann. \citeauthor{minsky_perceptrons_1969} zeigten formal, dass bereits einfache logische Funktionen wie das XOR-Problem von einem einzelnen Perceptron nicht lösbar sind~\cite{minsky_perceptrons_1969}. Diese Limitation wird durch sogenannte \textit{Multi-Layer Perceptrons}~(MLPs) überwunden, bei denen mehrere Neuronen in verborgenen Schichten angeordnet werden und mittels des Backpropagation-Algorithmus auch nichtlineare Zusammenhänge modelliert werden können.
-
+Die Gewichte werden iterativ über die sogenannte Perceptron-Lernregel angepasst. Wird eine Eingabe falsch klassifiziert, so erfolgt eine zum Fehler proportionale Korrektur der Gewichte~\cite[vgl.][S.~88]{mitchell_machine_2013}:
 %
-Es besteht aus einem einzelnen künstlichen Neuron, das mehrere Eingabewerte $x_1, x_2, \dots, x_n$ entgegennimmt, diese jeweils mit einem zugehörigen Gewicht $w_1, w_2, \dots, w_n$ multipliziert und aufsummiert. Zusätzlich wird ein Bias-Term~$b$ addiert, der als Schwellenwertverschiebung dient. Auf die resultierende gewichtete Summe wird eine Aktivierungsfunktion~$f$ angewendet, sodass sich die Ausgabe~$y$ wie folgt ergibt:
-\begin{equation}
-    y = f\!\left(\sum_{i=1}^{n} w_i \cdot x_i + b\right)
-\end{equation}
-Beim klassischen Perceptron ist die Aktivierungsfunktion eine Heaviside-Stufenfunktion, die den Wert~1 ausgibt, wenn die gewichtete Summe einen Schwellenwert überschreitet, und andernfalls den Wert~0~\cite{rosenblatt_perceptron_1958}.
-
-Das Perceptron lernt durch iterative Anpassung seiner Gewichte. Wird eine Eingabe falsch klassifiziert, so werden die Gewichte proportional zum Fehler korrigiert. Dieser Vorgang wird als Perceptron-Lernregel bezeichnet und lässt sich formal beschreiben als:
 \begin{equation}
     w_i^{(t+1)} = w_i^{(t)} + \eta \cdot (y_{\text{soll}} - y_{\text{ist}}) \cdot x_i
+    \label{eq:perceptron_lernregel}
 \end{equation}
-wobei $\eta$ die Lernrate bezeichnet, die die Schrittweite der Gewichtsanpassung steuert~\cite[S.~86\,ff.]{mitchell_machine_2013}.
-
-% Eine wesentliche Einschränkung des Perceptrons besteht darin, dass es ausschließlich \textit{linear separierbare} Probleme lösen kann, d.\,h. es ist nur in der Lage, Klassen zu trennen, zwischen denen eine lineare Entscheidungsgrenze existiert. Minsky und Papert zeigten 1969 formal, dass bereits einfache logische Funktionen wie das XOR-Problem von einem einzelnen Perceptron nicht gelöst werden können~\cite{minsky_perceptrons_1969}. Diese Limitation wird durch sogenannte \textit{Multi-Layer Perceptrons}~(MLPs) überwunden, bei denen mehrere Neuronen in verborgenen Schichten (\textit{Hidden Layers}) angeordnet werden. In Kombination mit dem Backpropagation-Algorithmus, der den Fehler schichtweise rückwärts durch das Netz propagiert und so die Gewichte aller Schichten anpasst, können MLPs auch nichtlineare Zusammenhänge modellieren~\cite[S.~97\,ff.]{mitchell_machine_2013}. Diese mehrschichtigen Architekturen bilden die Grundlage für die in Kapitel~\ref{ch:deep_generative} vorgestellten tiefen neuronalen Netze.
+%
+Dabei bezeichnet $\eta$ die Lernrate, die die Schrittweite der Gewichtsanpassung steuert.
+\abschnitt
+Ein einzelnes Perceptron kann als Boolesche Funktion verwendet werden und so die logischen Operationen \text{AND}, \text{OR}, \text{NAND} und \text{NOR} darstellen. \text{AND} und \text{OR} lassen sich dabei als \textit{m-of-n}-Funktionen auffassen, bei denen mindestens $m$ von $n$ Eingaben wahr sein müssen
+%~\cite[vgl.][S.~87]{mitchell_machine_2013}
+. Die \text{XOR}-Funktion lässt sich durch ein einzelnes Perceptron hingegen nicht repräsentieren, da ihre Ausgaben nicht linear separierbar sind und somit keine einzelne Hyperebene die beiden Klassen korrekt trennen kann~\cite[vgl.][S.~87]{mitchell_machine_2013}. \citeauthor{minsky_perceptrons_1969} zeigten formal, dass diese Einschränkung eine ganze Klasse einfacher logischer Funktionen betrifft~\cite{minsky_perceptrons_1969}.
+\abschnitt
+Diese Limitation wird durch das~\ac{MLP} überwunden, bei dem mehrere Neuronen in verborgenen Schichten (\textit{Hidden Layers}) angeordnet sind. Bereits ein zweischichtiges Netz aus Perceptronen ist ausreichend, um eine beliebige Boolesche Funktion darzustellen~\cite[vgl.][S.~105]{mitchell_machine_2013}. In Kombination mit dem Backpropagation-Algorithmus, der den Fehler schichtweise rückwärts durch das Netz propagiert und so die Gewichte aller Schichten anpasst, können auch nichtlineare Zusammenhänge modelliert werden~\cite[vgl.][S.~97\,ff.]{mitchell_machine_2013}. Diese mehrschichtigen Architekturen bilden die Grundlage für die in Kapitel~\ref{ch:deep_generative} vorgestellten tiefen neuronalen Netze.
 
 \towrite{Was ist Intelligenz}
 
