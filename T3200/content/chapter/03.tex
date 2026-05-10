@@ -21,17 +21,140 @@ Die \textbf{subsymbolische \ac{KI}} (auch \textit{konnektionistische \ac{KI}}) l
 %Auch die in dieser Arbeit behandelten Diffusionsmodelle gehören zur subsymbolischen \ac{KI}, da sie die Verteilung medizinischer Bilddaten direkt aus Beispieldaten erlernen, ohne auf vorab definierte Regeln zur Bildgenerierung angewiesen zu sein.
 
 \section{Maschinelles Lernen}
-% Zu dem Erlenen und trainieren...
-Zu diesen Methoden gehört das maschinelle Lernen, wobei der Computer selbständig Wissen generiert aus Erfahrungen. Dabei wird der Computer durch Beispiele trainiert worraus dieser dann Muster abgeleitet werden. Diese Muster werden dann auf die jeweilige Situation angewendet~\cite[S. 42]{kohne_chatbots_2020}. 
+Eine zentrale Methode der subsymbolischen \ac{KI} ist das \acfi{ML}. Hierbei wird einem Computer nicht jede Regel explizit vorgegeben, sondern er erlernt selbstständig aus Daten Muster und Zusammenhänge, die er anschließend auf neue, vergleichbare Situationen anwendet. Der Computer lernt dabei nicht im Sinne eines Auswendig lernens, sondern erkennt verallgemeinerbare Gemeinsamkeiten in den Trainingsbeispielen, die sich auf unbekannte Daten übertragen lassen~\cite[vgl.][S.~42]{kohne_chatbots_2020}. \citeauthor{mitchell_machine_2013} definiert dies mit:
+%
+\begin{quote}
+    \enquote{A computer program is said to \textbf{learn} from experience \textit{E} with respect to some class of tasks \textit{T} and performance measure \textit{P}, if its performance at tasks in \textit{T}, as measured by \textit{P}, improves with experience \textit{E}.}~\cite[S.~2]{mitchell_machine_2013}
+\end{quote}
+%
+Bedeuet, ein Programm gilt also dann als lernend, wenn es seine Leistung bei einer Aufgabe \(T\), gemessen durch eine Performanzmetrik \(P\), durch Erfahrung \(E\) verbessert.
+\abschnitt
+Weiterhin, wird im maschinellem Lernen zwischen drei Hauptkategorien unterschieden.
+
+\subsection{Überwachtes Lernen}
+Beim überwachten Lernen (\textit{supervised learning}) lernt das Modell aus gelabelten Trainingsdaten~\cite[vgl.][S.~3]{bishop_pattern_2006}. Jeder Datenpunkt besteht aus einem Eingabevektor $\mathbf{x}_i$ und einem zugehörigen Zielwert $y_i$, der die korrekte Antwort vorgibt. Die Trainingsmenge umfasst $N$ solcher Paare $D = \{(\mathbf{x}_i, y_i)\}_{i=1}^{N}$~\cite[vgl.][S.~137]{bishop_pattern_2006}~\cite[vgl.][S.~695\,f.]{russell_artificial_2016}.
+\abschnitt
+Ziel ist es, eine Funktion zu lernen, die einer beliebigen Eingabe $\mathbf{x}$ den passenden Zielwert zuordnet und sich auch auf neue, unbekannte Daten übertragen lässt~\cite[vgl.][S.~696]{russell_artificial_2016}. Diese Funktion wird durch ein Modell $f_{\boldsymbol{\theta}}$ mit lernbaren Parametern $\boldsymbol{\theta}$ realisiert. Wie gut das Modell die Trainingsdaten trifft, wird über eine Verlustfunktion $L$ gemessen, die den Fehler zwischen Vorhersage $f_{\boldsymbol{\theta}}(\mathbf{x}_i)$ und tatsächlichem Wert $y_i$ angibt. Beim Training werden die Parameter $\boldsymbol{\theta}$ so angepasst, dass dieser Fehler über die gesamte Trainingsmenge minimiert wird~\cite[vgl.][S.~275\,f.]{heaton_ian_2018}:
+%
+\begin{equation}
+    \boldsymbol{\theta}^{*} = \arg\min_{\boldsymbol{\theta}}\; 
+    \frac{1}{N} \sum_{i=1}^{N} 
+    L\!\left(f_{\boldsymbol{\theta}}(\mathbf{x}_i),\, y_i\right)
+    \label{eq:supervised}
+\end{equation}
+%
+Aus probabilistischer Sicht entspricht das überwachte Lernen dem Schätzen der bedingten Wahrscheinlichkeit $p(y \mid \mathbf{x})$~\cite[vgl.][S.~105\,f.]{heaton_ian_2018}~\cite[vgl.][S.~137\,f.]{bishop_pattern_2006}. Je nach Art des Zielwerts unterscheidet man zwischen \textit{Klassifikation} (diskrete Klassen) und \textit{Regression} (kontinuierliche Werte)~\cite[vgl.][S.~3]{bishop_pattern_2006}~\cite[vgl.][S.~696]{russell_artificial_2016}.
+
+\subsection{Unüberwachtes Lernen}
+Beim unüberwachten Lernen (\textit{unsupervised learning}) erhält das Modell ausschließlich Eingabedaten ohne zugehörige Labels und soll darin selbstständig Strukturen oder Muster entdecken~\cite[vgl.][S.~3]{bishop_pattern_2006}~\cite[vgl.][S.~694]{russell_artificial_2016}. Aufgaben sind beispielsweise das Gruppieren ähnlicher Datenpunkte (\textit{Clustering}), das Reduzieren der Dimensionalität sowie das Schätzen der zugrunde liegenden Datenverteilung $p_{\text{data}}(\mathbf{x})$~\cite[vgl.][S.~3]{bishop_pattern_2006}~\cite[vgl.][S.~146]{heaton_ian_2018}.
+\abschnitt
+Bei der Dichteschätzung wird ein Modell $p_{\boldsymbol{\theta}}(\mathbf{x})$ mit Parametern $\boldsymbol{\theta}$ so an die Trainingsdaten angepasst, dass es die echte Datenverteilung möglichst gut nachbildet. Ein verwendetes Lernkriterium hierfür ist die \textit{Maximum-Likelihood-Schätzung}. Es werden die Parameter gewählt, unter denen die Trainingsdaten die höchste Wahrscheinlichkeit besitzen. In der Praxis wird dafür die Log-Likelihood maximiert, da dies numerisch stabiler ist~\cite[vgl.][S.~131\,f.]{heaton_ian_2018}:
+%
+\begin{equation}
+    \boldsymbol{\theta}^{*} = \arg\max_{\boldsymbol{\theta}}\; 
+    \sum_{i=1}^{N} \log p_{\boldsymbol{\theta}}(\mathbf{x}_i)
+    \label{eq:mle}
+\end{equation}
 %
 
-\section{Artificial Neural Networks}
-Ein \ac{ANN} (engl. \textit{Künstliches Neuronales Netzwerk}) ist ein rechnergestütztes Modell, das die Informationsverarbeitung des menschlichen Gehirns nachbildet. Inspiriert durch das biologische Nervensystem besteht es aus einer Vielzahl miteinander verbundener künstlicher Neuronen, die Informationen schichtweise empfangen, verarbeiten und weiterleiten~\cite[S. 52]{urbach_managing_2026}~\cite[S. 82]{mitchell_machine_2013}. Durch das Anpassen ihrer internen Parameter ist ein \ac{ANN} in der Lage, komplexe Muster in Daten zu erkennen und Vorhersagen zu treffen. Ein \ac{ANN} erlaubt somit einer Maschine Aufgaben zu erledigen, die eine menschliche Intelligenz benötigt hätten. Darunter gehören beispielsweise die Bilderkennung und \ac{NLP}~\cite[S. 52]{urbach_managing_2026}. Weiterhin ist ein \ac{ANN} robust gegenüber verrauschten Daten~\cite[S. 83]{mitchell_machine_2013}.
-% Es ist dazu fähig Muster zu erkennen und Entscheidungen zu treffen, weshalb es auch als eine adaptive Maschine bezeichnet wird~\cite[S. 1 f.]{akhmet_artificial_2025}.
-\todo{mehr ausschreiben}
-Ein einzelner künstlicher Neuron kann wird mathematisch wie folgt beschrieben:
+\subsection{Bestärkendes Lernen}
+Beim bestärkenden Lernen (\textit{reinforcement learning}) lernt ein Agent durch direkte Interaktion mit einer Umgebung, welche Handlungen langfristig die größte Belohnung einbringen~\cite[vgl.][S.~2\,f.]{sutton_reinforcement_nodate}~\cite[vgl.][S.~830]{russell_artificial_2016}. Zu jedem Zeitschritt $t$ beobachtet der Agent einen Zustand $S_t$, führt eine Aktion $A_t$ aus und erhält daraufhin eine Belohnung $R_{t+1}$ sowie einen neuen Zustand $S_{t+1}$~\cite[vgl.][S.~54]{sutton_reinforcement_nodate}.
+\abschnitt
+Diese Wechselwirkung zwischen Agent und Umgebung wird als \acfi{MDP} modelliert. Ein \ac{MDP} besteht aus einer Menge von Zuständen $S$, einer Menge von Aktionen $A$, den Übergangswahrscheinlichkeiten $p(s' \mid s, a)$, einer Belohnungsfunktion $r(s, a)$ und einem Diskontierungsfaktor $\gamma \in [0,\,1]$, der angibt, wie stark zukünftige Belohnungen gegenüber sofortigen gewichtet werden~\cite[vgl.][S.~67\,ff.]{sutton_reinforcement_nodate}~\cite[vgl.][S.~646\,f.]{russell_artificial_2016}.
+\abschnitt
+Die Verhaltensstrategie des Agenten wird durch eine \textit{Policy} $\pi(a \mid s)$ beschrieben, also die Wahrscheinlichkeit, im Zustand $s$ die Aktion $a$ zu wählen~\cite[vgl.][S.~54]{sutton_reinforcement_nodate}. Wie gut eine Policy ist, lässt sich über die \textit{Wertfunktion} $V^{\pi}(s)$ messen. Diese gibt die erwartete Summe aller zukünftigen Belohnungen an, wenn der Agent im Zustand $s$ startet und sich an die Policy $\pi$ hält~\cite[vgl.][S.~70]{sutton_reinforcement_nodate}:
+%
+\begin{equation}
+    V^{\pi}(s) = \mathbb{E}_{\pi}\!\left[\, 
+    \sum_{k=0}^{\infty} \gamma^{k}\, R_{t+k+1} \;\middle|\; S_t = s 
+    \right]
+    \label{eq:value}
+\end{equation}
+%
+Die Wertfunktion lässt sich rekursiv über die sogenannte \textit{Bellman-Gleichung} ausdrücken, welche die Grundlage für reinforcement learning-Algorithmen bildet~\cite[vgl.][S.~71\,f.]{sutton_reinforcement_nodate}:
+%
+\begin{equation}
+    V^{\pi}(s) = \sum_{a} \pi(a \mid s) \sum_{s'} p(s' \mid s, a) 
+    \!\left[\, r(s, a) + \gamma\, V^{\pi}(s') \,\right]
+    \label{eq:bellman}
+\end{equation}
+%
+Ziel des reinforcement learning ist es, eine optimale Policy $\pi^{*}$ zu finden, die in jedem Zustand die Wertfunktion maximiert~\cite[vgl.][S.~75\,f.]{sutton_reinforcement_nodate}. Im Gegensatz zum supvervised learning erhält der Agent dabei keine direkte Rückmeldung über die korrekte Aktion, sondern muss diese selbstständig herausfinden~\cite[vgl.][S.~1\,f.]{sutton_reinforcement_nodate}.
 
-\todo{Feedforward und Recurrent Neural Network}
+\section{Artificial Neural Networks}
+Ein \ac{ANN} (deutsch: \textit{Künstliches Neuronales Netzwerk}) ist 
+ein rechnergestütztes Modell, das die Informationsverarbeitung 
+biologischer Nervensysteme stark vereinfacht 
+nachbildet~\cite[vgl.][S.~52]{urbach_managing_2026}%
+~\cite[vgl.][S.~82]{mitchell_machine_2013}. Es besteht aus einer 
+Vielzahl miteinander verbundener \textit{künstlicher Neuronen}, die 
+in Schichten organisiert sind: einer Eingabeschicht, einer oder 
+mehreren verborgenen Schichten (\textit{hidden layers}) und einer 
+Ausgabeschicht~\cite[vgl.][S.~164\,ff.]{goodfellow_deep_2016}. Durch 
+das iterative Anpassen der internen Parameter -- der \textit{Gewichte} 
+zwischen den Neuronen -- ist ein \ac{ANN} in der Lage, komplexe 
+Muster in Daten zu erkennen und Vorhersagen zu 
+treffen~\cite[vgl.][S.~436]{lecun_deep_2015}. Damit lassen sich 
+Aufgaben bearbeiten, die zuvor menschliche Intelligenz erforderten, 
+beispielsweise die Bilderkennung oder die Verarbeitung natürlicher 
+Sprache (\acs{NLP})~\cite[vgl.][S.~52]{urbach_managing_2026}%
+~\cite[vgl.][S.~436\,ff.]{lecun_deep_2015}. Ein weiterer Vorteil 
+neuronaler Netze ist ihre Robustheit gegenüber verrauschten oder 
+unvollständigen Daten~\cite[vgl.][S.~83]{mitchell_machine_2013}.
+
+\subsection{Mathematisches Modell eines Neurons}
+Ein einzelnes künstliches Neuron lässt sich mathematisch als eine 
+gewichtete Summe seiner Eingaben mit anschließender 
+Aktivierungsfunktion beschreiben~\cite[vgl.][S.~227]{bishop_pattern_2006}. 
+Es erhält einen Eingabevektor 
+$\mathbf{x} = (x_1, x_2, \dots, x_n) \in \mathbb{R}^n$, der mit einem 
+Gewichtsvektor $\mathbf{w} = (w_1, w_2, \dots, w_n) \in \mathbb{R}^n$ 
+multipliziert und zu einem Bias-Term $b \in \mathbb{R}$ addiert wird. 
+Auf die resultierende Summe wird eine nichtlineare 
+Aktivierungsfunktion $\varphi$ angewendet, sodass sich der Ausgabewert 
+$y$ ergibt zu~\cite[vgl.][S.~227\,f.]{bishop_pattern_2006}:
+%
+\begin{equation}
+    y = \varphi\!\left( \sum_{i=1}^{n} w_i \, x_i + b \right) 
+      = \varphi\!\left( \mathbf{w}^\top \mathbf{x} + b \right)
+    \label{eq:neuron}
+\end{equation}
+%
+Die Aktivierungsfunktion $\varphi$ führt eine Nichtlinearität in das 
+Modell ein, ohne die ein neuronales Netz unabhängig von seiner Tiefe 
+nur lineare Zusammenhänge abbilden 
+könnte~\cite[vgl.][S.~96]{mitchell_machine_2013}. Gängige 
+Aktivierungsfunktionen sind die Sigmoidfunktion, der Tangens 
+Hyperbolicus sowie die in modernen tiefen Netzen weit verbreitete 
+\textit{Rectified Linear Unit} 
+(\acs{ReLU})~\cite[vgl.][S.~187\,ff.]{goodfellow_deep_2016}.
+
+\subsection{Netzwerkarchitekturen}
+Je nach Verbindungsstruktur der Neuronen lassen sich zwei 
+grundlegende Architekturen 
+unterscheiden~\cite[vgl.][S.~441\,f.]{lecun_deep_2015}:
+%
+\begin{itemize}
+    \item In einem \textbf{Feedforward Neural Network} 
+    (\textit{vorwärtsgerichtetes Netz}) werden Informationen 
+    ausschließlich in eine Richtung -- von der Eingabe- über die 
+    verborgenen Schichten zur Ausgabeschicht -- propagiert. Es 
+    existieren keine Rückkopplungen zwischen den 
+    Schichten~\cite[vgl.][S.~164]{goodfellow_deep_2016}. Dieser 
+    Architekturtyp ist die Grundlage vieler moderner 
+    Deep-Learning-Modelle, einschließlich der in dieser Arbeit 
+    verwendeten Diffusionsmodelle.
+    \item In einem \textbf{Recurrent Neural Network} (\acs{RNN}, 
+    \textit{rückgekoppeltes Netz}) hingegen existieren Verbindungen, 
+    die zu vorherigen Schichten oder zum Neuron selbst zurückführen. 
+    Dadurch wird ein interner Zustand realisiert, der die 
+    Verarbeitung sequenzieller Daten wie Texte oder Zeitreihen 
+    ermöglicht~\cite[vgl.][S.~367\,ff.]{goodfellow_deep_2016}%
+    ~\cite[vgl.][S.~441\,f.]{lecun_deep_2015}.
+\end{itemize}
+%
+Die einfachste Form eines Feedforward Neural Networks ist das 
+\textit{Perceptron}, das im folgenden Abschnitt vorgestellt wird.
 
 \subsection{Perceptron}
 Das Perceptron wurde von~\citeauthor{rosenblatt1957perceptron} im Jahr~\citeyear{rosenblatt1957perceptron} eingeführt und gilt als die einfachste Form eines~\ac{ANN}. Es handelt sich um einen Mechanismus zur Mustererkennung, dessen Ausgaben nicht auf einem rein deterministischen Prozess, sondern auf Wahrscheinlichkeiten beruhen. Ein Modell, das speziell visuelle Muster verarbeitet, wird als \textit{Photoperceptron} bezeichnet~\cite[vgl.][S.~2]{rosenblatt1957perceptron}.
@@ -79,10 +202,6 @@ Ein einzelnes Perceptron kann als Boolesche Funktion verwendet werden und so die
 . Die \text{XOR}-Funktion lässt sich durch ein einzelnes Perceptron hingegen nicht repräsentieren, da ihre Ausgaben nicht linear separierbar sind und somit keine einzelne Hyperebene die beiden Klassen korrekt trennen kann~\cite[vgl.][S.~87]{mitchell_machine_2013}. \citeauthor{minsky_perceptrons_1969} zeigten formal, dass diese Einschränkung eine ganze Klasse einfacher logischer Funktionen betrifft~\cite{minsky_perceptrons_1969}.
 \abschnitt
 Diese Limitation wird durch das~\ac{MLP} überwunden, bei dem mehrere Neuronen in verborgenen Schichten (\textit{Hidden Layers}) angeordnet sind. Bereits ein zweischichtiges Netz aus Perceptronen ist ausreichend, um eine beliebige Boolesche Funktion darzustellen~\cite[vgl.][S.~105]{mitchell_machine_2013}. In Kombination mit dem Backpropagation-Algorithmus, der den Fehler schichtweise rückwärts durch das Netz propagiert und so die Gewichte aller Schichten anpasst, können auch nichtlineare Zusammenhänge modelliert werden~\cite[vgl.][S.~97\,ff.]{mitchell_machine_2013}. Diese mehrschichtigen Architekturen bilden die Grundlage für die in Kapitel~\ref{Ch:deep_generative} vorgestellten tiefen neuronalen Netze.
-
-\towrite{Was ist Intelligenz}
-
-\towrite{Je weniger Eigenschaften gebracuth werden desto besser können Ergebnisse sein}
 
 \section{Unterscheidung zwischen Diskriminative und Generative Modelle}
 Modelle des maschinellen Lernens werden häufig in zwei Kategorien unterteilt: diskriminative und generative Modelle. Beide verfolgen unterschiedliche Ziele und unterscheiden sich darin, was sie aus den gegebenen Daten lernen.
@@ -139,4 +258,4 @@ Die Guidance-Stärke $w$ steuert dabei das Ergebnis. Bei $w = 0$ entspricht das S
 \section{Einordnung der Diffusionsmodelle}
 Mit den bisher eingeführten Konzepten lassen sich Diffusionsmodelle nun methodisch einordnen. Sie gehören zur schwachen \ac{KI}, da sie auf einen klar abgegrenzten Anwendungsbereich, wie der Generierung medizinischer Bilddaten, zugeschnitten sind und sich nicht direkt auf andere Domänen übertragen lassen. Gleichzeitig zählen sie zur subsymbolischen \ac{KI}. Diffusionsmodelle repräsentieren ihr Wissen verteilt in den Gewichten tiefer neuronaler Netze und lernen die gegebene Datenverteilung induktiv anhand von Beispielen, ohne dass explizite Regeln zur Bildgenerierung vorgegeben werden.
 \abschnitt
-Innerhalb des maschinellen Lernens gehören Diffusionsmodelle zu den generativen Modellen, da sie die gegebene Wahrscheinlichkeitsverteilung der Trainingsdaten approximieren und daraus neue, synthetische Samples erzeugen können. Wegen ihrer hohen Modelltiefe und der Verarbeitung hochdimensionaler Bilddaten lassen sie sich genauer den tiefen generativen Modellen (\textit{\acs{DGM}}) zuordnen. Mehr dazu in \autoref{Ch:deep_generative}. Weiterhin können Diffusionsmodelle \textit{unconditional} arbeiten, wie zum Beispiel der einfachen Generierung von Samples oder \textit{conditional}, indem die Generierung gezielt durch zusätzliche Informationen wie Klassenlabels oder vorhandene Bilddaten gesteuert wird.
+Innerhalb des maschinellen Lernens gehören Diffusionsmodelle zu den generativen Modellen, da sie die gegebene Wahrscheinlichkeitsverteilung der Trainingsdaten approximieren und daraus neue, synthetische Samples erzeugen können. Wegen ihrer hohen Modelltiefe und der Verarbeitung hochdimensionaler Bilddaten lassen sie sich genauer den tiefen generativen Modellen (\textit{\acl{DGM}}) zuordnen. Mehr dazu in \autoref{Ch:deep_generative}. Weiterhin können Diffusionsmodelle \textit{unconditional} arbeiten, wie zum Beispiel der einfachen Generierung von Samples oder \textit{conditional}, indem die Generierung gezielt durch zusätzliche Informationen wie Klassenlabels oder vorhandene Bilddaten gesteuert wird.
