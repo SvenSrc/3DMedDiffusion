@@ -1,48 +1,24 @@
 \chapter{Künstliche Intelligenz}\label{Ch:Kuenstliche Intelligenz}
-\todo{Titel gegebenenfalls anpassen}
-\towrite{Schreiben worüber in diesem Kapitel behandelt wird}
+Dieses Kapitel führt kurz in die Grundbegriffe der \ac{KI} ein und ordnet die in dieser Arbeit verwendeten Diffusionsmodelle in das Feld der \ac{KI} ein. Eine umfassende Darstellung des Forschungsgebiets ist nicht das Ziel; vielmehr werden 
+nur jene Konzepte vorgestellt, die für das Verständnis der weiteren 
+Kapitel zu maschinellem Lernen und generativen Modellen notwendig sind.
 
-\section{Defintion Künstliche Intelligenz}
-Der Begriff \ac{KI} kann je nach Anwendungsgebiet eine andere Definition haben. Ein Buch beschreibt die \ac{KI} als ein Forschungsgebiet~\cite[S. 5]{nahrstedt_algorithmen_2018}.
-%und keine eine einzelne Methode oder Algorithmus dar 
-Jedoch wird die \ac{KI} in dieser Studienarbeit beschrieben als eine Methode, dass Computern die Intelligenz des Menschens vorgibt und somit menschenähnlich zu denken~\cite[S. 3]{liu_artificial_2025}~\cite[S. 42]{kohne_chatbots_2020}. 
-\todo{Agenten nochmal neu definieren. Siehe S. 17 Knowledge Science - Grundlagen}
-%%
-% Schaue Quellen nochmal besser
-\subsection{Defintion Intelligenz}
-Die Intelligenz kann als eine Sammlung von Eigenschaften verstanden werden und es ist das Ziel dass diese Eigenschaften nachgebaut werden. Wissenschaflter in der KI haben die folgenden Eigenschaften zu der Intelligenz definiert:~\cite[S. 1 f.]{honavar_articial_nodate}
-%
-\begin{itemize}
-    \item \textbf{Wahrnehmung:} Die Beobachtung seiner Umwelt mithilfe von Sensoren.
-    
-    \item \textbf{Schlussfolgern:} Aus bekannten Informationen rationale Entscheidungen ziehen auch bei Unsicherheit.
-    
-    \item \textbf{Handeln:} Aus bekannten Informationen gezielt handeln und Werkzeuge nutzen oder entwickeln.
-    
-    \item \textbf{Planung und Problemlösung:} Schritte planen, um ein Ziel zu erreichen oder ein Problem zu lösen.
-    
-    \item \textbf{Kommunikation:} Mit anderen Systemen oder Menschen kommunzieren.
-    
-    \item \textbf{Anpassungsfähigkeit und Lernen:} Aus Erfahrungen lernen und sich an neue Situationen anpassen.
-    
-    \item \textbf{Autonomie:} Eigene Ziele setzen und selbst entscheiden, wie man sie erreicht.
-    
-    \item \textbf{Kreativität:} Neue Wege zur Lösung von Problemen finden.
-    
-    \item \textbf{Reflexion und Bewusstheit:} Über eigene Entscheidungen und Prozesse reflektieren.
-    
-    \item \textbf{Ästhetik:} Bei Entscheidungen auch ästhetische Aspekte berücksichtigen.
-    
-    \item \textbf{Organisation:} Mit anderen zusammenarbeiten und sich abstimmen.
-\end{itemize}
-%
-\towrite{Über die Punkte angehen, wie diese die Intelligenz bescrheibe}
-\todo{Bearbeiten}
-Anschließend zu der Intelligenz zählt das rationale Denken. Beim rationalen Denken wird auf Basis des bekannten Informationen auch mit Unsicherheit, die bestmögliche Entscheidung getroffen. Das System soll auch auf diese Entscheidungen handeln und selbstständig weiterlernen. Ein solches System wird als \textit{intelligenter Agent} bezeichnet~\cite[S. 4]{russell_artificial_2016}.
+\section{Definition Künstliche Intelligenz}
+Der Begriff \ac{KI} ist nicht eindeutig definiert und wird je nach Disziplin unterschiedlich verwendet. \citeauthor{nahrstedt_algorithmen_2018} versteht \ac{KI} primär als ein Forschungsgebiet und nicht als eine einzelne Methode~\cite[vgl.][S.~5]{nahrstedt_algorithmen_2018}. In dieser Studienarbeit wird \ac{KI} im technischen Sinne als ein Sammelbegriff für Methoden verstanden, mit denen Computer befähigt werden, Aufgaben zu bewältigen, die üblicherweise menschliche Intelligenz erfordern~\cite[vgl.][S.~42]{kohne_chatbots_2020}~\cite[vgl.][S.~3]{liu_artificial_2025}. Im Kontext dieser Arbeit zählt hierzu das Erkennen, Interpretieren und Erzeugen komplexer Bilddaten in der medizinischen Bildgebung.
+\abschnitt
+Zentrale Eigenschaften, die mit Intelligenz assoziiert werden, sind unter anderem die \textit{Wahrnehmung} (Verarbeitung und Interpretation von Sensordaten), das \textit{Schlussfolgern} (logisches und induktives Ableiten von Erkenntnissen, auch unter Unsicherheit und unvollständiger Information) sowie die \textit{Anpassungsfähigkeit} und das \textit{Lernen} aus Erfahrungen~\cite[S.~1\,f.]{honavar_articial_nodate}. 
+%Insbesondere die Fähigkeit zum Lernen aus Daten ist die zentrale Eigenschaft moderner \ac{KI}-Systeme und damit auch Grundlage der in dieser Arbeit behandelten Diffusionsmodelle.
+\abschnitt
+In der Literatur wird zwischen \textit{schwacher} bzw.\ \textit{beschränkter} \ac{KI} (\textit{narrow AI}) und \textit{starker} bzw.\ \textit{allgemeiner} \ac{KI} (\textit{general AI}) unterschieden~\cite[vgl.][S.~1]{bory_strong_2025}. Eine schwache \ac{KI} ist auf eine bestimmte Domäne beschränkt und kann erlernte Lösungsmuster nicht auf andere Bereiche übertragen~\cite[vgl.][S.~7]{lanquillon_knowledge_2023}. Eine starke \ac{KI} hingegen wäre in der Lage, beliebige intellektuelle Aufgaben auf menschlichem Niveau zu lösen. Dies existiert bislang jedoch ausschließlich als theoretisches Konzept. Würde sich eine solche starke \ac{KI} selbstständig weiterentwickeln, käme es zur sogenannten \textit{technologischen Singularität}. Einem hypothetischen Zeitpunkt, an dem die maschinelle Intelligenz die menschliche übertrifft und in eine \textit{Superintelligenz} übergeht~\cite[vgl.][S.~7]{lanquillon_knowledge_2023}~\cite[vgl.][S.~17\,f.]{ciesla_book_2024}. Die heutigen eingesetzten \ac{KI}-Systeme sind nach dieser Klassifikation der schwachen \ac{KI} zuzuordnen~\cite[vgl.][S.~1]{bory_strong_2025}. 
+%Dazu gehört auch der in dieser Arbeit untersuchten Diffusionsmodelle.
 
-\subsection{Schwache und Starke KI}
-Wie intelligent eine \ac{KI} ist, wird unter Wissenschaftler zwischen einer \textit{schwachen (weak)} / \textit{beschränkten (narrow)} und \textit{starken (strong)} / \textit{allgemeine (general)} \ac{KI} unterschieden~\cite[S. 1]{bory_strong_2025}. Eine schwache \ac{KI} ist spezifisch für eine Domäne entwickelt, die die menschenliche Intelligenz dort simuliert~\cite[S. 1]{bory_strong_2025}~\cite[S. 7]{lanquillon_knowledge_2023}. Diese können ein oder wenige spezifische Probleme sehr gut lösen. Allerdings kann die schwache \ac{KI} bekannte Lösungsmuster auf neue Probleme nicht in andere Domänen übertragen \cite[S. 7]{lanquillon_knowledge_2023}. Momentan können alle \ac{KI}-Systeme als eine schwache \ac{KI} bewertet werden, da sie jeweils spezifisch zu ihrer Domäne sind. Eine beispiel Domäne ist die \ac{NLP}~\cite[S. 1]{bory_strong_2025}. Die schwache \ac{KI} wird noch mal in zwei weitere Kategorien verfasst und unterscheiden sich dabei, mit welcher Methode sie trainiert werden. Diese sind die \textit{symbolische \ac{KI}} und \textit{nicht-symbolische \ac{KI}}. In der symbolischen \ac{KI} wird diese mithilfe von Deduktion trainiert. Heißt auf logische Regeln. Während die nicht-symbolische \ac{KI} mit Induktion also anhand von vorhandene Daten lernt~\cite[S. 4 f.]{liu_artificial_2025}. Eine starke \ac{KI} hingegen besitzt die Fähigkeit die menschenliche Intelligenz zu emulieren. Dies bedeutet, dass sie selbständig fungiert und somit auch selbstbewusst ist. Dabei kann die starke \ac{KI} Probleme lösen, ohne davor dafür trainiert zu sein~\cite[S. 7]{lanquillon_knowledge_2023}~\cite[S. 17]{ciesla_book_2024}. Dies würde dann zu einer technologischen Singularität führen und einer Superintelligenz~\cite[S. 1]{bory_strong_2025}~\cite[S. 7]{lanquillon_knowledge_2023}~\cite[S. 17]{ciesla_book_2024}. Eine technologische Singularität ist der Punkt, an dem die \ac{KI} nicht mehr vom Menschen kontrolliert werden kann~\cite[S. 18]{ciesla_book_2024}. Allerdings gibt bis jetzt keine starke \ac{KI} und somit ein theoretisches Konzept. Es wird jedoch in Science-Fiction-Werke angewedet~\cite[S. 1]{bory_strong_2025}~\cite[S. 17 f.]{ciesla_book_2024}~\cite[S. 4]{liu_artificial_2025}.
-\todo{Neu durchlesen}
+\section{Symbolische und subsymbolische KI}
+Innerhalb der \ac{KI} lassen sich zwei methodische Hauptströmungen unterscheiden, die sich grundlegend in der Art der Wissensrepräsentation und im Lernverfahren unterscheiden: die \textit{symbolische} und die \textit{subsymbolische} \ac{KI}~\cite[S.~4\,f.]{liu_artificial_2025}.
+\abschnitt
+Die \textbf{symbolische \ac{KI}} (auch \textit{regelbasierte \ac{KI}}) repräsentiert Wissen explizit durch Symbole und logische Regeln. Aus allgemeinen Regeln werden mittels Deduktion konkrete Schlussfolgerungen abgeleitet (Top-Down-Ansatz). Dies sind Expertensysteme, deren Wissensbasis manuell durch Fachexperten erstellt wird~\cite[vgl.][S.~4\,f.]{liu_artificial_2025}.
+\abschnitt
+Die \textbf{subsymbolische \ac{KI}} (auch \textit{konnektionistische \ac{KI}}) lernt hingegen induktiv aus großen Datenmengen, ohne dass explizite Regeln vorgegeben werden. Wissen wird verteilt in den Gewichten künstlicher neuronaler Netze repräsentiert und ist nicht direkt interpretierbar (Bottom-Up-Ansatz)~\cite[S.~4\,f.]{liu_artificial_2025}. Dieser datengetriebene Ansatz bildet die Grundlage moderner Verfahren des maschinellen Lernens und des Deep Learning. 
+%Auch die in dieser Arbeit behandelten Diffusionsmodelle gehören zur subsymbolischen \ac{KI}, da sie die Verteilung medizinischer Bilddaten direkt aus Beispieldaten erlernen, ohne auf vorab definierte Regeln zur Bildgenerierung angewiesen zu sein.
 
 \section{Maschinelles Lernen}
 % Zu dem Erlenen und trainieren...
@@ -102,7 +78,7 @@ Ein einzelnes Perceptron kann als Boolesche Funktion verwendet werden und so die
 %~\cite[vgl.][S.~87]{mitchell_machine_2013}
 . Die \text{XOR}-Funktion lässt sich durch ein einzelnes Perceptron hingegen nicht repräsentieren, da ihre Ausgaben nicht linear separierbar sind und somit keine einzelne Hyperebene die beiden Klassen korrekt trennen kann~\cite[vgl.][S.~87]{mitchell_machine_2013}. \citeauthor{minsky_perceptrons_1969} zeigten formal, dass diese Einschränkung eine ganze Klasse einfacher logischer Funktionen betrifft~\cite{minsky_perceptrons_1969}.
 \abschnitt
-Diese Limitation wird durch das~\ac{MLP} überwunden, bei dem mehrere Neuronen in verborgenen Schichten (\textit{Hidden Layers}) angeordnet sind. Bereits ein zweischichtiges Netz aus Perceptronen ist ausreichend, um eine beliebige Boolesche Funktion darzustellen~\cite[vgl.][S.~105]{mitchell_machine_2013}. In Kombination mit dem Backpropagation-Algorithmus, der den Fehler schichtweise rückwärts durch das Netz propagiert und so die Gewichte aller Schichten anpasst, können auch nichtlineare Zusammenhänge modelliert werden~\cite[vgl.][S.~97\,ff.]{mitchell_machine_2013}. Diese mehrschichtigen Architekturen bilden die Grundlage für die in Kapitel~\ref{ch:deep_generative} vorgestellten tiefen neuronalen Netze.
+Diese Limitation wird durch das~\ac{MLP} überwunden, bei dem mehrere Neuronen in verborgenen Schichten (\textit{Hidden Layers}) angeordnet sind. Bereits ein zweischichtiges Netz aus Perceptronen ist ausreichend, um eine beliebige Boolesche Funktion darzustellen~\cite[vgl.][S.~105]{mitchell_machine_2013}. In Kombination mit dem Backpropagation-Algorithmus, der den Fehler schichtweise rückwärts durch das Netz propagiert und so die Gewichte aller Schichten anpasst, können auch nichtlineare Zusammenhänge modelliert werden~\cite[vgl.][S.~97\,ff.]{mitchell_machine_2013}. Diese mehrschichtigen Architekturen bilden die Grundlage für die in Kapitel~\ref{Ch:deep_generative} vorgestellten tiefen neuronalen Netze.
 
 \towrite{Was ist Intelligenz}
 
@@ -159,3 +135,8 @@ Jeodch ist das einfache Konditionieren auf $\mathbf{y}$ häufig nicht ausreichend
 wobei $w \geq 0$ die Guidance-Stärke bezeichnet. Über die Bayes-Beziehung $\nabla_{\mathbf{x}_t}\log p(\mathbf{y} \mid \mathbf{x}_t) = \nabla_{\mathbf{x}_t}\log p(\mathbf{x}_t \mid \mathbf{y}) - \nabla_{\mathbf{x}_t}\log p(\mathbf{x}_t)$ lässt sich diese Linearkombination als implizite Approximation des Classifier-Gradienten interpretieren, sodass auf ein zusätzliches Modell verzichtet werden kann~\cite[vgl.][S.~2]{ho_classifier-free_2022}~\cite[vgl.][S. 18]{chen_overview_2024}. Aufgrund dieser Einfachheit wird Classifier-Free Guidance heute häufig für das Training konditionaler Diffusionsmodelle von Grund auf eingesetzt. Jedoch ist das Verfahren wegen des damit verbundenen Rechenaufwands nicht für die Adaption oder das Fine-Tuning bereits trainierter Modelle geeignet~\cite[vgl.][S. 17]{chen_overview_2024}.
 \abschnitt
 Die Guidance-Stärke $w$ steuert dabei das Ergebnis. Bei $w = 0$ entspricht das Sampling der rein bedingten Vorhersage, während größere Werte die Treue zur Bedingung erhöhen, jedoch mit einer Reduktion der Sample-Diversität einhergehen~\cite[vgl.][S.~17 ff.]{chen_overview_2024}.
+
+\section{Einordnung der Diffusionsmodelle}
+Mit den bisher eingeführten Konzepten lassen sich Diffusionsmodelle nun methodisch einordnen. Sie gehören zur schwachen \ac{KI}, da sie auf einen klar abgegrenzten Anwendungsbereich, wie der Generierung medizinischer Bilddaten, zugeschnitten sind und sich nicht direkt auf andere Domänen übertragen lassen. Gleichzeitig zählen sie zur subsymbolischen \ac{KI}. Diffusionsmodelle repräsentieren ihr Wissen verteilt in den Gewichten tiefer neuronaler Netze und lernen die gegebene Datenverteilung induktiv anhand von Beispielen, ohne dass explizite Regeln zur Bildgenerierung vorgegeben werden.
+\abschnitt
+Innerhalb des maschinellen Lernens gehören Diffusionsmodelle zu den generativen Modellen, da sie die gegebene Wahrscheinlichkeitsverteilung der Trainingsdaten approximieren und daraus neue, synthetische Samples erzeugen können. Wegen ihrer hohen Modelltiefe und der Verarbeitung hochdimensionaler Bilddaten lassen sie sich genauer den tiefen generativen Modellen (\textit{\acs{DGM}}) zuordnen. Mehr dazu in \autoref{Ch:deep_generative}. Weiterhin können Diffusionsmodelle \textit{unconditional} arbeiten, wie zum Beispiel der einfachen Generierung von Samples oder \textit{conditional}, indem die Generierung gezielt durch zusätzliche Informationen wie Klassenlabels oder vorhandene Bilddaten gesteuert wird.
