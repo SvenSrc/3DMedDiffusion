@@ -60,6 +60,7 @@ Ein einzelner künstlicher Neuron kann wird mathematisch wie folgt beschrieben:
 \subsection{Perceptron}
 Das Perceptron wurde von~\citeauthor{rosenblatt1957perceptron} im Jahr~\citeyear{rosenblatt1957perceptron} eingeführt und gilt als die einfachste Form eines~\ac{ANN}. Es handelt sich um einen Mechanismus zur Mustererkennung, dessen Ausgaben nicht auf einem rein deterministischen Prozess, sondern auf Wahrscheinlichkeiten beruhen. Ein Modell, das speziell visuelle Muster verarbeitet, wird als \textit{Photoperceptron} bezeichnet~\cite[vgl.][S.~2]{rosenblatt1957perceptron}.
 \abschnitt
+\abschnitt
 Mathematisch ist das Perceptron ein lineares Klassifikationsmodell und gehört zu den diskriminativen Modellen~\cite[vgl.][S.~40]{li_machine_2024}. Es nimmt einen Eingabevektor $x \in \mathbb{R}^n$ entgegen, gewichtet ihn mit einem Gewichtsvektor $w \in \mathbb{R}^n$ und addiert einen Bias-Term $b \in \mathbb{R}$. Auf die resultierende Summe wird eine Aktivierungsfunktion angewendet, sodass sich die Klassifikationsfunktion ergibt zu~\cite[vgl.][S.~39]{li_machine_2024}:
 %
 \begin{equation}
@@ -78,7 +79,15 @@ Die Aktivierungsfunktion $\text{sign}$ ist dabei als Vorzeichenfunktion definier
     \label{eq:sign}
 \end{equation}
 %
-Geometrisch entspricht die Gleichung $w \cdot x + b = 0$ einer Hyperebene im Raum $\mathbb{R}^n$, die diesen in zwei Klassen unterteilt~\cite[vgl.][S.~86]{mitchell_machine_2013}.
+Geometrisch entspricht die Gleichung $w \cdot x + b = 0$ einer Hyperebene im Raum $\mathbb{R}^n$, die diesen in zwei Klassen unterteilt~\cite[vgl.][S.~86]{mitchell_machine_2013}. Abbildung~\ref{fig:perceptron} fasst diesen Berechnungsablauf schematisch zusammen.
+%
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{bilder/perceptron/perceptron.png}
+    \caption[Schematische Darstellung eines Perceptrons]{Schematische Darstellung eines Perceptrons. Die Eingaben $x_1, \dots, x_n$ werden mit den Gewichten $w_1, \dots, w_n$ gewichtet aufsummiert. Der Bias-Term ist hierbei als zusätzliche konstante Eingabe $x_0 = 1$ mit zugehörigem Gewicht $w_0$ realisiert. Auf die gewichtete Summe wird eine Vorzeichenfunktion angewendet, die die Ausgabe $o \in \{+1, -1\}$ liefert~\cite[S.~87]{mitchell_machine_2013}.}
+    \label{fig:perceptron}
+\end{figure}
+%
 \abschnitt
 Die Gewichte werden iterativ über die sogenannte Perceptron-Lernregel angepasst. Wird eine Eingabe falsch klassifiziert, so erfolgt eine zum Fehler proportionale Korrektur der Gewichte~\cite[vgl.][S.~88]{mitchell_machine_2013}:
 %
