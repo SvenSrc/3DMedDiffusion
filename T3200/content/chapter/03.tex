@@ -82,83 +82,21 @@ Die Wertfunktion lässt sich rekursiv über die sogenannte \textit{Bellman-Gleichu
 Ziel des reinforcement learning ist es, eine optimale Policy $\pi^{*}$ zu finden, die in jedem Zustand die Wertfunktion maximiert~\cite[vgl.][S.~75\,f.]{sutton_reinforcement_nodate}. Im Gegensatz zum supvervised learning erhält der Agent dabei keine direkte Rückmeldung über die korrekte Aktion, sondern muss diese selbstständig herausfinden~\cite[vgl.][S.~1\,f.]{sutton_reinforcement_nodate}.
 
 \section{Artificial Neural Networks}
-Ein \ac{ANN} (deutsch: \textit{Künstliches Neuronales Netzwerk}) ist 
-ein rechnergestütztes Modell, das die Informationsverarbeitung 
-biologischer Nervensysteme stark vereinfacht 
-nachbildet~\cite[vgl.][S.~52]{urbach_managing_2026}%
-~\cite[vgl.][S.~82]{mitchell_machine_2013}. Es besteht aus einer 
-Vielzahl miteinander verbundener \textit{künstlicher Neuronen}, die 
-in Schichten organisiert sind: einer Eingabeschicht, einer oder 
-mehreren verborgenen Schichten (\textit{hidden layers}) und einer 
-Ausgabeschicht~\cite[vgl.][S.~164\,ff.]{goodfellow_deep_2016}. Durch 
-das iterative Anpassen der internen Parameter -- der \textit{Gewichte} 
-zwischen den Neuronen -- ist ein \ac{ANN} in der Lage, komplexe 
-Muster in Daten zu erkennen und Vorhersagen zu 
-treffen~\cite[vgl.][S.~436]{lecun_deep_2015}. Damit lassen sich 
-Aufgaben bearbeiten, die zuvor menschliche Intelligenz erforderten, 
-beispielsweise die Bilderkennung oder die Verarbeitung natürlicher 
-Sprache (\acs{NLP})~\cite[vgl.][S.~52]{urbach_managing_2026}%
-~\cite[vgl.][S.~436\,ff.]{lecun_deep_2015}. Ein weiterer Vorteil 
-neuronaler Netze ist ihre Robustheit gegenüber verrauschten oder 
-unvollständigen Daten~\cite[vgl.][S.~83]{mitchell_machine_2013}.
-
-\subsection{Mathematisches Modell eines Neurons}
-Ein einzelnes künstliches Neuron lässt sich mathematisch als eine 
-gewichtete Summe seiner Eingaben mit anschließender 
-Aktivierungsfunktion beschreiben~\cite[vgl.][S.~227]{bishop_pattern_2006}. 
-Es erhält einen Eingabevektor 
-$\mathbf{x} = (x_1, x_2, \dots, x_n) \in \mathbb{R}^n$, der mit einem 
-Gewichtsvektor $\mathbf{w} = (w_1, w_2, \dots, w_n) \in \mathbb{R}^n$ 
-multipliziert und zu einem Bias-Term $b \in \mathbb{R}$ addiert wird. 
-Auf die resultierende Summe wird eine nichtlineare 
-Aktivierungsfunktion $\varphi$ angewendet, sodass sich der Ausgabewert 
-$y$ ergibt zu~\cite[vgl.][S.~227\,f.]{bishop_pattern_2006}:
-%
-\begin{equation}
-    y = \varphi\!\left( \sum_{i=1}^{n} w_i \, x_i + b \right) 
-      = \varphi\!\left( \mathbf{w}^\top \mathbf{x} + b \right)
-    \label{eq:neuron}
-\end{equation}
-%
-Die Aktivierungsfunktion $\varphi$ führt eine Nichtlinearität in das 
-Modell ein, ohne die ein neuronales Netz unabhängig von seiner Tiefe 
-nur lineare Zusammenhänge abbilden 
-könnte~\cite[vgl.][S.~96]{mitchell_machine_2013}. Gängige 
-Aktivierungsfunktionen sind die Sigmoidfunktion, der Tangens 
-Hyperbolicus sowie die in modernen tiefen Netzen weit verbreitete 
-\textit{Rectified Linear Unit} 
-(\acs{ReLU})~\cite[vgl.][S.~187\,ff.]{goodfellow_deep_2016}.
+Ein \ac{ANN} (deutsch: \textit{Künstliches Neuronales Netzwerk}) ist ein rechnergestütztes Modell, das die Informationsverarbeitung biologischer Nervensysteme vereinfacht nachbildet~\cite[vgl.][S.~52]{urbach_managing_2026} ~\cite[vgl.][S.~82]{mitchell_machine_2013}. Es besteht aus einer Vielzahl miteinander verbundener \textit{künstlicher Neuronen}, die in Schichten organisiert sind: einer Eingabeschicht, einer oder mehreren verborgenen Schichten (\textit{hidden layers}) und einer Ausgabeschicht~\cite[vgl.][S.~168\,f.]{heaton_ian_2018}. Durch das iterative Anpassen der internen Parameter also der \textit{Gewichte} zwischen den Neuronen ist ein \ac{ANN} in der Lage, komplexe Muster in Daten zu erkennen und Vorhersagen zu treffen~\cite[vgl.][S.~99]{mitchell_machine_2013}. Damit lassen sich Aufgaben bearbeiten, die zuvor menschliche Intelligenz erforderten, beispielsweise die Bilderkennung oder die Verarbeitung natürlicher Sprache (\ac{NLP})~\cite[vgl.][S.~52]{urbach_managing_2026}~\cite[vgl.][S.~443]{heaton_ian_2018}. Ein weiterer Vorteil neuronaler Netze ist ihre Robustheit gegenüber verrauschten oder unvollständigen Daten~\cite[vgl.][S.~83]{mitchell_machine_2013}.
 
 \subsection{Netzwerkarchitekturen}
-Je nach Verbindungsstruktur der Neuronen lassen sich zwei 
-grundlegende Architekturen 
-unterscheiden~\cite[vgl.][S.~441\,f.]{lecun_deep_2015}:
+Je nach Verbindungsstruktur der Neuronen lassen sich zwei grundlegende Architekturen unterscheiden~\cite[vgl.][S.~168]{heaton_ian_2018}:
 %
 \begin{itemize}
-    \item In einem \textbf{Feedforward Neural Network} 
-    (\textit{vorwärtsgerichtetes Netz}) werden Informationen 
-    ausschließlich in eine Richtung -- von der Eingabe- über die 
-    verborgenen Schichten zur Ausgabeschicht -- propagiert. Es 
-    existieren keine Rückkopplungen zwischen den 
-    Schichten~\cite[vgl.][S.~164]{goodfellow_deep_2016}. Dieser 
-    Architekturtyp ist die Grundlage vieler moderner 
-    Deep-Learning-Modelle, einschließlich der in dieser Arbeit 
-    verwendeten Diffusionsmodelle.
-    \item In einem \textbf{Recurrent Neural Network} (\acs{RNN}, 
-    \textit{rückgekoppeltes Netz}) hingegen existieren Verbindungen, 
-    die zu vorherigen Schichten oder zum Neuron selbst zurückführen. 
-    Dadurch wird ein interner Zustand realisiert, der die 
-    Verarbeitung sequenzieller Daten wie Texte oder Zeitreihen 
-    ermöglicht~\cite[vgl.][S.~367\,ff.]{goodfellow_deep_2016}%
-    ~\cite[vgl.][S.~441\,f.]{lecun_deep_2015}.
+    \item In einem \acfi{FNN} werden Informationen ausschließlich in eine Richtung propagiert. Nämlich von der Eingabe- über die verborgenen Schichten zur Ausgabeschicht. Es existieren keine Rückkopplungen zwischen den Schichten~\cite[vgl.][S.~168]{heaton_ian_2018}. 
+    %Dieser Architekturtyp ist die Grundlage vieler moderner Deep-Learning-Modelle.
+    \item In einem \acfi{RNN} hingegen existieren Verbindungen, die zu vorherigen Schichten oder zum Neuron selbst zurückführen. Dadurch wird ein interner Zustand realisiert, der die Verarbeitung sequenzieller Daten wie Texte oder Zeitreihen ermöglicht~\cite[vgl.][S.~374]{heaton_ian_2018}.
 \end{itemize}
 %
-Die einfachste Form eines Feedforward Neural Networks ist das 
-\textit{Perceptron}, das im folgenden Abschnitt vorgestellt wird.
+Die einfachste Form eines \ac{FNN} ist das \textit{Perceptron}, das im folgenden \autoref{Ch:perceptron} vorgestellt wird.
 
-\subsection{Perceptron}
+\subsection{Perceptron}\label{Ch:perceptron}
 Das Perceptron wurde von~\citeauthor{rosenblatt1957perceptron} im Jahr~\citeyear{rosenblatt1957perceptron} eingeführt und gilt als die einfachste Form eines~\ac{ANN}. Es handelt sich um einen Mechanismus zur Mustererkennung, dessen Ausgaben nicht auf einem rein deterministischen Prozess, sondern auf Wahrscheinlichkeiten beruhen. Ein Modell, das speziell visuelle Muster verarbeitet, wird als \textit{Photoperceptron} bezeichnet~\cite[vgl.][S.~2]{rosenblatt1957perceptron}.
-\abschnitt
 \abschnitt
 Mathematisch ist das Perceptron ein lineares Klassifikationsmodell und gehört zu den diskriminativen Modellen~\cite[vgl.][S.~40]{li_machine_2024}. Es nimmt einen Eingabevektor $x \in \mathbb{R}^n$ entgegen, gewichtet ihn mit einem Gewichtsvektor $w \in \mathbb{R}^n$ und addiert einen Bias-Term $b \in \mathbb{R}$. Auf die resultierende Summe wird eine Aktivierungsfunktion angewendet, sodass sich die Klassifikationsfunktion ergibt zu~\cite[vgl.][S.~39]{li_machine_2024}:
 %
@@ -197,9 +135,9 @@ Die Gewichte werden iterativ über die sogenannte Perceptron-Lernregel angepasst.
 %
 Dabei bezeichnet $\eta$ die Lernrate, die die Schrittweite der Gewichtsanpassung steuert.
 \abschnitt
-Ein einzelnes Perceptron kann als Boolesche Funktion verwendet werden und so die logischen Operationen \text{AND}, \text{OR}, \text{NAND} und \text{NOR} darstellen. \text{AND} und \text{OR} lassen sich dabei als \textit{m-of-n}-Funktionen auffassen, bei denen mindestens $m$ von $n$ Eingaben wahr sein müssen
+Ein einzelnes Perceptron kann als Boolesche Funktion verwendet werden und so die logischen Operationen \textbf{AND}, \textbf{OR}, \textbf{NAND} und \textbf{NOR} darstellen. AND und OR lassen sich dabei als \textit{m-of-n}-Funktionen auffassen, bei denen mindestens $m$ von $n$ Eingaben wahr sein müssen.
 %~\cite[vgl.][S.~87]{mitchell_machine_2013}
-. Die \text{XOR}-Funktion lässt sich durch ein einzelnes Perceptron hingegen nicht repräsentieren, da ihre Ausgaben nicht linear separierbar sind und somit keine einzelne Hyperebene die beiden Klassen korrekt trennen kann~\cite[vgl.][S.~87]{mitchell_machine_2013}. \citeauthor{minsky_perceptrons_1969} zeigten formal, dass diese Einschränkung eine ganze Klasse einfacher logischer Funktionen betrifft~\cite{minsky_perceptrons_1969}.
+Die \textbf{XOR}-Funktion lässt sich durch ein einzelnes Perceptron hingegen nicht repräsentieren, da ihre Ausgaben nicht linear separierbar sind und somit keine einzelne Hyperebene die beiden Klassen korrekt trennen kann~\cite[vgl.][S.~87]{mitchell_machine_2013}. \citeauthor{minsky_perceptrons_1969} zeigten formal, dass diese Einschränkung eine ganze Klasse einfacher logischer Funktionen betrifft~\cite{minsky_perceptrons_1969}.
 \abschnitt
 Diese Limitation wird durch das~\ac{MLP} überwunden, bei dem mehrere Neuronen in verborgenen Schichten (\textit{Hidden Layers}) angeordnet sind. Bereits ein zweischichtiges Netz aus Perceptronen ist ausreichend, um eine beliebige Boolesche Funktion darzustellen~\cite[vgl.][S.~105]{mitchell_machine_2013}. In Kombination mit dem Backpropagation-Algorithmus, der den Fehler schichtweise rückwärts durch das Netz propagiert und so die Gewichte aller Schichten anpasst, können auch nichtlineare Zusammenhänge modelliert werden~\cite[vgl.][S.~97\,ff.]{mitchell_machine_2013}. Diese mehrschichtigen Architekturen bilden die Grundlage für die in Kapitel~\ref{Ch:deep_generative} vorgestellten tiefen neuronalen Netze.
 
