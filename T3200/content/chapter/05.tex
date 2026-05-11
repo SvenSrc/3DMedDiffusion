@@ -163,17 +163,10 @@ Die Varianz $\sigma_t^2$ wird üblicherweise als fester Wert gesetzt, wobei $\sig
 Das Sampling beschreibt den Prozess der Datengenerierung, bei dem von reinem Rauschen $x_T \sim \mathcal{N}(0, I)$ schrittweise der Rückwärtsprozess durchlaufen wird~\cite[S. 4]{ho_denoising_2020}. Die Wahl des Sampling-Verfahrens beeinflusst sowohl die Qualität der generierten Daten als auch die benötigte Rechenzeit.
  
 \subsubsection{DDPM-Sampling}
-Das \ac{DDPM}-Sampling folgt direkt dem stochastischen Rückwärtsprozess aus \autoref{eq:sampling_step}. Es durchläuft alle $T$ Zeitschritte (meistens $T = 1000$~\cite[S. 5]{ho_denoising_2020}) und fügt bei jedem Schritt stochastisches Rauschen hinzu:
-%
-\begin{equation}
-    x_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}}\, \epsilon_\theta(x_t, t) \right) + \sigma_t\, z, \qquad z \sim \mathcal{N}(0, I)
-    \label{eq:ddpm_sampling}
-\end{equation}
-%
-Dieses Verfahren liefert qualitativ hochwertige Ergebnisse, ist jedoch aufgrund der $T$ erforderlichen Netzwerkauswertungen rechenintensiv\cite[S. 3]{song_denoising_2022}.
+Das \ac{DDPM}-Sampling implementiert den stochastischen Rückwärtsprozess aus \autoref{eq:sampling_step} und entspricht damit der ursprünglichen Sampling-Prozedur von \citeauthor{ho_denoising_2020}. Ausgehend von reinem gaußschen Rauschen $x_T \sim \mathcal{N}(0, I)$ wird in jedem Schritt $t \to t-1$ eine kleine Menge des in $x_t$ enthaltenen Rauschens entfernt, wobei das trainierte Netzwerk $\epsilon_\theta(x_t, t)$ diese Rauschkomponente vorhersagt. Der erste Klammerausdruck aus \autoref{eq:sampling_step} entspricht dem geschätzten Mittelwert der Rückwärtsverteilung $p_\theta(x_{t-1} \mid x_t)$, während über das hinzugefügte Rauschen $\sigma_t\, z$ mit $z \sim \mathcal{N}(0, I)$ die für den Markov-Prozess charakteristische Stochastizität eingebracht wird~\cite[vgl.][S. 4]{ho_denoising_2020}. Für die Varianz kann $\sigma_t^2 = \beta_t$ gewählt werden~\cite[vgl.][S. 3]{ho_denoising_2020}. Der Prozess durchläuft alle $T$ Zeitschritte, wobei in der Praxis $T = 1000$ mit einem linearen $\beta$-Schedule von $\beta_1 = 10^{-4}$ bis $\beta_T = 0{,}02$ verwendet wird~\cite[vgl.][S. 5]{ho_denoising_2020}. Da bei jedem dieser Schritte eine vollständige Auswertung des neuronalen Netzes erforderlich ist, liefert das Verfahren zwar qualitativ hochwertige Ergebnisse, ist jedoch rechenintensiv und in der Praxis deutlich langsamer als alternative generative Modelle~\cite[vgl.][S. 3]{song_denoising_2022}.
  
 \subsubsection{DDIM-Sampling}
-Im Gegensatz zum \ac{DDPM}-Sampling müssen beim \ac{DDIM}-Sampling nicht alle $T$ Schritte durchlaufen werden. Dies wird dadurch ermöglicht, dass der Vorwärtsprozess auch als nicht-Markov-Prozess interpretiert werden kann, was zu einer deterministischen Sampling-Prozedur führt~\cite[S. 4 f.]{song_denoising_2022}. Das \ac{DDIM}-Sampling wird wie folgt beschrieben:
+Im Gegensatz zum \ac{DDPM}-Sampling müssen beim \ac{DDIM}-Sampling nicht alle $T$ Schritte durchlaufen werden. Dies wird dadurch ermöglicht, dass der Vorwärtsprozess auch als nicht-Markov-Prozess interpretiert werden kann~\cite[vgl.][S. 3]{song_denoising_2022}. Dadurch lassen sich Teilsequenzen der Zeitschritte verwenden, und über den Parameter $\sigma_t$ kann zusätzlich der Grad der Stochastizität eingestellt werden, bis zu einem vollständig deterministischen Sampling~\cite[vgl.][S. 5]{song_denoising_2022}. Das \ac{DDIM}-Sampling wird wie folgt beschrieben\cite[vgl.][S. 5]{song_denoising_2022}:
 %
 \begin{equation}
     x_{t-1} = \sqrt{\bar{\alpha}_{t-1}} 
@@ -183,13 +176,36 @@ Im Gegensatz zum \ac{DDPM}-Sampling müssen beim \ac{DDIM}-Sampling nicht alle $T
     \label{eq:ddim_sampling}
 \end{equation}
 %
-Für $\sigma_t = 0$ wird der Prozess deterministisch, das heißt derselbe Startpunkt $x_T$ erzeugt immer dasselbe Ergebnis~\cite[S. 5]{song_denoising_2022}. 
-% Ein weiterer Vorteil von \ac{DDIM} ist, dass eine Teilmenge $\tau = \{\tau_1, \ldots, \tau_S\} \subset \{1, \ldots, T\}$ mit $S \ll T$ gewählt werden kann, wobei das Sampling nur über diese $S$ Schritte erfolgt~\cite[S. 5]{song_denoising_2022}. 
-In der Praxis reichen häufig 50 bis 100 Schritte statt für $T = 1000$, was eine 10- bis 50-fache Beschleunigung bei vergleichbarer Bildqualität ermöglicht~\cite[S. 7]{song_denoising_2022}.
+Der erste Term entspricht der Vorhersage des sauberen Bildes $x_0$ ausgehend vom verrauschten Zustand $x_t$, der zweite Term stellt die deterministische Richtung dar, die auf $x_t$ zeigt, und der letzte Term $\sigma_t\, z$ mit $z \sim \mathcal{N}(0, I)$ steuert über $\sigma_t$ den Grad der Stochastizität des Verfahrens. Für $\sigma_t = 0$ wird der Prozess deterministisch, das heißt derselbe Startpunkt $x_T$ erzeugt immer dasselbe Ergebnis~\cite[vgl.][S. 5]{song_denoising_2022}. In der Praxis reichen häufig 20 bis 100 Schritte statt $T = 1000$, was eine 10- bis 50-fache Beschleunigung bei vergleichbarer Bildqualität ermöglicht~\cite[S. 7]{song_denoising_2022}.
  
 \subsubsection{DPM-Solver++}
+DPM-Solver++ ist ein numerischer Löser für die zum Diffusionsprozess gehörende Differentialgleichung (Diffusion \ac{ODE}) und stellt eine Weiterentwicklung des ursprünglichen DPM-Solvers dar~\cite[vgl.][S. 2]{lu_dpm-solver_2025}. Grundidee dieses Verfahrens ist es, den Sampling-Prozess als Lösen dieser \ac{ODE} zu interpretieren und durch eine Variablentransformation auf das log-SNR $\lambda_t = \log(\alpha_t / \sigma_t)$ den linearen Anteil der Lösung analytisch zu berechnen. Lediglich der nichtlineare, durch das Neuronale Netz parametrisierte Anteil muss noch durch eine Taylor-Entwicklung approximiert werden~\cite[vgl.][S. 4 f.]{lu_dpm-solver_2025}. Im Gegensatz zum ursprünglichen DPM-Solver, der hierfür das Rauschvorhersagemodell $\epsilon_\theta$ verwendet, basiert DPM-Solver++ auf dem Datenvorhersagemodell $x_\theta$, welches direkt das saubere Bild $x_0$ schätzt. Dies reduziert den Diskretisierungsfehler bei großen Guidance-Skalen und erlaubt zudem den Einsatz von Thresholding-Methoden, die den vorhergesagten Wert auf den gültigen Datenbereich beschränken~\cite[vgl.][S. 5 ff.]{lu_dpm-solver_2025}.
+\abschnitt
+In der Praxis kommt überwiegend die Multistep-Variante zweiter Ordnung DPM-Solver++(2M) zum Einsatz. Ein Solver zweiter Ordnung berücksichtigt in der Taylor-Entwicklung zusätzlich die erste Ableitung des Vorhersagemodells und erreicht so einen geringeren Diskretisierungsfehler pro Schritt als ein Solver erster Ordnung. Die benötigte Ableitung wird dabei aus zwischengespeicherten Modellauswertungen vorheriger Schritte approximiert, sodass pro Iteration nur eine einzige Auswertung des Neuronalen Netzes erforderlich ist~\cite[vgl.][S. 6 f.]{lu_dpm-solver_2025}. Mit der Schrittweite $h_i := \lambda_{t_i} - \lambda_{t_{i-1}}$ und dem Verhältnis $r_i := h_{i-1}/h_i$ ergibt sich der Update-Schritt zu:
+%
+\begin{equation}
+    \tilde{x}_{t_i} = \frac{\sigma_{t_i}}{\sigma_{t_{i-1}}}\, \tilde{x}_{t_{i-1}} 
+    - \alpha_{t_i}(e^{-h_i} - 1)\, D_i, \quad 
+    D_i = \left(1 + \frac{1}{2r_i}\right) x_\theta(\tilde{x}_{t_{i-1}}, t_{i-1}) 
+    - \frac{1}{2r_i}\, x_\theta(\tilde{x}_{t_{i-2}}, t_{i-2})
+    \label{eq:dpm_solver_pp}
+\end{equation}
+%
+Der erste Iterationsschritt wird durch eine Aktualisierung erster Ordnung initialisiert, die dem deterministischen \ac{DDIM}-Sampling entspricht~\cite[vgl.][S. 9]{lu_dpm-solver_2025}. Aus der Forschung erzeugt DPM-Solver++(2M) bereits in 15 bis 20 Schritten Bilder vergleichbarer Qualität wie ein \ac{DDIM}-Sampling mit mehreren hundert Schritten~\cite[vgl.][S. 11]{lu_dpm-solver_2025}.
 
-\subsection{UniPC}
+\subsubsection{UniPC}
+\ac{UniPC} ist ein trainingsfreies Sampling-Verfahren, das insbesondere bei sehr wenigen Schritten (< 10) eine bessere Sampling-Qualität als vergleichbare Verfahren erreicht~\cite[vgl.][S. 1 f.]{zhao_unipc_nodate}. Die Grundidee besteht darin, jeden Sampling-Schritt in zwei Teilschritte aufzuteilen. Zuerst erzeugt der Prädiktor (UniP) analog zum DPM-Solver++ eine erste Schätzung des nachfolgenden Zustands $\tilde{x}_{t_i}$. Anschließend verbessert der Korrektor (UniC) diese Schätzung zu einem korrigierten Wert $\tilde{x}^{c}_{t_i}$, indem die Modellauswertung am vorhergesagten Punkt als zusätzlicher Stützpunkt einbezogen wird~\cite[vgl.][S. 2]{zhao_unipc_nodate}. Dadurch erhöht sich die Genauigkeitsordnung des Verfahrens um eins~\cite[vgl.][S. 4]{zhao_unipc_nodate}. Der wesentliche Unterschied zu klassischen Predictor-Corrector-Verfahren aus der Mathematik liegt darin, dass UniC keine zusätzlichen Auswertungen des neuronalen Netzes benötigt. Die im Korrekturschritt berechnete Modellauswertung wird im darauffolgenden Sampling-Schritt wiederverwendet, sodass pro Iteration nur eine einzige Netzauswertung erforderlich ist~\cite[vgl.][S. 5]{zhao_unipc_nodate}.
+\abschnitt
+Wie der DPM-Solver++ basiert \ac{UniPC} auf der Lösung der Diffusion-\ac{ODE} im log-SNR-Bereich. Mit der Schrittweite $h_i := \lambda_{t_i} - \lambda_{t_{i-1}}$ und den Differenzen $D_m$ aus zusätzlichen Modellauswertungen ergibt sich der Korrekturschritt UniC-p zu:
+%
+\begin{equation}
+    \tilde{x}^{c}_{t_i} = \frac{\alpha_{t_i}}{\alpha_{t_{i-1}}}\, \tilde{x}^{c}_{t_{i-1}} 
+    - \sigma_{t_i}(e^{h_i} - 1)\, \epsilon_\theta(\tilde{x}_{t_{i-1}}, t_{i-1}) 
+    - \sigma_{t_i}\, B(h_i) \sum_{m=1}^{p} \frac{a_m}{r_m}\, D_m
+    \label{eq:unipc}
+\end{equation}
+%
+Die ersten beiden Terme entsprechen einer Aktualisierung erster Ordnung, die dem deterministischen \ac{DDIM}-Sampling entspricht. Der Summenterm bringt die Korrektur höherer Ordnung ein, indem die Differenzen $D_m$ vorangegangener Modellauswertungen mit den Koeffizienten $a_m$ gewichtet kombiniert werden~\cite[vgl.][S. 3 f.]{zhao_unipc_nodate}. Der Prädiktor UniP-p ergibt sich aus \autoref{eq:unipc} durch Weglassen des Terms $D_p$, da dieser die im Prädiktorschritt noch nicht verfügbare Modellauswertung am aktuellen Zeitschritt voraussetzt. Die Kombination beider Komponenten erreicht eine Genauigkeitsordnung von $p+1$. Da Prädiktor und Korrektor derselben analytischen Form folgen, lassen sich beliebige Ordnungen einheitlich formulieren, während der DPM-Solver++ nur bis zur dritten Ordnung explizit angegeben werden kann~\cite[vgl.][S. 5]{zhao_unipc_nodate}.
 
 % % ============================================================
 % % 4. NEUER ABSCHNITT: Trainingsziel
