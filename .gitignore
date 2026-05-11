@@ -48,6 +48,8 @@ build/
 *.eps
 *.tps
 *.tcp
+*.pyc
 
+__pycache__
 
 # .pdf
