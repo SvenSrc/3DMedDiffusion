@@ -1,26 +1,78 @@
 \chapter{Deep Generative Model}\label{Ch:deep_generative}
 
-\section{GANs}
-\ac{GAN}s bestehen aus zwei neuronalen Netzwerken, die gegeneinander trainiert werden: einem \textit{Generator} $G$ und einem \textit{Diskriminator} $D$. Der Generator erzeugt aus einem zufälligen Rauschen $z \sim p_z(z)$ synthetische Daten $G(z)$, während der Diskriminator lernt, echte Daten $x \sim p_{data}(x)$ von gefälschten zu unterscheiden. Dieses Wettbewerbsprinzip wird als \textit{Minimax-Spiel} bezeichnet und durch folgende Zielfunktion beschrieben:
+
+\section{Generative Adversarial Networks}
+\acp{GAN} wurden von~\citeauthor{goodfellow_generative_nodate} eingeführt 
+und bestehen aus zwei neuronalen Netzwerken, die in einem adversarialen 
+Prozess gegeneinander trainiert werden. Diese beiden Netzwerke werden als 
+\textit{Generator} $G$ und \textit{Diskriminator} $D$ bezeichnet. Der 
+Generator bildet einen latenten Rauschvektor $z \sim p_z(z)$ auf ein 
+synthetisches Sample $G(z)$ ab, während der Diskriminator lernt, echte 
+Datenpunkte $x \sim p_{data}(x)$ von gefälschten zu unterscheiden. Dieses 
+Wettbewerbsprinzip lässt sich formal als \textit{Minimax-Spiel} mit 
+Wertfunktion $V(D, G)$ formulieren~\cite[vgl.][S.~2\,f.]{goodfellow_generative_nodate}. 
+Die mathematische Formulierung lautet~\cite[S.~3]{goodfellow_generative_nodate}:
 %
 \begin{equation}
-    \min_G \max_D \; \mathbb{E}_{x \sim p_{data}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
+    \min_G \max_D \; V(D, G) = 
+    \mathbb{E}_{x \sim p_{data}(x)}\!\left[\log D(x)\right] 
+    + \mathbb{E}_{z \sim p_z(z)}\!\left[\log\bigl(1 - D(G(z))\bigr)\right]
     \label{eq:gan}
 \end{equation}
 %
-Der Diskriminator $D$ versucht, $D(x) \approx 1$ für echte und $D(G(z)) \approx 0$ für gefälschte Daten zu erreichen. Der Generator $G$ hingegen versucht, den Diskriminator zu täuschen, sodass $D(G(z)) \approx 1$. Im Idealfall konvergiert das Training zu einem Nash-Gleichgewicht, bei dem $G$ die wahre Datenverteilung $p_{data}$ approximiert.
+Der Diskriminator maximiert diesen Ausdruck, indem er $D(x) \to 1$ für 
+echte und $D(G(z)) \to 0$ für generierte Proben anstrebt. Der Generator 
+minimiert ihn dagegen, indem er versucht, $D$ zu täuschen. 
+\citeauthor{goodfellow_generative_nodate} zeigen, dass dieses Spiel ein 
+globales Optimum bei $p_g = p_{data}$ besitzt, an dem $D(x) = \tfrac{1}{2}$ 
+gilt und der Diskriminator echte und synthetische Daten nicht mehr 
+unterscheiden kann~\cite[S.~4\,f.]{goodfellow_generative_nodate}.
 
-% Erschwerend kommt hinzu, dass insbesondere generative adversarische Netze (GANs) häufig unter \textit{Mode Collapse} leiden, wodurch die Vielfalt der generierten Bilder eingeschränkt wird~\cite[S.~2]{khader_medical_2022}.
-
-\section{VAE}
-Ein \ac{VAE} ist ein generatives Modell, das Daten in einen komprimierten \textit{latenten Raum} $z$ kodiert und aus diesem neue Daten rekonstruiert. Im Gegensatz zu klassischen Autoencodern kodiert der \ac{VAE} nicht einen festen Punkt, sondern eine Wahrscheinlichkeitsverteilung $q_\phi(z \mid x) = \mathcal{N}(\mu, \sigma^2 I)$, aus der dann Samples gezogen werden. Das Training minimiert die folgende Verlustfunktion, den \textit{Evidence Lower Bound} (ELBO):
+\section{Variational Autoencoders}
+\aclp{VAE} von~\citeauthor{kingma_auto-encoding_2022} verfolgen einen 
+probabilistischen Ansatz. Sie modellieren die Daten als gemeinsame 
+Verteilung $p_\theta(x, z) = p_\theta(z)\,p_\theta(x \mid z)$ über 
+beobachtete Variablen $x$ und latente Variablen $z$ mit der 
+A-priori-Verteilung $p_\theta(z)$ (typischerweise $N(0, I)$). Da sich 
+die wahre A-posteriori-Verteilung $p_\theta(z \mid x)$ in der Regel nicht 
+geschlossen berechnen lässt, wird sie durch eine parametrisierte 
+Verteilung $q_\phi(z \mid x)$, das sogenannte \textit{Erkennungsmodell} 
+oder \textit{Encoder}, angenähert. Der \textit{Decoder} 
+$p_\theta(x \mid z)$ rekonstruiert dann $x$ aus $z$~\cite[S.~2\,f.]{kingma_auto-encoding_2022}.
+\abschnitt
+Das Training maximiert nicht direkt die Log-Likelihood 
+$\log p_\theta(x)$, sondern die \ac{ELBO} 
+$L(\theta, \phi; x)$, eine untere Schranke an die 
+Log-Likelihood~\cite[S.~3]{kingma_auto-encoding_2022}:
 %
 \begin{equation}
-    \mathcal{L}_{\text{VAE}} = \underbrace{\mathbb{E}_{q_\phi(z|x)}\left[\log p_\theta(x \mid z)\right]}_{\text{Rekonstruktionsfehler}} - \underbrace{D_{\text{KL}}\left(q_\phi(z \mid x) \;\|\; p(z)\right)}_{\text{Regularisierung}}
-    \label{eq:vae}
+    L(\theta, \phi; x^{(i)}) =
+    -\,D_{KL}\!\bigl(q_\phi(z \mid x^{(i)}) \,\|\, p_\theta(z)\bigr)
+    + \mathbb{E}_{q_\phi(z \mid x^{(i)})}\!\left[\log p_\theta(x^{(i)} \mid z)\right]
+    \label{eq:vae_elbo}
 \end{equation}
 %
-Der erste Term minimiert den Rekonstruktionsfehler – das Modell soll die Eingabe $x$ möglichst gut wiederherstellen. Der zweite Term, die \textit{KL-Divergenz}, zwingt den latenten Raum nah an eine Standardnormalverteilung $\mathcal{N}(0, I)$ zu bleiben, sodass neue Daten durch einfaches Sampling aus $p(z)$ generiert werden können.
+Der erste Term wirkt als Regularisierer, der die genäherte 
+A-posteriori-Verteilung $q_\phi(z \mid x)$ in Richtung der 
+A-priori-Verteilung $p_\theta(z)$ zieht. Der zweite Term beschreibt die 
+erwartete Rekonstruktionsqualität und sorgt dafür, dass aus dem latenten 
+Code $z$ wieder die ursprüngliche Eingabe abgeleitet werden 
+kann~\cite[S.~3\,f.]{kingma_auto-encoding_2022}.
+\abschnitt
+Da die Erwartungswertbildung in Gleichung~\eqref{eq:vae_elbo} bezüglich 
+$\phi$ nicht direkt differenzierbar ist, verwenden 
+\citeauthor{kingma_auto-encoding_2022} den \textit{Reparametrisierungstrick}: 
+Eine Probe $z \sim q_\phi(z \mid x) = N(\mu_\phi(x), \sigma_\phi^2(x))$ 
+wird als deterministische Funktion eines Hilfsrauschens 
+$\epsilon \sim N(0, I)$ ausgedrückt~\cite[S.~4\,f.]{kingma_auto-encoding_2022},
+%
+\begin{equation}
+    z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon,
+    \label{eq:vae_reparam}
+\end{equation}
+%
+wodurch der Gradient der \ac{ELBO} mittels Standard-Backpropagation 
+durch das Netzwerk fließen kann~\cite[S.~4]{kingma_auto-encoding_2022}.
 
 \section{Diffusion Model}
 Ein \textit{Diffusion Model} oder auch \textit{Diffusions-Wahrscheinlichkeitsmodell} ist ein generatives Modell, das zur Klasse der latenten Variablenmodelle gehört~\cite[S. 153]{okadome_essentials_2025}~\cite[S. 114]{feuerriegel_generative_2024}. Das grundlegende Prinzip besteht darin, einen Diffusionsprozess umzukehren, bei dem schrittweise Rauschen zu den Daten hinzugefügt wird. Durch die Umkehrung dieses Prozesses kann das Modell aus verrauschten Signalen Daten rekonstruieren und so neue Daten generieren. Dafür wird eine parametrisierte Markov-Kette mittels Variationsinferenz trainiert, deren Übergänge lernen, den Diffusionsprozess umzukehren~\cite[S. 153]{okadome_essentials_2025}~\cite[S. 2]{ho_denoising_2020}.
