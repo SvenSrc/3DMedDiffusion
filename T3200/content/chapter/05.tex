@@ -103,7 +103,7 @@ Aufgrund der Markov-Eigenschaft kann die gemeinsame Wahrscheinlichkeit der gesam
 %
 Diese Faktorisierung ist für Diffusionsmodelle von zentraler Bedeutung
 %Im Vorwärtsprozess wird die Notation $q$ verwendet, um die festen (nicht trainierbaren) Übergangswahrscheinlichkeiten zu kennzeichnen, während $p_\theta$ im Rückwärtsprozess die vom neuronalen Netz parametrisierten Übergänge bezeichnet
-~\cite[S. 153 f.]{okadome_essentials_2025}~\cite[S. 608 f.]{bishop_pattern_2006}. Die Gedächtnislosigkeit der Markov-Kette erweist sich als besonders geeignet für Diffusionsprozesse, da jeder Schritt sowohl beim Hinzufügen als auch beim Entfernen von Rauschen ausschließlich vom aktuellen Zustand abhängt. 
+~\cite[S. 153 f.]{okadome_essentials_2025}~\cite[S. 608 f.]{bishop_pattern_2006}. Die Gedächtnislosigkeit der Markov-Kette erweist sich als vorteilhaft für Diffusionsprozesse, da jeder Schritt sowohl beim Hinzufügen als auch beim Entfernen von Rauschen ausschließlich vom aktuellen Zustand abhängt.
 %Diese Eigenschaft motiviert die Modellierung des Rückwärtsprozesses ebenfalls als Markov-Kette~\cite[S. 154]{okadome_essentials_2025}.
 %%
 
@@ -117,7 +117,7 @@ Der \textit{Noise Schedule} definiert eine Sequenz von vorgegebene Werten $\beta
 %
 Dabei gibt $\alpha_t$ an, welcher Anteil des Signals aus dem vorherigen Schritt erhalten bleibt. Hingegen tut $\bar{\alpha}_t$ das kumulative Produkt über alle bisherigen Schritte darstellen. Mit steigendem $t$ nimmt $\bar{\alpha}_t$ monoton ab, sodass das ursprüngliche Signal zunehmend durch Rauschen überschrieben wird~\cite[S. 44]{lai_principles_2025}. Heißt, wenn für $t \to T$ gilt $\bar{\alpha}_T \approx 0$, was bedeutet, dass das Originalbild nahezu vollständig zerstört ist.
 \abschnitt
-Die Wahl des Noise Schedulers beinflusst die Qualität der generierten Daten. Der \textit{lineare Schedule}, der von Ho et al.~\cite[S. 5]{ho_denoising_2020} verwendet wird, definiert $\beta_t$ als lineare Interpolation zwischen einem Start- und Endwert:
+Die Wahl des Noise Schedulers beeinflusst die Qualität der generierten Daten. Der \textit{lineare Schedule}, der von \citeauthor{ho_denoising_2020} verwendet wird, definiert $\beta_t$ als lineare Interpolation zwischen einem Start- und Endwert~\cite[S.~5]{ho_denoising_2020}:
 %
 \begin{equation}
     \beta_t = \beta_1 + \frac{t-1}{T-1}(\beta_T - \beta_1)
@@ -125,10 +125,11 @@ Die Wahl des Noise Schedulers beinflusst die Qualität der generierten Daten. Der
 \end{equation}
 %
 % Typische Werte sind $\beta_1 = 10^{-4}$ und $\beta_T = 0{,}02$ bei $T = 1000$ Schritten~\cite{ho_denoising_2020}.
-Allerdings wurde beobachtet dass der lineare Schedule in den späten Schritten zu aggressiv rauscht. Nichol und Dhariwal~\cite[S. 4]{nichol_improved_2021} verwenden daher einen \textit{Cosine Schedule}, der $\bar{\alpha}_t$ direkt über eine Kosinusfunktion definiert:
+Allerdings wurde beobachtet, dass der lineare Schedule in den späten Schritten zu aggressiv rauscht. \citeauthor{nichol_improved_2021} verwenden daher einen \textit{Cosine Schedule}, der $\bar{\alpha}_t$ direkt über eine Kosinusfunktion definiert~\cite[vgl.][S.~4]{nichol_improved_2021}:
 %
 \begin{equation}
-    \bar{\alpha}_t = \frac{f(t)}{f(0)}, \quad \text{mit} \quad f(t) = \cos\!\left(\frac{t/T + s}{1 + s} \cdot \frac{\pi}{2}\right)^2
+    \bar{\alpha}_t = \frac{f(t)}{f(0)}, \quad \text{mit} \quad 
+    f(t) = \cos\!\left(\frac{t/T + s}{1 + s} \cdot \frac{\pi}{2}\right)^2
     \label{eq:cosine_schedule}
 \end{equation}
 %
@@ -163,16 +164,15 @@ Hierbei wird das Signal aus dem vorherigen Schritt mit dem Faktor $\sqrt{1 - \be
 Dies bedeutet, dass ein Bild $x_0$ nach $T$ schritten vollständig zerstört wird und das Ergebnis $x_T$ reinem Gaußschem Rauschen $\mathcal{N}(0, I)$ entspricht. Ein Vorteil des Vorwärtsprozesses ist, dass $x_t$ nicht iterativ berechnet werden muss. Mithilfe der Definitionen $\alpha_t = 1 - \beta_t$ und $\bar{\alpha}_t = \prod_{k=1}^{t} \alpha_k$  lässt sich $x_t$ direkt aus dem Originalbild $x_0$ berechnen~\cite[S. 156]{okadome_essentials_2025}~\cite[S. 2]{ho_denoising_2020}~\cite[S. 44 f.]{lai_principles_2025}:
 %
 \begin{equation}
-    q(x_t \mid x_0) = \mathcal{N}\!\left(x_t;\; \sqrt{\bar{\alpha}_t}\, x_0,\; (1 - \bar{\alpha}_t)\, I\right)
+    q(x_t \mid x_0) = \mathcal{N}\!\left(x_t;\; \sqrt{\bar{\alpha}_t}\, x_0,\; 
+    (1 - \bar{\alpha}_t)\, I\right)
     \label{eq:forward_closed}
 \end{equation}
-%
-% Vllt Reparaemtrisierungsformel?
-%
-Daraus ergibt sich die folgende Formel~\cite[S. 156]{okadome_essentials_2025}~\cite[S. 2]{ho_denoising_2020}~\cite[S. 44 f.]{lai_principles_2025}: 
+Daraus ergibt sich die folgende Formel~\cite[S.~156]{okadome_essentials_2025}~\cite[S.~2]{ho_denoising_2020}~\cite[S.~44\,f.]{lai_principles_2025}:  
 %
 \begin{equation}
-    x_t = \sqrt{\bar{\alpha}_t}\, x_0 + \sqrt{1 - \bar{\alpha}_t}\, \epsilon, \qquad \epsilon \sim \mathcal{N}(0, I)
+    x_t = \sqrt{\bar{\alpha}_t}\, x_0 + \sqrt{1 - \bar{\alpha}_t}\, \epsilon, 
+    \qquad \epsilon \sim \mathcal{N}(0, I)
     \label{eq:reparametrization_forward}
 \end{equation}
 %
