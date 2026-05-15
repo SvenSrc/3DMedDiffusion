@@ -88,11 +88,16 @@ In~\autoref{eq:ssim} stehen $\mu_x$ und $\mu_y$ für die mittleren Helligkeitswer
 %
 
 \subsubsection{\acl{PSNR}}
-Eine weitere Metrik ist die \ac{PSNR}. \ac{PSNR} bewertet die Bildqualität in dem sie das generierte Bild mit dem original Bild vergleicht~\cite[text]{keylist}. 
+Die \ac{PSNR} bewertet die Bildqualität, indem sie das generierte Bild pixelweise mit dem Referenzbild vergleicht. Sie wird über den mittleren quadratischen Fehler \ac{MSE} zwischen beiden Bildern bestimmt und in Dezibel angegeben~\cite[vgl.][S.~3]{moser_diffusion_2025}:
+%
+\begin{equation}
+    \mathrm{PSNR} = 10 \cdot \log_{10}\!\left(\frac{\mathrm{MAX}^2}{\mathrm{MSE}}\right)
+    \label{eq:psnr}
+\end{equation}
+%
+Dabei ist $\mathrm{MAX}$ der maximal mögliche Pixelwert (z.\,B. 255 bei 8-Bit-Bildern oder 1 bei normalisierten Bildern) und $\mathrm{MSE}$ der mittlere quadratische Fehler zwischen Referenz- und generiertem Bild.
 \abschnitt
-Ein hoher \ac{PSNR} Wert deutet auf eine hohe Bildqualität und und desto kleiner ist die Differenz der beiden vergleichen Bilder~\cite[vgl.][S. 137]{long_generative_2026}. Allerdings tut diese Metrik nicht die menschliche Wahrnehmung abbilden, da sie lediglich sich nur auf die Pixeldifferenzen bezieht. So kann bereits eine kleine räumliche Verschiebung der Pixel zu einer Verschlechterung des \ac{PSNR}-Wertes führen, obwohl die subjektiv wahrgenommene Bildqualität keinen Unterschied erkennt. Daher erzielen Modelle mit pixelbasiertem Trainingsziel höhere \ac{PSNR}-Werte als generative Modelle~\cite[vgl.][S. 3]{moser_diffusion_2025}. Die \ac{PSNR} kein ausreichendes Qualitätsmaß und sollte im Kontext generativer Modelle durch wahrnehmungsbasierte Metriken ergänzt werden.
-
-Die PSNR ist daher zwar ein etabliertes, aber kein ausreichendes Qualitätsmaß und sollte im Kontext generativer Modelle stets durch wahrnehmungsbasierte Metriken (z. B. LPIPS, FID) ergänzt werden.
+Ein hoher \ac{PSNR}-Wert deutet auf eine hohe Bildqualität hin. Je kleiner die Differenz zwischen den beiden Bildern, desto größer der Wert~\cite[vgl.][S.~137]{long_generative_2026}. Allerdings bildet die \ac{PSNR} die menschliche Wahrnehmung nicht zuverlässig ab, da sie ausschließlich auf Pixeldifferenzen beruht. Bereits eine kleine räumliche Verschiebung der Pixel kann zu einem schlechteren \ac{PSNR}-Wert führen, obwohl die subjektiv wahrgenommene Bildqualität unverändert bleibt. Aus demselben Grund erreichen Modelle mit pixelbasiertem Trainingsziel typischerweise höhere \ac{PSNR}-Werte als generative Modelle~\cite[vgl.][S.~3]{moser_diffusion_2025}. Die \ac{PSNR} ist daher zwar ein etabliertes, aber kein hinreichendes Qualitätsmaß und sollte im Kontext generativer Modelle durch wahrnehmungsbasierte Metriken wie \ac{LPIPS} oder \ac{FID} ergänzt werden.
 
 \subsubsection{\acl{LPIPS}}
 Die \ac{LPIPS} ist eine \ac{FR}-Metrik. Sie misst die Ähnlichkeit zweier Bilder nicht im Pixelraum wie \ac{SSIM} oder \ac{PSNR}, sondern anhand der Merkmale, die ein tiefes neuronales Netz aus den Bildern extrahiert. Sie wurde 2018 von \citeauthor{zhang_unreasonable_2018} eingeführt, weil pixelbasierte Maße die wahrgenommene Ähnlichkeit zweier Bilder oft schlecht widerspiegeln, insbesondere bei Verzerrungen wie Unschärfen oder Verschiebungen~\cite[vgl.][S.~1]{zhang_unreasonable_2018}.
@@ -100,7 +105,7 @@ Die \ac{LPIPS} ist eine \ac{FR}-Metrik. Sie misst die Ähnlichkeit zweier Bilder 
 Zur Berechnung werden beide Bilder $x$ und $x_0$ durch ein vortrainiertes \ac{CNN} (z.\,B. VGG oder AlexNet) geleitet. Aus $L$ Schichten werden die Merkmalskarten $\phi_l(x)$ und $\phi_l(x_0)$ entnommen und kanalweise normalisiert. Anschließend wird an jeder Position die $\ell_2$-Distanz berechnet, über die Fläche der Schicht gemittelt, mit einem gelernten Gewicht $w_l$ skaliert und über alle Schichten summiert~\cite[vgl.][S.~5\,f.]{zhang_unreasonable_2018}:
 %
 \begin{equation}
-    d(x, x_0) = \sum_{l=1}^{L} \frac{w_l}{H_l W_l} \sum_{h,w} 
+    \mathrm{LPIPS}(x, x_0) = \sum_{l=1}^{L} \frac{w_l}{H_l W_l} \sum_{h,w} 
     \bigl\| \phi_l(x)_{h,w} - \phi_l(x_0)_{h,w} \bigr\|_2^2
     \label{eq:lpips}
 \end{equation}
@@ -109,4 +114,12 @@ In \autoref{eq:lpips} steht $\phi_l(x)_{h,w}$ für den normalisierten Merkmalsvek
 \abschnitt
 Ein niedriger \ac{LPIPS}-Wert bedeutet hohe wahrgenommene Ähnlichkeit. Im Vergleich zu klassischen Metriken wie $\ell_2$, \ac{SSIM} oder FSIM stimmt \ac{LPIPS} deutlich stärker mit menschlichen Urteilen überein, benötigt aber wie andere \ac{FR}-Metriken ein Referenzbild~\cite[vgl.][S.~7]{zhang_unreasonable_2018}.
 
-\subsubsection{Dice}
+\subsubsection{Dice Similarity Coeffecient}
+Der \ac{DSC} ist eine Überlappungsmetrik aus der Bildsegmentierung. Er wurde ursprünglich 1945 von \citeauthor{dice_measures_1945} als \textit{coincidence index} für ökologische Anwendungen eingeführt~\cite[vgl.][S.~298]{dice_measures_1945}. Jedoch hat es sich später in der medizinischen Bildverarbeitung als Standardmaß zur Bewertung von Segmentierungen etabliert~\cite[vgl.][S.~2]{zou_statistical_2004}. Er misst die räumliche Überlappung zweier Segmentierungen, einer erzeugten und einer als Referenz dienenden Segmentierung. Für zwei Mengen $A$ und $B$, die die jeweiligen segmentierten Bereiche darstellen, ist er definiert als~\cite[vgl.][S.~4]{zou_statistical_2004}:
+%
+\begin{equation}
+    \mathrm{DSC}(A, B) = \frac{2 \, |A \cap B|}{|A| + |B|}
+    \label{eq:dice}
+\end{equation}
+%
+Der Zähler entspricht der doppelten Anzahl der gemeinsamen Voxel, der Nenner der Summe der Voxel beider Mengen. Der Wertebereich liegt zwischen 0 und 1, wobei 0 keine und 1 vollständige Überlappung bedeutet; Werte über 0{,}7 gelten in der Praxis als gute Übereinstimmung~\cite[vgl.][S.~4]{zou_statistical_2004}.
