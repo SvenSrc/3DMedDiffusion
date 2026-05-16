@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from src.model.blocks import (
+from blocks import (
     SinusoidalPositionEmbeddings,
     ResidualBlock3D,
     SelfAttention3D,
@@ -18,13 +18,24 @@ class UNet3D(nn.Module):
         self.config = config
         time_emb_dim = config.model_channels * 4
 
+        # base time embedding (sin/cos + 2-layer MLP)
         self.time_mlp = nn.Sequential(
             SinusoidalPositionEmbeddings(config.model_channels),
             nn.Linear(config.model_channels, time_emb_dim),
             nn.SiLU(),
             nn.Linear(time_emb_dim, time_emb_dim),
         )
-        self.init_conv = nn.Conv3d(config.in_channels, config.model_channels, 3, padding=1)
+
+        # optional categorical conditioning (size class etc.) — added to time embedding
+        self.num_size_classes = getattr(config, "num_size_classes", 0)
+        if self.num_size_classes > 0:
+            self.size_embed = nn.Embedding(self.num_size_classes + 1, time_emb_dim)
+            self.null_class = self.num_size_classes   # last index reserved for "no condition"
+
+        # optional spatial conditioning (e.g. seg map) — concatenated channel-wise to x
+        self.cond_channels = getattr(config, "cond_channels", 0)
+        self.init_conv = nn.Conv3d(config.in_channels + self.cond_channels,
+                                   config.model_channels, 3, padding=1)
 
         channels = [config.model_channels * m for m in config.channel_mult]
         skip_channels = [config.model_channels]
@@ -74,12 +85,26 @@ class UNet3D(nn.Module):
 
         self.final_norm = nn.GroupNorm(config.num_groups, config.model_channels)
         self.final_conv = nn.Conv3d(config.model_channels, config.in_channels, 3, padding=1)
-        # zero the last conv so the model starts as ~identity (helps stability early on)
         nn.init.zeros_(self.final_conv.weight)
         nn.init.zeros_(self.final_conv.bias)
 
-    def forward(self, x, t):
+    def forward(self, x, t, cond=None, size_cond=None):
         t_emb = self.time_mlp(t)
+
+        # add size-class embedding (uses the null index if size_cond not given)
+        if self.num_size_classes > 0:
+            if size_cond is None:
+                size_cond = torch.full((x.shape[0],), self.null_class,
+                                       device=x.device, dtype=torch.long)
+            t_emb = t_emb + self.size_embed(size_cond)
+
+        # concat spatial conditioning (uses zeros if cond not given)
+        if self.cond_channels > 0:
+            if cond is None:
+                cond = torch.zeros((x.shape[0], self.cond_channels, *x.shape[2:]),
+                                   device=x.device)
+            x = torch.cat([x, cond], dim=1)
+
         x = self.init_conv(x)
         skips = [x]
 
@@ -91,7 +116,7 @@ class UNet3D(nn.Module):
                 elif isinstance(block, Downsample3D):
                     x = block(x)
                     skips.append(x)
-                else:   # attention
+                else:
                     x = block(x)
 
         x = self.mid_block1(x, t_emb)
