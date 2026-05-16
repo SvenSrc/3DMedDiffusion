@@ -1,69 +1,27 @@
 \chapter{Medizinische Bildgebung}\label{Ch:Medizinische Bildgebung}
-Die medizinische Bildgebung bildet die Datengrundlage lernbasierter Verfahren
-in der medizinischen KI. Insbesondere dreidimensionale Modalitäten wie die
-\ac{MRT} liefern volumetrische Aufnahmen, die anatomische Strukturen wie
-Organe oder Tumore räumlich vollständig abbilden und damit den Ausgangspunkt
-für generative 3D-Modelle darstellen. Dieses Kapitel gibt einen Überblick
-über die für diese Arbeit relevanten bildgebenden Verfahren und stellt
-anschließend das verwendete \ac{NIfTI}-Format vor.
+Die medizinische Bildgebung bildet die Datengrundlage für die in dieser
+Arbeit untersuchten Diffusionsmodelle. Dieses Kapitel stellt die hierfür
+relevanten Modalitäten sowie das verwendete Datenformat vor.
 
 \section{Bildgebende Verfahren}
-
-In der medizinischen Bildgebung kommen je nach Fragestellung unterschiedliche
-Modalitäten zum Einsatz. Für die volumetrische Darstellung von
-Hirnstrukturen und Tumoren sind insbesondere die \ac{MRT} und die \ac{CT}
-etabliert. Beide liefern dreidimensionale Schnittbilder, unterscheiden sich
-jedoch grundlegend im physikalischen Wirkprinzip und im resultierenden
-Gewebekontrast.
+In der medizinischen Bildgebung kommen je nach Fragestellung unterschiedliche Modalitäten zum Einsatz. Für die volumetrische Darstellung von Hirnstrukturen und Tumoren sind insbesondere die \ac{MRT} und die \ac{CT} etabliert. Beide liefern dreidimensionale Schnittbilder, unterscheiden sich jedoch grundlegend im physikalischen Wirkprinzip und im resultierenden Gewebekontrast.
 
 \subsection{Magnetresonanztomographie}
-
-Die \ac{MRT} basiert auf der Anregung von Wasserstoffkernen im Körpergewebe
-durch starke statische Magnetfelder und Radiofrequenzimpulse. Beim
-Zurückkehren in den Gleichgewichtszustand emittieren die Kerne ein messbares
-Signal, dessen räumliche Zuordnung über zusätzliche Gradientenfelder
-erfolgt~\cite{brown_magnetic_2014}. Da die \ac{MRT} ohne ionisierende
-Strahlung auskommt und einen ausgeprägten Weichgewebekontrast liefert, gilt
-sie als Standardverfahren für die Bildgebung des zentralen
-Nervensystems~\cite{shukla_advanced_2017}.
-
-Durch Variation der Aufnahmesequenz lassen sich unterschiedliche
-Gewebeeigenschaften hervorheben. In der klinischen Routine der
-Hirntumorbildgebung werden vier komplementäre Sequenzen
-kombiniert~\cite{shukla_advanced_2017}:
+Die \ac{MRT} basiert auf der Anregung von Wasserstoffkernen im Körpergewebe durch starke statische Magnetfelder und Radiofrequenzimpulse. Beim Zurückkehren in den Gleichgewichtszustand emittieren die Kerne ein messbares Signal, dessen räumliche Zuordnung über zusätzliche Gradientenfelder erfolgt~\cite[vgl.][S.~514\,ff.]{bitar_mr_2006}. Die \ac{MRT} kommt ohne ionisierende Strahlung aus~\cite[vgl.][S.~536]{bitar_mr_2006}. Ebenfalls hebt sie durch Variation der Aufnahmesequenz unterschiedliche Gewebeeigenschaften hervor~\cite[vgl.][S.~517]{bitar_mr_2006}. In der klinischen Routine der Hirntumorbildgebung werden vier strukturelle Sequenzen kombiniert~\cite[vgl.][S.~3\,ff.]{kazerooni_brain_nodate}:
 %
 \begin{itemize}
-    \item \textbf{T1-gewichtet (T1):} Hebt anatomische Strukturen hervor;
-    Liquor erscheint dunkel, weiße Substanz hell.
-    \item \textbf{T1 kontrastverstärkt (T1ce):} T1-Aufnahme nach
-    intravenöser Gabe eines gadoliniumhaltigen Kontrastmittels. Bereiche mit
-    gestörter Blut-Hirn-Schranke -- etwa aktiv wachsende Tumoranteile --
-    reichern den Kontrast an und werden hyperintens dargestellt.
-    \item \textbf{T2-gewichtet (T2):} Liquor und ödematöses Gewebe
-    erscheinen hyperintens, was die Abgrenzung pathologischer Areale
-    erleichtert.
-    \item \textbf{FLAIR:} T2-basierte Sequenz mit unterdrücktem
-    Liquorsignal, wodurch insbesondere periläsionale Ödeme in der Nähe der
-    Ventrikel besser sichtbar werden.
+    \item \textbf{T1-gewichtet (T1):} Native Referenzaufnahme, die zum
+    Vergleich mit der kontrastverstärkten T1ce-Aufnahme dient.
+    \item \textbf{T1 kontrastverstärkt (T1ce):} Aktiv wachsende Tumoranteile reichern den Kontrast stark an und erscheinen auf T1ce heller als auf der T1-Aufnahme.
+    \item \textbf{T2-gewichtet (T2):} Tumorkomponenten erscheinen hyperintens.
+    \item \textbf{FLAIR:} Edema stellen sich auf FLAIR-Aufnahmen hyperintens dar.
 \end{itemize}
 %
-Die Sequenzen ergänzen sich in ihrer diagnostischen Aussagekraft: T1ce
-eignet sich zur Abgrenzung aktiv wachsender Tumoranteile, während T2 und
-FLAIR vor allem das umgebende Ödem sichtbar machen~\cite{shukla_advanced_2017}.
+Diese vier Sequenzen bilden den klinischen Standard in der
+Hirntumor-Bildgebung~\cite[vgl.][S.~3]{kazerooni_brain_nodate}.
 
 \subsection{Computertomographie}
-
-Die \ac{CT} beruht auf der Messung der Röntgenstrahlungs\-schwächung beim
-Durchgang durch das Gewebe. Eine rotierende Röntgenquelle und ein
-gegenüberliegender Detektorring nehmen aus verschiedenen Winkeln
-Projektionen auf, aus denen rechnergestützt ein dreidimensionaler Datensatz
-rekonstruiert wird~\cite{mileto_computed_2023}. Im Vergleich zur \ac{MRT}
-ist die \ac{CT} schneller, breiter verfügbar und stellt knöcherne Strukturen
-detaillierter dar, geht aber mit einer Strahlenbelastung einher und liefert
-einen geringeren Weichgewebekontrast~\cite{mileto_computed_2023}. In der
-Hirntumordiagnostik wird sie daher vor allem in der Notfall- und
-Erstabklärung eingesetzt, während die detaillierte Charakterisierung und
-Verlaufsbeurteilung der \ac{MRT} vorbehalten bleibt.
+Die \ac{CT} beruht auf der Messung der Röntgenstrahlungsschwächung beim Durchgang durch das Gewebe. Aus den so gewonnenen Projektionen wird rechnergestützt ein dreidimensionaler Datensatz rekonstruiert. Die \ac{CT} ist in der radiologischen Routine das am weitesten verbreitete bildgebende Verfahren und insbesondere in der Traumadiagnostik etabliert, geht aber mit einer Strahlenbelastung einher~\cite[vgl.][S.~1\,ff.]{buzug_computed_2008}.
 
 \section{Datenformat}
 Das \ac{NIfTI}-Format (.nii, .nii.gz) wurde in den frühen 2000er Jahren unter
