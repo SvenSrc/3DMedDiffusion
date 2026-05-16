@@ -1,20 +1,60 @@
 \chapter{Medizinische Bildgebung}\label{Ch:Medizinische Bildgebung}
+Die medizinische Bildgebung bildet die Datengrundlage für die in dieser
+Arbeit untersuchten Diffusionsmodelle. Dieses Kapitel stellt die hierfür
+relevanten Modalitäten sowie das verwendete Datenformat vor.
 
 \section{Bildgebende Verfahren}
+In der medizinischen Bildgebung kommen je nach Fragestellung unterschiedliche Modalitäten zum Einsatz. Für die volumetrische Darstellung von Hirnstrukturen und Tumoren sind insbesondere die \ac{MRT} und die \ac{CT} etabliert. Beide liefern dreidimensionale Schnittbilder, unterscheiden sich jedoch grundlegend im physikalischen Wirkprinzip und im resultierenden Gewebekontrast.
 
-\section{NIfTI}
-Das \ac{NIfTI}-Format (.nii, .nii.gz) wurde in den frühen 2000er Jahren vom \ac{NIH} entwickelt und hat sich als Standardformat in der neuroimaging-basierten Forschung etabliert. Es ist speziell für die Verarbeitung volumetrischer 3D-Bilddaten ausgelegt und daher geeignet für beispielsweise MRT-Gehirnuntersuchungen~\cite[S. 203]{rajagopal_artificial_2026}. \ac{NIfTI} ist ein Rasterformat, das Daten in dreidimensionaler Form als Voxel speichert also als Pixel mit einer definierten Breite, Höhe und Tiefe~\cite[S. 4]{elhadad_reduction_2024}. Dabei werden in den ersten drei Dimensionen die räumlichen Koordinaten x, y und z gespeichert, während die vierte Dimension für den Zeitpunkt $t$ reserviert ist~\cite[S. 76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}. Der Header einer \ac{NIfTI}-Datei umfasst im .nii-Format 352 Bytes~\cite[S. 76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}. In \autoref{fig:nifti-header} ist ein Beispiel-Header zu sehen, welcher zeigt, welche Metadaten gespeichert werden. So ist beispielsweise im Parameter \texttt{ImageSize} die Auflösung des MRT-Scans abzulesen, in diesem Fall \texttt{256x156x256}.
+\subsection{Magnetresonanztomographie}
+Die \ac{MRT} basiert auf der Anregung von Wasserstoffkernen im Körpergewebe durch starke statische Magnetfelder und Radiofrequenzimpulse. Beim Zurückkehren in den Gleichgewichtszustand emittieren die Kerne ein messbares Signal, dessen räumliche Zuordnung über zusätzliche Gradientenfelder erfolgt~\cite[vgl.][S.~514\,ff.]{bitar_mr_2006}. Die \ac{MRT} kommt ohne ionisierende Strahlung aus~\cite[vgl.][S.~536]{bitar_mr_2006}. Ebenfalls hebt sie durch Variation der Aufnahmesequenz unterschiedliche Gewebeeigenschaften hervor~\cite[vgl.][S.~517]{bitar_mr_2006}. In der klinischen Routine der Hirntumorbildgebung werden vier strukturelle Sequenzen kombiniert~\cite[vgl.][S.~3\,ff.]{kazerooni_brain_nodate}:
+%
+\begin{itemize}
+    \item \textbf{T1-gewichtet (T1):} Native Referenzaufnahme, die zum
+    Vergleich mit der kontrastverstärkten T1ce-Aufnahme dient.
+    \item \textbf{T1 kontrastverstärkt (T1ce):} Aktiv wachsende Tumoranteile reichern den Kontrast stark an und erscheinen auf T1ce heller als auf der T1-Aufnahme.
+    \item \textbf{T2-gewichtet (T2):} Tumorkomponenten erscheinen hyperintens.
+    \item \textbf{FLAIR:} Edema stellen sich auf FLAIR-Aufnahmen hyperintens dar.
+\end{itemize}
+%
+Diese vier Sequenzen bilden den klinischen Standard in der
+Hirntumor-Bildgebung~\cite[vgl.][S.~3]{kazerooni_brain_nodate}.
+
+\subsection{Computertomographie}
+Die \ac{CT} beruht auf der Messung der Röntgenstrahlungsschwächung beim Durchgang durch das Gewebe. Aus den so gewonnenen Projektionen wird rechnergestützt ein dreidimensionaler Datensatz rekonstruiert. Die \ac{CT} ist in der radiologischen Routine das am weitesten verbreitete bildgebende Verfahren und insbesondere in der Traumadiagnostik etabliert, geht aber mit einer Strahlenbelastung einher~\cite[vgl.][S.~1\,ff.]{buzug_computed_2008}.
+
+\section{Datenformat}
+Das \ac{NIfTI}-Format (.nii, .nii.gz) wurde in den frühen 2000er Jahren unter
+Förderung des \ac{NIH} entwickelt und hat sich seitdem als Standardformat in
+der neuroimaging-basierten Forschung etabliert. Es ist speziell auf
+volumetrische 3D-Bilddaten ausgelegt und eignet sich daher besonders für
+Anwendungen wie MRT-Aufnahmen des Gehirns~\cite[S.~203]{rajagopal_artificial_2026}.
+
+Als Rasterformat speichert \ac{NIfTI} die Bilddaten in Form von Voxeln, also
+Pixeln mit definierter Breite, Höhe und Tiefe~\cite[S.~4]{elhadad_reduction_2024}.
+Die ersten drei Dimensionen kodieren die räumlichen Koordinaten $x$, $y$ und
+$z$, während die vierte Dimension den Zeitpunkt $t$ abbildet und etwa bei
+funktionellen MRT-Aufnahmen
+genutzt
+wird~\cite[S.~76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}.
+Der Header einer \ac{NIfTI}-Datei umfasst im .nii-Format 352~Byte und enthält
+alle Metadaten, die für die Interpretation der Bilddaten benötigt
+werden~\cite[S.~76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}.
+\autoref{fig:nifti-header} zeigt einen solchen Header beispielhaft; über den
+Parameter \texttt{ImageSize} lässt sich etwa die Auflösung des Scans ablesen,
+in diesem Fall \texttt{256x156x256} Voxel.
 %
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.6\textwidth]{./bilder/nifti/nifti-header.png}
-\caption{NIfTI-Header~\cite[S. 76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}}
+\caption{NIfTI-Header~\cite[S.~76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}}
 \label{fig:nifti-header}
 \end{figure}
 %
-Im Gegensatz zu Formaten wie JPEG, das eine verlustbehaftete Kompression verwendet und dadurch relevante Bildinformationen beeinträchtigen kann, unterstützt \ac{NIfTI} eine verlustfreie Kompression~\cite[S. 203]{rajagopal_artificial_2026}.
-% In der Hirntumorsegmentierung gilt NIfTI als das einzig geeignete Dateiformat, da es vollständig kompatibel mit gängigen Deep-Learning-Pipelines ist und die 3D-Raumstruktur der MRT-Daten vollständig erhält [9, 10].
-
+Im Gegensatz zu Formaten wie JPEG, die mit verlustbehafteter Kompression
+arbeiten und dadurch diagnostisch relevante Bildinformationen beeinträchtigen
+können, unterstützt \ac{NIfTI} über die Endung \texttt{.nii.gz} eine
+verlustfreie Kompression~\cite[S.~203]{rajagopal_artificial_2026}.
 
 
 
