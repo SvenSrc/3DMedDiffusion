@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from preprocessing import (
+from .preprocessing import (
     percentile_clip,
     crop_foreground,
     pad_to_cubic,
