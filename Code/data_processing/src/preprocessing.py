@@ -4,7 +4,7 @@ import numpy as np
 from scipy import ndimage
 from tqdm import tqdm
 
-from nifti import load_nifti, save_nifti, find_t1n_files, find_seg_files
+from .nifti import load_nifti, save_nifti, find_t1n_files, find_seg_files
 
 
 # Pipeline: percentile clip -> crop foreground -> pad to cubic -> resize -> normalize to [-1, 1].
