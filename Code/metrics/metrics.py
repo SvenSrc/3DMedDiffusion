@@ -87,3 +87,32 @@ def fid(real_volumes, gen_volumes, model, device):
 
     diff = mu_r - mu_g
     return float(diff @ diff + np.trace(cov_r + cov_g - 2 * covmean))
+
+
+# --- Dice (segmentation overlap) -----------------------------------------
+
+def _discretize(vol, num_classes):
+    # Inverse of the {0..K-1} -> [-1, 1] mapping used during preprocessing.
+    # Generated seg-maps are continuous, so round to the nearest label.
+    x = (vol + 1.0) / 2.0 * (num_classes - 1)
+    return np.clip(np.round(x), 0, num_classes - 1).astype(np.int32)
+
+
+def dice_per_class(real, gen, num_classes=4):
+    # Per-class Dice for labels {1..K-1}. Label 0 is background and
+    # conventionally excluded in BraTS-style reporting.
+    real_d = _discretize(real, num_classes)
+    gen_d  = _discretize(gen,  num_classes)
+    scores = []
+    for k in range(1, num_classes):
+        a = real_d == k
+        b = gen_d  == k
+        denom = a.sum() + b.sum()
+        # if the class is absent in both volumes the score is undefined —
+        # NaN so it doesn't pull the per-sample mean toward zero.
+        scores.append(float("nan") if denom == 0 else 2.0 * np.logical_and(a, b).sum() / denom)
+    return scores
+
+
+def dice(real, gen, num_classes=4):
+    return float(np.nanmean(dice_per_class(real, gen, num_classes)))
