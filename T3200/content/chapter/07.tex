@@ -70,18 +70,18 @@ Der Datensatz wird in 90\% Trainings- und 10\% Validierungsdaten aufgeteilt. Die
 \section{Ablationsstudien} 
 Um den Einfluss einzelner Komponenten auf die Generierungsqualität zu untersuchen werden ausgehend von der Baseline-Konfiguration gezielt einzelne Variablen verändert. Pro Experiment wird jeweils nur eine Komponente angepasst, um deren isolierten Einfluss bewerten zu können. Die Ablationsstudien werden auf einer Auflösung von 32\textsuperscript{3} Voxeln durchgeführt. 
 
-\paragraph{Ohne Self-Attention.} 
+\paragraph{Ohne Self-Attention} 
 Die Self-Attention-Schichten auf den niedrigen Auflösungsstufen werden entfernt. Dadurch lässt sich untersuchen, welchen Beitrag die Modellierung globaler Abhängigkeiten zur Bildqualität leistet und ob die lokalen Informationen der Faltungsschichten allein ausreichen. 
 
-\paragraph{Linearer Schedule.} 
-Der Cosine Schedule wird durch einen linearen Schedule ersetzt, bei dem die Varianz gleichmäßig von $\beta_1 = 0{,}0001$ bis $\beta_T = 0{,}02$ ansteigt. Dies entspricht dem ursprünglichen Vorschlag von Ho et al.~\cite{ho2020ddpm}. 
+\paragraph{Linearer Schedule} 
+Der Cosine Schedule wird durch einen linearen Schedule ersetzt, bei dem die Varianz gleichmäßig von $\beta_1 = 0{,}0001$ bis $\beta_T = 0{,}02$ ansteigt.
 
-\paragraph{Noise-Prediction ($\epsilon$-Prediction).}
-Anstelle der v-Prediction wird das Modell darauf trainiert, das hinzugefügte Rauschen $\epsilon$ direkt vorherzusagen. Dies ist die ursprüngliche DDPM-Formulierung~\cite{ho2020ddpm} und dient als Vergleich zur moderneren v-Prediction. 
+\paragraph{Noise-Prediction ($\epsilon$-Prediction)}
+Anstelle der v-Prediction wird das Modell darauf trainiert, das hinzugefügte Rauschen $\epsilon$ direkt vorherzusagen. 
 
-\paragraph{Datenaugmentierung.} Die Trainingsdaten werden durch zufällige räumliche Transformationen augmentiert, um die effektive Datensatzgröße zu erhöhen und die Generalisierung zu verbessern. 
+\paragraph{Datenaugmentierung} Die Trainingsdaten werden mit einer Wahrscheinlichkeit von 50\% horizontal gespiegelt, was die approximative Links-Rechts-Symmetrie des Gehirns ausnutzt. Damit wird die effektive Datensatzgröße verdoppelt, ohne anatomisch unplausible Volumina zu erzeugen.
 
-\paragraph{Erhöhte Auflösung (48\textsuperscript{3}).} Zusätzlich wird die Baseline-Konfiguration auf einer Auflösung von 48\textsuperscript{3} Voxeln trainiert, um den Einfluss der räumlichen Auflösung auf die Bildqualität zu untersuchen. Aufgrund der deutlich längeren Trainingszeiten bei höherer Auflösung werden die übrigen Ablationen nur auf 32\textsuperscript{3} durchgeführt.
+\paragraph{Erhöhte Auflösung ($48^3$).} Zusätzlich wird die Baseline-Konfiguration auf einer Auflösung von $48^3$ Voxeln trainiert, um den Einfluss der räumlichen Auflösung auf die Bildqualität zu untersuchen.
 
 \section{Aufgezeichnete Werte} 
 Während des Trainings werden für jede Epoche verschiedene Metriken protokolliert, um den Trainingsverlauf nachvollziehen zu können. Dazu gehören der Trainings- und Validierungsverlust, die aktuelle Lernrate, die Epochendauer sowie der GPU-Speicherverbrauch. Zusätzlich werden die Gradientennorm und die Anzahl der durch Gradient Clipping begrenzten Updates erfasst, um die Stabilität des Trainings beurteilen zu können. 
