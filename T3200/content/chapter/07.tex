@@ -28,7 +28,8 @@ Das kubische Volumen wird mittels trilinearer Interpolation auf die Zielauflösun
 Abschließend werden die Intensitätswerte je Volumen per Min-Max-Skalierung auf den Wertebereich $[-1, 1]$ abgebildet. Dies ist die gängige Konvention für Diffusionsmodelle, da der Rauschprozess auf einem standardisierten Wertebereich arbeitet.
 
 \paragraph{Segmentierungsmasken}
-Die Tumor-Segmentierungsmasken durchlaufen eine reduzierte Variante derselben Pipeline. Die Vordergrund-Bounding-Box wird nicht aus der Maske selbst, sondern aus dem zugehörigen T1N-Volumen übernommen, damit Bild und Maske räumlich übereinander liegen. Auf die Intensitätsbegrenzung und die Normalisierung wird verzichtet, da die Maske diskrete Klassenlabels enthält. Das Resizing erfolgt entsprechend per Nearest-Neighbor-Interpolation, sodass die Labelwerte erhalten bleiben.
+Die Tumor-Segmentierungsmasken durchlaufen eine reduzierte Variante derselben Pipeline. Die Vordergrund-Bounding-Box wird nicht aus der Maske selbst, sondern aus dem zugehörigen T1N-Volumen übernommen, damit Bild und Maske räumlich übereinander liegen. Auf die Intensitätsbegrenzung und die Normalisierung wird verzichtet, da die Maske diskrete Klassenlabels enthält. Das Resizing erfolgt entsprechend per Nearest-Neighbor-Interpolation, sodass die Labelwerte erhalten bleiben. Die vier Labelwerte des BraTS-2023-Schemas bezeichnen Hintergrund (0), nekrotischen Tumorkern (1), peritumorales Ödem (2) und anreichernden Tumor (3).
+
 
 \section{Modellarchitektur}
 Als Architektur dient ein 3D-UNet, das dem in der DDPM-Literatur etablierten Aufbau folgt~\citeauthor{ho_denoising_2020}%~\cite{ho_denoising_2020}.
@@ -60,7 +61,7 @@ Für die Gewichtung des Trainingsverlusts wird das von~\citeauthor{hang_efficient
 \abschnitt
 Während des Trainings werden die Zeitschritte nicht uniform gezogen, sondern über ein loss-bewusstes Importance Sampling auf Basis der jüngsten Verlust-Historie~\cite[vgl.][S.~5]{nichol_improved_2021}. Pro Zeitschritt wird der quadratische Mittelwert der Verluste der letzten zehn Batches geführt und daraus eine Wahrscheinlichkeitsverteilung gebildet, sodass Zeitschritte mit hohen Verlusten häufiger angesteuert werden. Damit der Erwartungswert des Trainings-Loss unverändert bleibt, wird jeder Sample-Verlust mit dem Inversen seiner Ziehungswahrscheinlichkeit gewichtet. Die Strategie wird erst nach dem Warmup aktiv, damit instabile Initialverluste die Sampler-Historie nicht verzerren.
 
-\section{Trainingsverfahren und Hyperparameter}
+\section{Trainingsverfahren und Hyperparameter}\label{Sec:hyper}
 Alle Modelle werden über 300 Epochen mit dem AdamW-Optimizer (Weight Decay $0{,}01$) und einer initialen Lernrate von $2 \times 10^{-4}$ trainiert. Dieser Wert entspricht dem in der DDPM-Literatur üblichen Lernratenniveau~\cite[vgl.][S.~14]{ho_denoising_2020}. In den ersten 500 Iterationen wird die Lernrate linear von null auf den Zielwert erhöht (Warmup), um Instabilitäten zu Beginn des Trainings zu vermeiden, und fällt anschließend nach einem Cosine-Schedule wieder auf null ab. Die Batch Size beträgt 10, was dem verfügbaren GPU-Speicher von 11~GB geschuldet ist.
 \abschnitt 
 Zur Stabilisierung der Modellgewichte wird \ac{EMA} mit einem Decay-Faktor von 0,9999 eingesetzt~\cite[vgl.][S.~15]{ho_denoising_2020}. Dabei wird parallel zu den trainierten Gewichten ein gleitender Durchschnitt geführt, der für die finale Evaluation und das Sampling verwendet wird. Zusätzlich wird Gradient Clipping mit einer maximalen Norm von 1,0 angewendet, um Gradientenexplosionen zu verhindern. 
@@ -89,6 +90,17 @@ Während des Trainings werden für jede Epoche verschiedene Metriken protokolliert
 An festgelegten Epochen, bei 1 und 10 sowie anschließend alle 25 Epochen bis Epoche 300, werden Samples generiert, um die visuelle Qualität der erzeugten Volumina im Trainingsverlauf zu überprüfen. An denselben Epochen wird jeweils ein Checkpoint gespeichert; zusätzlich wird das Modell mit dem besten Validierungsverlust separat gesichert. Sämtliche Metriken werden nach jeder Epoche in der JSON-Datei aktualisiert, sodass der Trainingsverlauf auch nachträglich vollständig analysiert werden kann.
 
 \todo{Später auf Anhang referenzieren welch WErte tatsächläclich aufgenommen worden sind}
+
+\section{Conditional-Modelle}
+Neben dem unconditional trainierten Baseline-Modell werden zwei conditional Varianten trainiert, die der gleichen 3D-UNet-Architektur folgen, jedoch um eine Konditionierungs-Schnittstelle erweitert sind. Beide Modelle nutzen Classifier-Free Guidance, bei dem die Konditionierung während des Trainings mit einer Wahrscheinlichkeit von 15\% durch einen Null-Token ersetzt wird. Beim Sampling wird der Einfluss der Konditionierung mit einer Guidance Scale von $w = 3{,}0$ verstärkt.
+\abschnitt
+Die übrigen Hyperparameter aus~\autoref{Sec:hyper} werden übernommen. Lediglich das Gradient Clipping wird auf eine maximale Norm von $0{,}5$ herabgesetzt, um das Training trotz des zusätzlichen Konditionierungssignals stabil zu halten.
+
+\paragraph{Maske-zu-MRI-Modell}
+Das Modell erzeugt ein synthetisches T1N-Volumen, das auf eine vorgegebene Tumor-Segmentierungsmaske konditioniert ist. Die Maske wird vom diskreten Wertebereich $\{0, \dots, 3\}$ auf das Intervall $[-1, 1]$ skaliert, damit sie sich auf demselben Wertebereich wie das verrauschte Eingangsvolumen bewegt und anschließend kanalweise an dieses angehängt. Das Modell sieht somit zwei Eingangskanäle: das verrauschte MRI und die zugehörige Segmentierung. Trainiert wird auf den paarweise vorliegenden $(T1N,\,Seg)$-Volumina des BraTS-2023-Datensatzes.
+
+\paragraph{Klassen-zu-Maske-Modell}
+Das Modell erzeugt eine synthetische Tumor-Segmentierungsmaske aus einer vorgegebenen Größenklasse. Die Klassen sind in drei Stufen unterteilt: klein ($\leq 2$\,cm), mittel ($2$--$5$\,cm) und groß ($> 5$\,cm)~\cite{doccheck_tnm}. Die Grenzwerte sind in Anlehnung an die TNM-Klassifikation des Mammakarzinoms gewählt, da für Hirntumore keine etablierte größenbasierte TNM-Klassifikation existiert. Sie werden vorab anhand der Tumor-Ausdehnung in den realen Segmentierungen vergeben. Die Klassen-Information wird über eine Embedding-Schicht in einen Vektor abgebildet und additiv zur sinusoidalen Zeit-Einbettung hinzugefügt. Das Modell liefert kontinuierliche Werte in $[-1, 1]$, die für die weitere Verwendung in die vier diskreten BraTS-Labels zurückquantisiert werden.
 
 
 
