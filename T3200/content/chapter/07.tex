@@ -1,6 +1,10 @@
 \chapter{Implementierung und experimenteller Aufbau}
-Das folgende Kapitel beschreibt die praktische Umsetzung. %Zunächst werden die eingesetzten Werkzeuge und die zugrunde liegende Hardware-Konfiguration vorgestellt. Anschließend wird auf die Architektur der einzelnen Modelle sowie die Wahl der jeweiligen Hyperparameter eingegangen und deren Einfluss auf das Trainingsverhalten erläutert.
+Das folgende Kapitel beschreibt die praktische Umsetzung. Zunächst werden die Projektmethodik und die eingesetzten Werkzeuge vorgestellt, anschließend Datenvorverarbeitung, Modellarchitektur und Trainingskonfiguration. Auf die Ablationsstudien folgen die conditional Modelle samt Generierungs-Pipeline sowie die abschließende Auswertung der erzeugten Volumina.
 
+\section{Projektmethodik}
+Das Projekt wurde nach einem Kanban-orientierten Vorgehen organisiert. Diese Methode bietet sich für Arbeiten mit experimentellem Charakter an, bei denen sich der nächste Arbeitsschritt häufig erst aus den Ergebnissen des vorherigen ergibt.
+\abschnitt
+Die einzelnen Arbeitspakete wie das Training der Baseline, die Ablationsvarianten und die conditional Modelle wurden in kleinere Teilaufgaben unterteilt und aus einer Bearbeitungsliste abgearbeitet. Die Reihenfolge der Aufgaben ergab sich laufend aus den Ergebnissen der vorhergehenden Trainingsläufe und wurde nicht vorab festgelegt.
 
 \section{Entwicklungsumgebung und Hardware}
 Das Training der Modelle wurde auf einem lokalen System durchgeführt. Dieses verfügt über eine NVIDIA GeForce GTX 1080 Ti mit 11 GB VRAM, einen AMD Athlon X4 860K Prozessor (4 Kerne, 3,7 GHz), 16 GB Arbeitsspeicher sowie ein Linux-Ubuntu-Desktop-Betriebssystem. Der Einsatz einer dedizierten GPU ermöglicht eine Reduktion der Trainingszeiten gegenüber einer reinen CPU-basierten Berechnung.
@@ -152,6 +156,3 @@ Da die Full-Reference-Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} ein Referenzb
 
 \paragraph{Ergebnisausgabe}
 Pro Auswertungslauf werden zwei CSV-Dateien geschrieben. Die Aggregat-Datei enthält eine Zeile mit Mittelwert und Standardabweichung sämtlicher Metriken. Die Detail-Datei führt die Werte pro Sample auf. %und ermöglicht damit Verteilungsdarstellungen im Ergebniskapitel.
-
-\section{Projektmethodik}
-\todo{Kanban oder sowas}
