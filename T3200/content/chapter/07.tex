@@ -91,18 +91,32 @@ An festgelegten Epochen, bei 1 und 10 sowie anschließend alle 25 Epochen bis Epo
 
 \todo{Später auf Anhang referenzieren welch WErte tatsächläclich aufgenommen worden sind}
 
-\section{Conditional-Modelle}
+\section{Conditional-Modelle}\label{Sec:cond}
 Neben dem unconditional trainierten Baseline-Modell werden zwei conditional Varianten trainiert, die der gleichen 3D-UNet-Architektur folgen, jedoch um eine Konditionierungs-Schnittstelle erweitert sind. Beide Modelle nutzen Classifier-Free Guidance, bei dem die Konditionierung während des Trainings mit einer Wahrscheinlichkeit von 15\% durch einen Null-Token ersetzt wird. Beim Sampling wird der Einfluss der Konditionierung mit einer Guidance Scale von $w = 3{,}0$ verstärkt.
 \abschnitt
 Die übrigen Hyperparameter aus~\autoref{Sec:hyper} werden übernommen. Lediglich das Gradient Clipping wird auf eine maximale Norm von $0{,}5$ herabgesetzt, um das Training trotz des zusätzlichen Konditionierungssignals stabil zu halten.
 
-\paragraph{Maske-zu-MRI-Modell}
-Das Modell erzeugt ein synthetisches T1N-Volumen, das auf eine vorgegebene Tumor-Segmentierungsmaske konditioniert ist. Die Maske wird vom diskreten Wertebereich $\{0, \dots, 3\}$ auf das Intervall $[-1, 1]$ skaliert, damit sie sich auf demselben Wertebereich wie das verrauschte Eingangsvolumen bewegt und anschließend kanalweise an dieses angehängt. Das Modell sieht somit zwei Eingangskanäle: das verrauschte MRI und die zugehörige Segmentierung. Trainiert wird auf den paarweise vorliegenden $(T1N,\,Seg)$-Volumina des BraTS-2023-Datensatzes.
+\paragraph{Maske-zu-MRT-Modell}
+Das Modell erzeugt ein synthetisches T1N-Volumen, das auf eine vorgegebene Tumor-Segmentierungsmaske konditioniert ist. Die Maske wird vom diskreten Wertebereich $\{0, \dots, 3\}$ auf das Intervall $[-1, 1]$ skaliert, damit sie sich auf demselben Wertebereich wie das verrauschte Eingangsvolumen bewegt und anschließend kanalweise an dieses angehängt. Das Modell sieht somit zwei Eingangskanäle: das verrauschte \ac{MRT} und die zugehörige Segmentierung. Trainiert wird auf den paarweise vorliegenden $(T1N,\,Seg)$-Volumina des BraTS-2023-Datensatzes.
 
 \paragraph{Klassen-zu-Maske-Modell}
 Das Modell erzeugt eine synthetische Tumor-Segmentierungsmaske aus einer vorgegebenen Größenklasse. Die Klassen sind in drei Stufen unterteilt: klein ($\leq 2$\,cm), mittel ($2$--$5$\,cm) und groß ($> 5$\,cm)~\cite{doccheck_tnm}. Die Grenzwerte sind in Anlehnung an die TNM-Klassifikation des Mammakarzinoms gewählt, da für Hirntumore keine etablierte größenbasierte TNM-Klassifikation existiert. Sie werden vorab anhand der Tumor-Ausdehnung in den realen Segmentierungen vergeben. Die Klassen-Information wird über eine Embedding-Schicht in einen Vektor abgebildet und additiv zur sinusoidalen Zeit-Einbettung hinzugefügt. Das Modell liefert kontinuierliche Werte in $[-1, 1]$, die für die weitere Verwendung in die vier diskreten BraTS-Labels zurückquantisiert werden.
 
+\section{Generierungs-Pipeline}
+Um vollständig synthetische Gehirn-Volumina mit realistisch positioniertem Tumor zu erzeugen, werden die beiden in~\autoref{Sec:cond} beschriebenen Modelle in einer dreistufigen Pipeline gekoppelt. Da das Klassen-zu-Maske-Modell auf zentrierten Tumormasken trainiert wurde, sitzen seine Samples in der Mitte des Volumens. In realen \ac{MRT}-Aufnahmen liegen Tumore jedoch an unterschiedlichen anatomischen Positionen, weshalb zwischen den beiden Modellen eine räumliche Verschiebung eingefügt wird.
 
+\paragraph{1. Tumormaske}
+Das Klassen-zu-Maske-Modell erzeugt aus einer vorgegebenen Größenklasse eine am Volumenmittelpunkt zentrierte Tumormaske im Wertebereich $[-1, 1]$. Diese wird anschließend per Nearest-Neighbor-Zuordnung auf die vier diskreten BraTS-Labels zurückquantisiert.
+
+\paragraph{2. Räumliche Platzierung}
+Aus dem realen BraTS-Datensatz wird ein Segmentierungs-Volumen zufällig ausgewählt und dessen Tumormittelpunkt berechnet. Die zentrierte synthetische Maske wird so verschoben, dass ihr Mittelpunkt mit diesem realen Mittelpunkt zusammenfällt. Würde durch diese Verschiebung ein Teil der Tumor-Bounding-Box aus dem Volumen herausragen, wird der Verschiebungsvektor entlang der jeweiligen Achse beschnitten. Die Verschiebung selbst erfolgt per Nearest-Neighbor-Interpolation, sodass die diskreten Labelwerte erhalten bleiben. Damit folgt die räumliche Verteilung der generierten Tumore der Verteilung realer Tumore, ohne dass anatomisch unmögliche Positionen entstehen.
+
+\paragraph{3. Gehirn-Generierung}
+Die platzierte Tumormaske wird auf das Intervall $[-1, 1]$ skaliert und dient als Konditionierung für das Maske-zu-MRT-Modell, welches das umliegende T1N-Gehirn-Volumen generiert. Pro Pipeline-Durchlauf werden zwei \ac{NIfTI}-Dateien gespeichert: die platzierte Tumormaske und das synthetisierte Gehirn-Volumen.
+\abschnitt
+Für jede der drei Stufen wird ein separater Seed verwendet, sodass Tumorform, räumliche Platzierung und Gehirntextur unabhängig voneinander kontrolliert werden können.
+
+\todo{Abbildung!!}
 
 \section{Projektmethodik}
 \todo{Kanban oder sowas}
