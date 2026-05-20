@@ -83,10 +83,14 @@ Anstelle der v-Prediction wird das Modell darauf trainiert, das hinzugefügte Rau
 
 \paragraph{Erhöhte Auflösung ($48^3$).} Zusätzlich wird die Baseline-Konfiguration auf einer Auflösung von $48^3$ Voxeln trainiert, um den Einfluss der räumlichen Auflösung auf die Bildqualität zu untersuchen.
 
-\section{Aufgezeichnete Werte} 
-Während des Trainings werden für jede Epoche verschiedene Metriken protokolliert, um den Trainingsverlauf nachvollziehen zu können. Dazu gehören der Trainings- und Validierungsverlust, die aktuelle Lernrate, die Epochendauer sowie der GPU-Speicherverbrauch. Zusätzlich werden die Gradientennorm und die Anzahl der durch Gradient Clipping begrenzten Updates erfasst, um die Stabilität des Trainings beurteilen zu können. 
+\section{Aufgezeichnete Werte während des Trainings} 
+Während des Trainings werden für jede Epoche verschiedene Metriken protokolliert, um den Trainingsverlauf nachvollziehen zu können. Dazu gehören der Trainings- und Validierungsverlust, die aktuelle Lernrate, die Epochendauer sowie der GPU-Speicherverbrauch. Zusätzlich werden die Gradientennorm und die Anzahl der durch Gradient Clipping begrenzten Updates erfasst, um die Stabilität des Trainings beurteilen zu können.
 \abschnitt 
-In regelmäßigen Abständen von 25 Epochen werden Samples generiert, um die visuelle Qualität der erzeugten Volumina im Trainingsverlauf zu überprüfen. Checkpoints werden an festgelegten Epochen gespeichert sowie für das Modell mit dem besten Validierungsverlust. Sämtliche Metriken werden nach jeder Epoche in einer JSON-Datei gesichert, sodass der Trainingsverlauf auch nachträglich vollständig analysiert werden kann.
+An festgelegten Epochen, bei 1 und 10 sowie anschließend alle 25 Epochen bis Epoche 300, werden Samples generiert, um die visuelle Qualität der erzeugten Volumina im Trainingsverlauf zu überprüfen. An denselben Epochen wird jeweils ein Checkpoint gespeichert; zusätzlich wird das Modell mit dem besten Validierungsverlust separat gesichert. Sämtliche Metriken werden nach jeder Epoche in der JSON-Datei aktualisiert, sodass der Trainingsverlauf auch nachträglich vollständig analysiert werden kann.
+
+\todo{Später auf Anhang referenzieren welch WErte tatsächläclich aufgenommen worden sind}
+
+
 
 \section{Projektmethodik}
 \todo{Kanban oder sowas}
