@@ -9,34 +9,33 @@ Die Implementierung sämtlicher Modelle erfolgte in der Programmiersprache Python
 \abschnitt
 Für den Modellaufbau wurde das Deep-Learning-Framework PyTorch eingesetzt. Die Diffusionslogik einschließlich des Noise Schedulers, des Sampling-Verfahrens und der Trainingsschleife wurde auf Basis von PyTorch implementiert. Für das Laden und Speichern der medizinischen Bilddaten im NIfTI-Format wurde die Bibliothek nibabel verwendet. Die Visualisierung der Ergebnisse erfolgte mit Matplotlib. Die Implementierung basiert auf Python 3.12.3 und PyTorch 2.7.1 mit CUDA 11.8. Die Wahl der CUDA-Version ergibt sich aus der Tatsache, dass die NVIDIA GeForce GTX 1080 Ti auf der Pascal-Architektur (Compute Capability 6.1) basiert, welche von neueren CUDA-Versionen nicht mehr vollständig unterstützt wird.
 
-
 \section{Datenvorverarbeitung}
 Vor dem Training wurden die MRT-Volumina des BraTS-2023-Datensatzes vorverarbeitet. Die Vorverarbeitung orientiert sich an der Datenverarbeitung von~\citeauthor{durrer_denoising_2024}~\cite[S. 6]{durrer_denoising_2024}. Es umfasst fünf Schritte, die im Folgenden beschrieben werden.
 
-\paragraph{Intensitätsbegrenzung.}
-Die Intensitätswerte werden auf das Intervall zwischen dem 0,5\%- und dem 99,5\%-Perzentil beschnitten. Dadurch werden extreme Ausreißer entfernt, die etwa durch Aufnahmeartefakte entstehen können, ohne relevante Bildinformationen zu verlieren.
+\paragraph{Intensitätsbegrenzung}
+Die Intensitätswerte werden auf das Intervall zwischen dem 0,5\%- und dem 99,5\%-Perzentil der Vordergrundvoxel beschnitten. Dadurch werden extreme Ausreißer entfernt, die etwa durch Aufnahmeartefakte entstehen können, ohne relevante Bildinformationen zu verlieren.
 
-\paragraph{Hintergrundentfernung.}
-Anschließend wird der Hintergrund entfernt, der hauptsächlich aus Luft und leeren Voxeln besteht. Dazu wird die kleinste Bounding Box berechnet, die alle Voxel mit einem Intensitätswert größer null enthält. Das Volumen wird so auf den anatomisch relevanten Bereich zugeschnitten.
+\paragraph{Hintergrundentfernung}
+Anschließend wird der Hintergrund entfernt, der hauptsächlich aus Luft und leeren Voxeln besteht.Dazu wird die kleinste Bounding Box berechnet, die alle Voxel mit einem Intensitätswert größer null enthält, erweitert um einen Rand von zwei Voxeln je Achse. Das Volumen wird so auf den anatomisch relevanten Bereich zugeschnitten.
 
-\paragraph{Kubisches Padding.}
+\paragraph{Kubisches Padding}
 Da die Volumina nach dem Cropping unterschiedliche Dimensionen aufweisen, werden sie durch symmetrisches Zero-Padding auf eine kubische Form gebracht. Im Gegensatz zu einer direkten Skalierung bleibt durch das Padding das Seitenverhältnis erhalten und es werden keine geometrischen Verzerrungen eingeführt.
 
-\paragraph{Resizing.}
+\paragraph{Resizing}
 Das kubische Volumen wird mittels trilinearer Interpolation auf die Zielauflösung von 32\textsuperscript{3} oder 48\textsuperscript{3} Voxeln skaliert. Da das Volumen bereits kubisch ist, erfolgt die Skalierung in allen drei Raumrichtungen gleichmäßig.
 
-\paragraph{Normalisierung.}
-Abschließend werden die Intensitätswerte linear auf den Wertebereich $[-1, 1]$ normalisiert. Dies ist die gängige Konvention für Diffusionsmodelle, da der Rauschprozess auf einem standardisierten Wertebereich arbeitet.
+\paragraph{Normalisierung}
+Abschließend werden die Intensitätswerte je Volumen per Min-Max-Skalierung auf den Wertebereich $[-1, 1]$ abgebildet. Dies ist die gängige Konvention für Diffusionsmodelle, da der Rauschprozess auf einem standardisierten Wertebereich arbeitet.
 
-
-\todo{Ab hier nochm l durch}
-
+\paragraph{Segmentierungsmasken}
+Die Tumor-Segmentierungsmasken durchlaufen eine reduzierte Variante derselben Pipeline. Die Vordergrund-Bounding-Box wird nicht aus der Maske selbst, sondern aus dem zugehörigen T1N-Volumen übernommen, damit Bild und Maske räumlich übereinander liegen. Auf die Intensitätsbegrenzung und die Normalisierung wird verzichtet, da die Maske diskrete Klassenlabels enthält. Das Resizing erfolgt entsprechend per Nearest-Neighbor-Interpolation, sodass die Labelwerte erhalten bleiben.
 
 \section{Modellarchitektur}
 Als Architektur dient ein 3D-UNet, das dem in der DDPM-Literatur etablierten Aufbau folgt~\citeauthor{ho_denoising_2020}~\cite{ho_denoising_2020}. Die Architektur ist symmetrisch als Encoder-Decoder aufgebaut und besteht aus vier Auflösungsstufen mit Kanalbreiten von 96, 192, 384 und 384. Im Encoder wird die räumliche Auflösung schrittweise halbiert, während der Decoder sie über trilineare Interpolation wieder auf die Eingabegröße bringt. Zwischen den entsprechenden Stufen von Encoder und Decoder werden Skip-Connections eingesetzt, um räumliche Informationen direkt weiterzugeben.
 
-\paragraph{Residualblöcke und Zeiteinbettung}
-Auf jeder Auflösungsstufe befinden sich zwei Residualblöcke, die jeweils aus zwei 3D-Faltungsschichten mit GroupNorm und SiLU-Aktivierung bestehen. Der aktuelle Diffusions-Zeitschritt wird über sinusoidale Positionseinbettungen kodiert und über eine lineare Projektion in jeden Residualblock eingespeist, sodass das Netzwerk sein Verhalten an den jeweiligen Rauschgrad anpassen kann.
+\paragraph{Residualblöcke und Zeiteinbettung.}
+Auf jeder Auflösungsstufe befinden sich zwei Residualblöcke, die jeweils aus zwei 3D-Faltungsschichten mit GroupNorm (acht Gruppen) und SiLU-Aktivierung bestehen. Der aktuelle Diffusions-Zeitschritt wird sinusoidal kodiert und durch ein zweischichtiges MLP mit SiLU-Aktivierung auf das Vierfache der Basis-Kanalbreite projiziert, im konkreten Fall 384 Dimensionen. Diese Zeit-Einbettung wird in jeden Residualblock eingespeist, sodass das Netzwerk sein Verhalten an den jeweiligen Rauschgrad anpassen kann.
+
 
 \paragraph{Self-Attention.}
 Auf den beiden niedrigsten Auflösungsstufen werden zusätzlich Self-Attention-Schichten eingesetzt, die es dem Netzwerk ermöglichen, globale Abhängigkeiten zwischen räumlich entfernten Regionen zu modellieren. Auf höheren Auflösungen wird darauf verzichtet, da der Speicherbedarf mit der Voxelanzahl ansteigt.
