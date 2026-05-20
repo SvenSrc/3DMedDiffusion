@@ -138,6 +138,20 @@ Pro Sample werden der verwendete Seed, die Generierungsdauer sowie die Voxel-Sta
 
 \todo{Werte nochmal durchlesen. Abändern in den Anhang}
 
+\section{Testdurchlauf}
+Nach der Sample-Generierung werden die in~\autoref{Sec:metrics} vorgestellten Metriken auf die erzeugten Datensätze angewendet. Die Auswertung läuft über ein eigenständiges Jupyter-Notebook, das nach der Sample-Generierung gestartet wird. Es wählt je nach gewähltem Modus die passende Paarungsstrategie und legt die Ergebnisse sowohl pro Sample als auch aggregiert als CSV-Datei ab.
+
+\paragraph{Auswertungsmodi}
+Das Notebook unterscheidet vier Modi. \textit{Unconditional} bewertet die unconditional erzeugten MRT-Volumina gegen den realen BraTS-Datensatz. \textit{Maske zu MRT} vergleicht die Ausgaben des Maske-zu-MRT-Modells mit den echten T1N-Volumina derselben Probanden. \textit{Klasse zu Maske} setzt die generierten Tumormasken gegen reale Masken der gleichen Größenklasse. \textit{Pipeline} schließlich bewertet die voll-synthetischen Gehirn-Volumina aus der Generierungs-Pipeline gegen den realen T1N-Datensatz.
+
+\paragraph{Paarung}
+Da die Full-Reference-Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} ein Referenzbild voraussetzen, muss jedem generierten Volumen ein reales Gegenstück zugeordnet werden. Bei \textit{Unconditional} und \textit{Pipeline} ist keine inhärente Zuordnung gegeben, daher wird mit festem Seed zufällig gepaart. Im Modus \textit{Maske zu MRT} ermöglicht die in der \texttt{stats.json} mitgeschriebene Samples eine exakte Zuordnung zu den realen T1N-Volumina derselben Subjekte. \textit{Klasse zu Maske} paart ebenfalls zufällig, jedoch nur innerhalb der gleichen Größenklasse, damit die Klassenverteilung erhalten bleibt.
+
+\paragraph{Berechnung der Metriken}
+\ac{SSIM} und \ac{PSNR} werden direkt auf den 3D-Volumina mittels der \texttt{scikit-image}-Bibliothek berechnet. Der Wertebereich ist auf $\Delta = 2{,}0$ gesetzt, da die Volumina im Intervall $[-1, 1]$ liegen. \ac{LPIPS} arbeitet auf zweidimensionalen Bildern (vortrainiertes AlexNet~\cite{zhang_unreasonable_2018}) und wird daher schichtweise auf die axialen Schnitte angewendet und über diese gemittelt. \ac{FID} nutzt ein Inception-V3-Netzwerk ohne Klassifikationskopf. Die axialen Schnitte werden auf $299 \times 299$ Pixel skaliert, im RGB-Raum repliziert und mit ImageNet-Statistiken normalisiert, bevor die 2048-dimensionalen Merkmalsvektoren entnommen werden. Der Dice-Koeffizient kommt ausschließlich im Modus \textit{Klasse zu Maske} zum Einsatz: die generierten Werte werden auf die diskreten BraTS-Labels zurückquantisiert, anschließend Dice pro Vordergrundklasse berechnet und über die drei Tumor-Subregionen gemittelt.
+
+\paragraph{Ergebnisausgabe}
+Pro Auswertungslauf werden zwei CSV-Dateien geschrieben. Die Aggregat-Datei enthält eine Zeile mit Mittelwert und Standardabweichung sämtlicher Metriken. Die Detail-Datei führt die Werte pro Sample auf. %und ermöglicht damit Verteilungsdarstellungen im Ergebniskapitel.
 
 \section{Projektmethodik}
 \todo{Kanban oder sowas}
