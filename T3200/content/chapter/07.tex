@@ -102,7 +102,7 @@ Das Modell erzeugt ein synthetisches T1N-Volumen, das auf eine vorgegebene Tumor
 \paragraph{Klassen-zu-Maske-Modell}
 Das Modell erzeugt eine synthetische Tumor-Segmentierungsmaske aus einer vorgegebenen Größenklasse. Die Klassen sind in drei Stufen unterteilt: klein ($\leq 2$\,cm), mittel ($2$--$5$\,cm) und groß ($> 5$\,cm)~\cite{doccheck_tnm}. Die Grenzwerte sind in Anlehnung an die TNM-Klassifikation des Mammakarzinoms gewählt, da für Hirntumore keine etablierte größenbasierte TNM-Klassifikation existiert. Sie werden vorab anhand der Tumor-Ausdehnung in den realen Segmentierungen vergeben. Die Klassen-Information wird über eine Embedding-Schicht in einen Vektor abgebildet und additiv zur sinusoidalen Zeit-Einbettung hinzugefügt. Das Modell liefert kontinuierliche Werte in $[-1, 1]$, die für die weitere Verwendung in die vier diskreten BraTS-Labels zurückquantisiert werden.
 
-\section{Generierungs-Pipeline}
+\section{Generierungs-Pipeline}\label{Sec:pipe}
 Um vollständig synthetische Gehirn-Volumina mit realistisch positioniertem Tumor zu erzeugen, werden die beiden in~\autoref{Sec:cond} beschriebenen Modelle in einer dreistufigen Pipeline gekoppelt. Da das Klassen-zu-Maske-Modell auf zentrierten Tumormasken trainiert wurde, sitzen seine Samples in der Mitte des Volumens. In realen \ac{MRT}-Aufnahmen liegen Tumore jedoch an unterschiedlichen anatomischen Positionen, weshalb zwischen den beiden Modellen eine räumliche Verschiebung eingefügt wird.
 
 \paragraph{1. Tumormaske}
@@ -117,6 +117,27 @@ Die platzierte Tumormaske wird auf das Intervall $[-1, 1]$ skaliert und dient al
 Für jede der drei Stufen wird ein separater Seed verwendet, sodass Tumorform, räumliche Platzierung und Gehirntextur unabhängig voneinander kontrolliert werden können.
 
 \todo{Abbildung!!}
+
+\section{Sample-Generierung}
+Nach Abschluss des Trainings werden die Modelle zur Generierung synthetischer Volumina eingesetzt. Pro Modell und Sampler werden 1024 Samples erzeugt. Für das Sampling werden die EMA-Gewichte aus~\autoref{Sec:hyper} verwendet.
+
+\paragraph{Sampler}
+Als Sampling-Verfahren stehen vier Schemata aus der \texttt{diffusers}-Bibliothek zur Verfügung: \ac{DDPM}~\cite{ho_denoising_2020}, \ac{DDIM}~\cite{song_denoising_2022}, DPM-Solver++~\cite{lu_dpm-solver_2022} und \ac{UniPC}~\cite{zhao_unipc_nodate}. \ac{DDPM} durchläuft den vollständigen Trainings-Schedule mit 250 Schritten, während die schnelleren Solver mit deutlich weniger Schritten auskommen. \ac{DDIM} mit 50, DPM-Solver++ mit 25 und \ac{UniPC} mit 10. Pro generiertem Sample wird ein eigener Seed verwendet, sodass die Volumina untereinander unabhängig und der Vorgang reproduzierbar bleibt.
+
+\paragraph{Unconditional}
+Bei den unconditional trainierten Modellen startet jeder Sample-Vorgang aus einem unabhängig gezogenen Gaußschen Rauschtensor. Abgetastet werden sowohl die fünf $32^3$-Ablationsvarianten als auch die $48^3$-Baseline.
+
+\paragraph{Conditional}
+Für das Maske-zu-MRT-Modell wird pro Sample eine Tumormaske zufällig aus den vorverarbeiteten BraTS-Segmentierungen gezogen. Das Klassen-zu-Maske-Modell durchläuft hingegen die drei Größenklassen nacheinander, sodass alle gleich oft vertreten sind. %Beide Modelle wenden zusätzlich die in~\autoref{Sec:cond}  eingeführte Classifier-Free Guidance mit einer Guidance Scale von $3{,}0$ an.
+
+\paragraph{Pipeline}
+Das Vorgehen für die Pipeline-Generierung ist in~\autoref{Sec:pipe} beschrieben. Sie kann wahlweise mit zyklisch durchlaufenen oder mit einer fest vorgegebenen Größenklasse betrieben werden.
+
+\paragraph{Aufgezeichnete Werte während des Samplings}
+Pro Sample werden der verwendete Seed, die Generierungsdauer sowie die Voxel-Statistiken (Minimum, Maximum, Mittelwert, Standardabweichung) festgehalten. Bei den conditional Modellen wird zusätzlich die verwendete Konditionierung erfasst: die Datei der Eingangsmaske beim Maske-zu-MRT-Modell und die Größenklasse beim Klassen-zu-Maske-Modell. Für die Pipeline kommen der Referenz-Tumormittelpunkt aus dem realen Datensatz sowie der angewandte Verschiebungsvektor hinzu. Pro Generierungslauf werden außerdem die Sampler-Konfiguration und der Peak-GPU-Speicherverbrauch in einer JSON-Datei abgelegt.
+
+\todo{Werte nochmal durchlesen. Abändern in den Anhang}
+
 
 \section{Projektmethodik}
 \todo{Kanban oder sowas}
