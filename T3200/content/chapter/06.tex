@@ -46,7 +46,7 @@ In einer Studie von~\citeauthor{schuit_perceptual_2025} wurde eine solche Reader
 \abschnitt
 Dennoch weist die visuelle Bewertung Einschränkungen auf. Sie ist subjektiv und von der Erfahrung der beurteilenden Person abhängig. Zudem lässt sie sich schwer auf große Datenmengen skalieren, weshalb die Bewertung durch mathematische Metriken ergänzt werden kann.
 
-\subsection{Mathematische Bewertungsmetriken}
+\subsection{Mathematische Bewertungsmetriken}\label{Sec:metrics}
 Um die Qualität von durch generativen Modelle erstellten Bildern objektiv zu beurteilen kommen sogenannte \acfi{IQMs} zum Einsatz. \ac{IQMs} erlauben einen objektiven Rahmen zur Bewertung von Eigenschaften wie Auflösung, Rauschen und Artefakte. Gegenüber subjektive Bewertungen durch Menschen haben \ac{IQMs} den Vorteil, dass sie standardisiert, quantifizierbar und reproduzierbar sind und somit einen systematischen Vergleich verschiedener generativer Modelle ermöglicht. \ac{IQMs} lassen sich in drei verschieden Kategorien einordnern: \ac{FR}, \ac{RR} und \ac{NR}. Diese Unterscheidung ist im Kontext von Diffusionsmodellen besonders wichtig. Bei Aufgaben wie Bildrekonstruktion oder Denoising, bei denen ein Originalbild als Referenz vorliegt, kommen \ac{FR}-Metriken wie \acs{SSIM} oder \acs{PSNR} zum Einsatz. Bei der freien Text-to-Image-Generierung hingegen existiert kein eindeutiges Referenzbild, weshalb hier häufig auf NR-Metriken oder semantische Maße wie den \acs{FID} oder den CLIP-Score zurückgegriffen wird~\cite[vgl.][S. 1]{civicioglu_image_2025}.
 \todo{mehr Quellen zu IQM finden}
 

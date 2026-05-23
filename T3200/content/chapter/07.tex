@@ -1,6 +1,10 @@
 \chapter{Implementierung und experimenteller Aufbau}
-Das folgende Kapitel beschreibt die praktische Umsetzung. %Zunächst werden die eingesetzten Werkzeuge und die zugrunde liegende Hardware-Konfiguration vorgestellt. Anschließend wird auf die Architektur der einzelnen Modelle sowie die Wahl der jeweiligen Hyperparameter eingegangen und deren Einfluss auf das Trainingsverhalten erläutert.
+Das folgende Kapitel beschreibt die praktische Umsetzung. Zunächst werden die Projektmethodik und die eingesetzten Werkzeuge vorgestellt, anschließend Datenvorverarbeitung, Modellarchitektur und Trainingskonfiguration. Auf die Ablationsstudien folgen die conditional Modelle samt Generierungs-Pipeline sowie die abschließende Auswertung der erzeugten Volumina.
 
+\section{Projektmethodik}
+Das Projekt wurde nach einem Kanban-orientierten Vorgehen organisiert. Diese Methode bietet sich für Arbeiten mit experimentellem Charakter an, bei denen sich der nächste Arbeitsschritt erst aus den Ergebnissen des vorherigen ergibt.
+\abschnitt
+Die einzelnen Aufgaben wie das Training der Baseline, die Ablationsvarianten und die conditional Modelle wurden in kleinere Teilaufgaben unterteilt und aus einer Bearbeitungsliste abgearbeitet. Die Reihenfolge der Aufgaben ergab sich laufend aus den Ergebnissen der vorhergehenden Trainingsläufe und wurde nicht vorab festgelegt.
 
 \section{Entwicklungsumgebung und Hardware}
 Das Training der Modelle wurde auf einem lokalen System durchgeführt. Dieses verfügt über eine NVIDIA GeForce GTX 1080 Ti mit 11 GB VRAM, einen AMD Athlon X4 860K Prozessor (4 Kerne, 3,7 GHz), 16 GB Arbeitsspeicher sowie ein Linux-Ubuntu-Desktop-Betriebssystem. Der Einsatz einer dedizierten GPU ermöglicht eine Reduktion der Trainingszeiten gegenüber einer reinen CPU-basierten Berechnung.
@@ -9,76 +13,148 @@ Die Implementierung sämtlicher Modelle erfolgte in der Programmiersprache Python
 \abschnitt
 Für den Modellaufbau wurde das Deep-Learning-Framework PyTorch eingesetzt. Die Diffusionslogik einschließlich des Noise Schedulers, des Sampling-Verfahrens und der Trainingsschleife wurde auf Basis von PyTorch implementiert. Für das Laden und Speichern der medizinischen Bilddaten im NIfTI-Format wurde die Bibliothek nibabel verwendet. Die Visualisierung der Ergebnisse erfolgte mit Matplotlib. Die Implementierung basiert auf Python 3.12.3 und PyTorch 2.7.1 mit CUDA 11.8. Die Wahl der CUDA-Version ergibt sich aus der Tatsache, dass die NVIDIA GeForce GTX 1080 Ti auf der Pascal-Architektur (Compute Capability 6.1) basiert, welche von neueren CUDA-Versionen nicht mehr vollständig unterstützt wird.
 
+\section{Dataset und Datenvorverarbeitung}
+Als Datengrundlage dient der öffentlich verfügbare Datensatz des \ac{BraTS} Challenge 2023~\cite{li_brain_2024}. Der Trainingsdatensatz umfasst 1251 multimodale \ac{MRT}-Untersuchungen von Patienten mit Hirntumoren. Die Aufnahmen stammen aus mehreren Kliniken. Für jeden Datensatz liegen vier \ac{MRT}-Sequenzen vor: T1-gewichtete (T1N), kontrastverstärkte T1-gewichtete (T1C), T2-gewichtete (T2W) sowie eine T2-FLAIR-Aufnahme. Dabei wurden alle Volumina bereits vorverarbeitet. Sie wurden räumlich ausgerichtet und auf das Gehirn freigestellt (skull-stripping). Zusätzlich enthält jeder Datensatz eine Tumor-Segmentierungsmaske. Für die Hausarbeit werden ausschließlich die nativen T1-gewichteten (T1N) Volumina sowie die zugehörigen Segmentierungsmasken verwendet. Die unconditional Modelle werden allein auf den T1N-Volumina trainiert, während die conditional Modelle zusätzlich auf die Segmentierungsmasken zurückgreifen.
+\abschnitt
+Vor dem Training wurden die \ac{MRT}-Volumina des \ac{BraTS}-2023-Datensatzes vorverarbeitet. Die Vorverarbeitung orientiert sich an der Datenverarbeitung von~\citeauthor{khader_medical_2023}~\cite[S.~4]{khader_medical_2023}. Es umfasst fünf Schritte, die im Folgenden beschrieben werden.
 
-\section{Datenvorverarbeitung}
-Vor dem Training wurden die MRT-Volumina des BraTS-2023-Datensatzes vorverarbeitet. Die Vorverarbeitung orientiert sich an der Datenverarbeitung von~\citeauthor{durrer_denoising_2024}~\cite[S. 6]{durrer_denoising_2024}. Es umfasst fünf Schritte, die im Folgenden beschrieben werden.
+\paragraph{Intensitätsbegrenzung}
+Die Intensitätswerte werden auf das Intervall zwischen dem 0,5\%- und dem 99,5\%-Perzentil der Vordergrundvoxel beschnitten. Dadurch werden extreme Ausreißer entfernt, die etwa durch Aufnahmeartefakte entstehen können, ohne relevante Bildinformationen zu verlieren.
 
-\paragraph{Intensitätsbegrenzung.}
-Die Intensitätswerte werden auf das Intervall zwischen dem 0,5\%- und dem 99,5\%-Perzentil beschnitten. Dadurch werden extreme Ausreißer entfernt, die etwa durch Aufnahmeartefakte entstehen können, ohne relevante Bildinformationen zu verlieren.
+\paragraph{Hintergrundentfernung}
+Anschließend wird der Hintergrund entfernt, der hauptsächlich aus Luft und leeren Voxeln besteht.Dazu wird die kleinste Bounding Box berechnet, die alle Voxel mit einem Intensitätswert größer null enthält, erweitert um einen Rand von zwei Voxeln je Achse. Das Volumen wird so auf den anatomisch relevanten Bereich zugeschnitten.
 
-\paragraph{Hintergrundentfernung.}
-Anschließend wird der Hintergrund entfernt, der hauptsächlich aus Luft und leeren Voxeln besteht. Dazu wird die kleinste Bounding Box berechnet, die alle Voxel mit einem Intensitätswert größer null enthält. Das Volumen wird so auf den anatomisch relevanten Bereich zugeschnitten.
-
-\paragraph{Kubisches Padding.}
+\paragraph{Kubisches Padding}
 Da die Volumina nach dem Cropping unterschiedliche Dimensionen aufweisen, werden sie durch symmetrisches Zero-Padding auf eine kubische Form gebracht. Im Gegensatz zu einer direkten Skalierung bleibt durch das Padding das Seitenverhältnis erhalten und es werden keine geometrischen Verzerrungen eingeführt.
 
-\paragraph{Resizing.}
+\paragraph{Resizing}
 Das kubische Volumen wird mittels trilinearer Interpolation auf die Zielauflösung von 32\textsuperscript{3} oder 48\textsuperscript{3} Voxeln skaliert. Da das Volumen bereits kubisch ist, erfolgt die Skalierung in allen drei Raumrichtungen gleichmäßig.
 
-\paragraph{Normalisierung.}
-Abschließend werden die Intensitätswerte linear auf den Wertebereich $[-1, 1]$ normalisiert. Dies ist die gängige Konvention für Diffusionsmodelle, da der Rauschprozess auf einem standardisierten Wertebereich arbeitet.
+\paragraph{Normalisierung}
+Abschließend werden die Intensitätswerte je Volumen per Min-Max-Skalierung auf den Wertebereich $[-1, 1]$ abgebildet. Dies ist die gängige Konvention für Diffusionsmodelle, da der Rauschprozess auf einem standardisierten Wertebereich arbeitet.
 
-
-\todo{Ab hier nochm l durch}
+\paragraph{Segmentierungsmasken}
+Die Tumor-Segmentierungsmasken durchlaufen eine reduzierte Variante derselben Pipeline. Die Vordergrund-Bounding-Box wird nicht aus der Maske selbst, sondern aus dem zugehörigen T1N-Volumen übernommen, damit Bild und Maske räumlich übereinander liegen. Auf die Intensitätsbegrenzung und die Normalisierung wird verzichtet, da die Maske diskrete Klassenlabels enthält. Das Resizing erfolgt entsprechend per Nearest-Neighbor-Interpolation, sodass die Labelwerte erhalten bleiben. Die vier Labelwerte des \ac{BraTS}-2023-Schemas bezeichnen Hintergrund (0), nekrotischen Tumorkern (1), peritumorales Ödem (2) und anreichernden Tumor (3).
 
 
 \section{Modellarchitektur}
-Als Architektur dient ein 3D-UNet, das dem in der DDPM-Literatur etablierten Aufbau folgt~\citeauthor{ho_denoising_2020}~\cite{ho_denoising_2020}. Die Architektur ist symmetrisch als Encoder-Decoder aufgebaut und besteht aus vier Auflösungsstufen mit Kanalbreiten von 96, 192, 384 und 384. Im Encoder wird die räumliche Auflösung schrittweise halbiert, während der Decoder sie über trilineare Interpolation wieder auf die Eingabegröße bringt. Zwischen den entsprechenden Stufen von Encoder und Decoder werden Skip-Connections eingesetzt, um räumliche Informationen direkt weiterzugeben.
+Als Architektur dient ein 3D-UNet, das dem in der DDPM-Literatur etablierten Aufbau folgt~\citeauthor{ho_denoising_2020}%~\cite{ho_denoising_2020}.
+Die Architektur ist symmetrisch als Encoder-Decoder aufgebaut und besteht aus vier Auflösungsstufen mit Kanalbreiten von 96, 192, 384 und 384. Im Encoder wird die räumliche Auflösung schrittweise halbiert, während der Decoder sie über trilineare Interpolation wieder auf die Eingabegröße bringt. Zwischen den entsprechenden Stufen von Encoder und Decoder werden Skip-Connections eingesetzt, um räumliche Informationen direkt weiterzugeben.
 
-\paragraph{Residualblöcke und Zeiteinbettung}
-Auf jeder Auflösungsstufe befinden sich zwei Residualblöcke, die jeweils aus zwei 3D-Faltungsschichten mit GroupNorm und SiLU-Aktivierung bestehen. Der aktuelle Diffusions-Zeitschritt wird über sinusoidale Positionseinbettungen kodiert und über eine lineare Projektion in jeden Residualblock eingespeist, sodass das Netzwerk sein Verhalten an den jeweiligen Rauschgrad anpassen kann.
+\paragraph{Residualblöcke und Zeiteinbettung.}
+Auf jeder Auflösungsstufe befinden sich zwei Residualblöcke, die jeweils aus zwei 3D-Faltungsschichten mit GroupNorm (acht Gruppen) und SiLU-Aktivierung~\footnote{Die SiLU-Funktion ist definiert als $\text{SiLU}(x) = x \cdot \sigma(x)$ mit der Sigmoid-Funktion $\sigma$. Im Gegensatz zum stückweise linearen ReLU verläuft sie glatt und differenzierbar und hat sich in tiefen Generativmodellen etabliert~\cite[vgl.][S.~4]{elfwing_sigmoid-weighted_2017}.} bestehen. Der aktuelle Diffusions-Zeitschritt wird zunächst sinusoidal kodiert und durch ein zweischichtiges \ac{MLP} auf 384 Dimensionen (das Vierfache der Basis-Kanalbreite) gebracht. In jedem Residualblock wird diese Zeit-Einbettung anschließend über eine lineare Projektion auf die jeweilige Kanalzahl skaliert und additiv eingespeist, sodass das Netzwerk sein Verhalten an den jeweiligen Rauschgrad anpassen kann.
 
 \paragraph{Self-Attention.}
-Auf den beiden niedrigsten Auflösungsstufen werden zusätzlich Self-Attention-Schichten eingesetzt, die es dem Netzwerk ermöglichen, globale Abhängigkeiten zwischen räumlich entfernten Regionen zu modellieren. Auf höheren Auflösungen wird darauf verzichtet, da der Speicherbedarf mit der Voxelanzahl ansteigt.
+Auf den beiden niedrigsten Auflösungsstufen werden zusätzlich Self-Attention-Schichten eingesetzt, die es dem Netzwerk ermöglichen, globale Abhängigkeiten zwischen räumlich entfernten Regionen zu modellieren. Auf höheren Auflösungen wird darauf verzichtet, da der Speicherbedarf mit der Voxelanzahl ansteigt. Bei einer Eingabegröße von $32^3$ Voxeln betrifft dies die Auflösungen $8^3$ und $4^3$, bei $48^3$ entsprechend $12^3$ und 6\textsuperscript{3}.
+\abschnitt
+Im Bottleneck zwischen Encoder und Decoder befindet sich eine weitere Self-Attention-Schicht. Diese ist fest in der Architektur und bleibt auch in der Ablation ohne Attention auf den niedrigen Stufen erhalten.
+
+\paragraph{Initialisierung.}
+Die finale 3D-Faltung am Ausgang des Netzwerks wird mit Nullen initialisiert. Das Modell liefert dadurch zu Trainingsbeginn eine konstante Nullvorhersage. Erst durch die Gradienten der ersten Iterationen formen sich von Null verschiedene Ausgaben. Diese Initialisierung stabilisiert den Verlust zu Beginn des Trainings und ist in der Diffusions-Literatur eine gängige Wahl.
+
 
 % \paragraph{Konfiguration.}
 % Das Modell umfasst rund 156 Millionen trainierbare Parameter, je nach Konfiguration. Zur Reduktion des GPU-Speicherverbrauchs wird Gradient Checkpointing eingesetzt, bei dem Zwischenergebnisse im Forward-Pass nicht dauerhaft gespeichert, sondern bei Bedarf im Backward-Pass neu berechnet werden.
 
 \section{Baseline-Konfiguration}
-Die Baseline-Konfiguration benutzt mehrere Techniken die sich in der aktuellen Literatur als Verbesserungen gegenüber dem ursprünglichen DDPM-Ansatz von Ho et al.~\cite{ho2020ddpm} etabliert haben. Sie dient als Referenzmodell, gegen das alle weiteren Experimente verglichen werden. 
+Die Baseline-Konfiguration benutzt mehrere Techniken die sich in der aktuellen Literatur als Verbesserungen gegenüber dem ursprünglichen DDPM-Ansatz von ~\citeauthor{ho_denoising_2020} etabliert haben. Sie dient als Referenzmodell, gegen das alle weiteren Experimente verglichen werden. 
 \abschnitt 
-Der Diffusionsprozess verwendet 250 Zeitschritte mit einem Cosine Schedule~\cite{nichol2021improved}. Im Vergleich zum linearen Schedule verteilt der Cosine Schedule das Signal-Rausch-Verhältnis gleichmäßiger über die Zeitschritte was insbesondere bei niedrigen Auflösungen zu einer höheren Bildqualität führt~\cite{nichol2021improved}. \abschnitt 
-Das Modell wird mit v-Prediction trainiert~\cite{salimans2022progressive}. Dabei sagt das Netzwerk weder das Rauschen $\epsilon$ noch das ursprüngliche Bild $x_0$ direkt vorher, sondern eine Kombination aus beiden, die als Velocity $v$ bezeichnet wird. Dieses Vorhersageziel hat sich als numerisch stabiler erwiesen, insbesondere bei niedrigen Signal-Rausch-Verhältnissen~\cite{salimans2022progressive}. 
+Der Diffusionsprozess verwendet 250 Zeitschritte mit einem Cosine Schedule empfohlen von~\citeauthor{nichol_improved_2021}. Im Vergleich zum linearen Schedule verteilt der Cosine Schedule das Signal-Rausch-Verhältnis gleichmäßiger über die Zeitschritte was insbesondere bei niedrigen Auflösungen zu einer höheren Bildqualität führt~\cite[vgl.][S.~7]{nichol_improved_2021}. 
 \abschnitt 
-Für die Gewichtung des Trainingsverlusts wird Min-SNR Weighting mit $\gamma = 5$ eingesetzt~\cite{hang2023minsnr}. Diese Strategie begrenzt den Einfluss von Zeitschritten mit hohem Signal-Rausch-Verhältnis auf den Gesamtverlust und sorgt so für ein ausgewogeneres Training über alle Zeitschritte hinweg.
+Das Modell wird mit v-Prediction trainiert, vorgeschlagen von~\citeauthor{salimans_progressive_2022}. Dabei sagt das Netzwerk weder das Rauschen $\epsilon$ noch das ursprüngliche Bild $x_0$ direkt vorher, sondern eine Kombination aus beiden, die als Velocity $v$ bezeichnet wird. Dieses Vorhersageziel hat sich als numerisch stabiler erwiesen, insbesondere bei niedrigen Signal-Rausch-Verhältnissen~\cite[vgl.][S.~5]{salimans_progressive_2022}. 
+\abschnitt 
+Für die Gewichtung des Trainingsverlusts wird das von~\citeauthor{hang_efficient_2023} vorgeschlagene Min-SNR Weighting mit $\gamma = 5$ eingesetzt. Diese Strategie begrenzt den Einfluss von Zeitschritten mit hohem Signal-Rausch-Verhältnis auf den Gesamtverlust und sorgt so für ein ausgewogeneres Training über alle Zeitschritte hinweg~\cite[vgl.][S.~4\,f.]{hang_efficient_2023}.
+\abschnitt
+Während des Trainings werden die Zeitschritte nicht uniform gezogen, sondern über ein loss-bewusstes Importance Sampling auf Basis der jüngsten Verlust-Historie~\cite[vgl.][S.~5]{nichol_improved_2021}. Pro Zeitschritt wird der quadratische Mittelwert der Verluste der letzten zehn Batches geführt und daraus eine Wahrscheinlichkeitsverteilung gebildet, sodass Zeitschritte mit hohen Verlusten häufiger angesteuert werden. Damit der Erwartungswert des Trainings-Loss unverändert bleibt, wird jeder Sample-Verlust mit dem Inversen seiner Ziehungswahrscheinlichkeit gewichtet. Die Strategie wird erst nach dem Warmup aktiv, damit instabile Initialverluste die Sampler-Historie nicht verzerren.
 
-
-\section{Trainingsverfahren und Hyperparameter}
-Alle Modelle werden über 300 Epochen mit dem Adam-Optimizer und einer Lernrate von $2 \times 10^{-4}$ trainiert. Diese Lernrate entspricht dem in der DDPM-Literatur üblichen Wert~\cite{ho2020ddpm}. In den ersten 500 Iterationen wird die Lernrate linear von null auf den Zielwert erhöht (Warmup), um Instabilitäten zu Beginn des Trainings zu vermeiden. Die Batch Size beträgt 10, was dem verfügbaren GPU-Speicher von 11~GB geschuldet ist. \abschnitt 
-Zur Stabilisierung der Modellgewichte wird Exponential Moving Average (EMA) mit einem Decay-Faktor von 0,9999 eingesetzt~\cite{nichol2021improved}. Dabei wird parallel zu den trainierten Gewichten ein gleitender Durchschnitt geführt, der für die finale Evaluation und das Sampling verwendet wird. Zusätzlich wird Gradient Clipping mit einer maximalen Norm von 1,0 angewendet, um Gradientenexplosionen zu verhindern. 
+\section{Trainingsverfahren und Hyperparameter}\label{Sec:hyper}
+Alle Modelle werden über 300 Epochen mit dem AdamW-Optimizer (Weight Decay $0{,}01$) und einer initialen Lernrate von $2 \times 10^{-4}$ trainiert. Dieser Wert entspricht dem in der DDPM-Literatur üblichen Lernratenniveau~\cite[vgl.][S.~14]{ho_denoising_2020}. In den ersten 500 Iterationen wird die Lernrate linear von null auf den Zielwert erhöht (Warmup), um Instabilitäten zu Beginn des Trainings zu vermeiden, und fällt anschließend nach einem Cosine-Schedule wieder auf null ab. Die Batch Size beträgt 10, was dem verfügbaren GPU-Speicher von 11~GB geschuldet ist.
+\abschnitt 
+Zur Stabilisierung der Modellgewichte wird \ac{EMA} mit einem Decay-Faktor von 0,9999 eingesetzt~\cite[vgl.][S.~15]{ho_denoising_2020}. Dabei wird parallel zu den trainierten Gewichten ein gleitender Durchschnitt geführt, der für die finale Evaluation und das Sampling verwendet wird. Zusätzlich wird Gradient Clipping mit einer maximalen Norm von 1,0 angewendet, um Gradientenexplosionen zu verhindern. 
 \abschnitt 
 Der Datensatz wird in 90\% Trainings- und 10\% Validierungsdaten aufgeteilt. Die Aufteilung erfolgt mit einem festen Random Seed, um die Reproduzierbarkeit sicherzustellen. Während des Trainings wird der Validierungsverlust nach jeder Epoche berechnet. 
 
 \section{Ablationsstudien} 
 Um den Einfluss einzelner Komponenten auf die Generierungsqualität zu untersuchen werden ausgehend von der Baseline-Konfiguration gezielt einzelne Variablen verändert. Pro Experiment wird jeweils nur eine Komponente angepasst, um deren isolierten Einfluss bewerten zu können. Die Ablationsstudien werden auf einer Auflösung von 32\textsuperscript{3} Voxeln durchgeführt. 
 
-\paragraph{Ohne Self-Attention.} 
+\paragraph{Ohne Self-Attention} 
 Die Self-Attention-Schichten auf den niedrigen Auflösungsstufen werden entfernt. Dadurch lässt sich untersuchen, welchen Beitrag die Modellierung globaler Abhängigkeiten zur Bildqualität leistet und ob die lokalen Informationen der Faltungsschichten allein ausreichen. 
 
-\paragraph{Linearer Schedule.} 
-Der Cosine Schedule wird durch einen linearen Schedule ersetzt, bei dem die Varianz gleichmäßig von $\beta_1 = 0{,}0001$ bis $\beta_T = 0{,}02$ ansteigt. Dies entspricht dem ursprünglichen Vorschlag von Ho et al.~\cite{ho2020ddpm}. 
+\paragraph{Linearer Schedule} 
+Der Cosine Schedule wird durch einen linearen Schedule ersetzt, bei dem die Varianz gleichmäßig von $\beta_1 = 0{,}0001$ bis $\beta_T = 0{,}02$ ansteigt.
 
-\paragraph{Noise-Prediction ($\epsilon$-Prediction).}
-Anstelle der v-Prediction wird das Modell darauf trainiert, das hinzugefügte Rauschen $\epsilon$ direkt vorherzusagen. Dies ist die ursprüngliche DDPM-Formulierung~\cite{ho2020ddpm} und dient als Vergleich zur moderneren v-Prediction. 
+\paragraph{Noise-Prediction ($\epsilon$-Prediction)}
+Anstelle der v-Prediction wird das Modell darauf trainiert, das hinzugefügte Rauschen $\epsilon$ direkt vorherzusagen. 
 
-\paragraph{Datenaugmentierung.} Die Trainingsdaten werden durch zufällige räumliche Transformationen augmentiert, um die effektive Datensatzgröße zu erhöhen und die Generalisierung zu verbessern. 
+\paragraph{Datenaugmentierung} Die Trainingsdaten werden mit einer Wahrscheinlichkeit von 50\% horizontal gespiegelt, was die approximative Links-Rechts-Symmetrie des Gehirns ausnutzt. Damit wird die effektive Datensatzgröße verdoppelt, ohne anatomisch unplausible Volumina zu erzeugen.
 
-\paragraph{Erhöhte Auflösung (48\textsuperscript{3}).} Zusätzlich wird die Baseline-Konfiguration auf einer Auflösung von 48\textsuperscript{3} Voxeln trainiert, um den Einfluss der räumlichen Auflösung auf die Bildqualität zu untersuchen. Aufgrund der deutlich längeren Trainingszeiten bei höherer Auflösung werden die übrigen Ablationen nur auf 32\textsuperscript{3} durchgeführt.
+\paragraph{Erhöhte Auflösung ($48^3$).} Zusätzlich wird die Baseline-Konfiguration auf einer Auflösung von $48^3$ Voxeln trainiert, um den Einfluss der räumlichen Auflösung auf die Bildqualität zu untersuchen.
 
-\section{Aufgezeichnete Werte} 
-Während des Trainings werden für jede Epoche verschiedene Metriken protokolliert, um den Trainingsverlauf nachvollziehen zu können. Dazu gehören der Trainings- und Validierungsverlust, die aktuelle Lernrate, die Epochendauer sowie der GPU-Speicherverbrauch. Zusätzlich werden die Gradientennorm und die Anzahl der durch Gradient Clipping begrenzten Updates erfasst, um die Stabilität des Trainings beurteilen zu können. 
+\section{Aufgezeichnete Werte während des Trainings} 
+Während des Trainings werden für jede Epoche verschiedene Metriken protokolliert, um den Trainingsverlauf nachvollziehen zu können. Dazu gehören der Trainings- und Validierungsverlust, die aktuelle Lernrate, die Epochendauer sowie der GPU-Speicherverbrauch. Zusätzlich werden die Gradientennorm und die Anzahl der durch Gradient Clipping begrenzten Updates erfasst, um die Stabilität des Trainings beurteilen zu können.
 \abschnitt 
-In regelmäßigen Abständen von 25 Epochen werden Samples generiert, um die visuelle Qualität der erzeugten Volumina im Trainingsverlauf zu überprüfen. Checkpoints werden an festgelegten Epochen gespeichert sowie für das Modell mit dem besten Validierungsverlust. Sämtliche Metriken werden nach jeder Epoche in einer JSON-Datei gesichert, sodass der Trainingsverlauf auch nachträglich vollständig analysiert werden kann.
+An festgelegten Epochen, bei 1 und 10 sowie anschließend alle 25 Epochen bis Epoche 300, werden Samples generiert, um die visuelle Qualität der erzeugten Volumina im Trainingsverlauf zu überprüfen. An denselben Epochen wird jeweils ein Checkpoint gespeichert; zusätzlich wird das Modell mit dem besten Validierungsverlust separat gesichert. Sämtliche Metriken werden nach jeder Epoche in der JSON-Datei aktualisiert, sodass der Trainingsverlauf auch nachträglich vollständig analysiert werden kann.
 
-\section{Projektmethodik}
-\todo{Kanban oder sowas}
+\todo{Später auf Anhang referenzieren welch WErte tatsächläclich aufgenommen worden sind}
+
+\section{Conditional-Modelle}\label{Sec:cond}
+Neben dem unconditional trainierten Baseline-Modell werden zwei conditional Varianten trainiert, die der gleichen 3D-UNet-Architektur folgen, jedoch um eine Konditionierungs-Schnittstelle erweitert sind. Beide Modelle nutzen Classifier-Free Guidance, bei dem die Konditionierung während des Trainings mit einer Wahrscheinlichkeit von 15\% durch einen Null-Token ersetzt wird. Beim Sampling wird der Einfluss der Konditionierung mit einer Guidance Scale von $w = 3{,}0$ verstärkt.
+\abschnitt
+Die übrigen Hyperparameter aus~\autoref{Sec:hyper} werden übernommen. Lediglich das Gradient Clipping wird auf eine maximale Norm von $0{,}5$ herabgesetzt, um das Training trotz des zusätzlichen Konditionierungssignals stabil zu halten.
+
+\paragraph{Maske-zu-MRT-Modell}
+Das Modell erzeugt ein synthetisches T1N-Volumen, das auf eine vorgegebene Tumor-Segmen\-tier\-ungsmaske konditioniert ist. Die Maske wird vom diskreten Wertebereich $\{0, \dots, 3\}$ auf das Intervall $[-1, 1]$ skaliert, damit sie sich auf demselben Wertebereich wie das verrauschte Eingangsvolumen bewegt und anschließend kanalweise an dieses angehängt. Das Modell sieht somit zwei Eingangskanäle: das verrauschte \ac{MRT} und die zugehörige Segmentierung. Trainiert wird auf den paarweise vorliegenden $(T1N,\,Seg)$-Volumina des \ac{BraTS}-2023-Datensatzes.
+
+\paragraph{Klassen-zu-Maske-Modell}
+Das Modell erzeugt eine synthetische Tumor-Segmentierungsmaske aus einer vorgegebenen Größenklasse. Die Klassen sind in drei Stufen unterteilt: klein ($\leq 2$\,cm), mittel ($2$--$5$\,cm) und groß ($> 5$\,cm)~\cite{doccheck_tnm}. Die Grenzwerte sind in Anlehnung an die TNM-Klassifikation des Mammakarzinoms gewählt, da für Hirntumore keine etablierte größenbasierte TNM-Klassifikation existiert. Sie werden vorab anhand der Tumor-Ausdehnung in den realen Segmentierungen vergeben. Die Klassen-Information wird über eine Embedding-Schicht in einen Vektor abgebildet und additiv zur sinusoidalen Zeit-Einbettung hinzugefügt. Das Modell liefert kontinuierliche Werte in $[-1, 1]$, die für die weitere Verwendung in die vier diskreten \ac{BraTS}-Labels zurückquantisiert werden.
+
+\section{Generierungs-Pipeline}\label{Sec:pipe}
+Um vollständig synthetische Gehirn-Volumina mit realistisch positioniertem Tumor zu erzeugen, werden die beiden in~\autoref{Sec:cond} beschriebenen Modelle in einer dreistufigen Pipeline gekoppelt. Da das Klassen-zu-Maske-Modell auf zentrierten Tumormasken trainiert wurde, sitzen seine Samples in der Mitte des Volumens. In realen \ac{MRT}-Aufnahmen liegen Tumore jedoch an unterschiedlichen anatomischen Positionen, weshalb zwischen den beiden Modellen eine räumliche Verschiebung eingefügt wird.
+
+\paragraph{1. Tumormaske}
+Das Klassen-zu-Maske-Modell erzeugt aus einer vorgegebenen Größenklasse eine am Volumenmittelpunkt zentrierte Tumormaske im Wertebereich $[-1, 1]$. Diese wird anschließend per Nearest-Neighbor-Zuordnung auf die vier diskreten \ac{BraTS}-Labels zurückquantisiert.
+
+\paragraph{2. Räumliche Platzierung}
+Aus dem realen \ac{BraTS}-Datensatz wird ein Segmentierungs-Volumen zufällig ausgewählt und dessen Tumormittelpunkt berechnet. Die zentrierte synthetische Maske wird so verschoben, dass ihr Mittelpunkt mit diesem realen Mittelpunkt zusammenfällt. Würde durch diese Verschiebung ein Teil der Tumor-Bounding-Box aus dem Volumen herausragen, wird der Verschiebungsvektor entlang der jeweiligen Achse beschnitten. Die Verschiebung selbst erfolgt per Nearest-Neighbor-Interpolation, sodass die diskreten Labelwerte erhalten bleiben. Damit folgt die räumliche Verteilung der generierten Tumore der Verteilung realer Tumore, ohne dass anatomisch unmögliche Positionen entstehen.
+
+\paragraph{3. Gehirn-Generierung}
+Die platzierte Tumormaske wird auf das Intervall $[-1, 1]$ skaliert und dient als Konditionierung für das Maske-zu-MRT-Modell, welches das umliegende T1N-Gehirn-Volumen generiert. Pro Pipeline-Durchlauf werden zwei \ac{NIfTI}-Dateien gespeichert: die platzierte Tumormaske und das synthetisierte Gehirn-Volumen.
+\abschnitt
+Für jede der drei Stufen wird ein separater Seed verwendet, sodass Tumorform, räumliche Platzierung und Gehirntextur unabhängig voneinander kontrolliert werden können.
+
+\todo{Abbildung!!}
+
+\section{Sample-Generierung}
+Nach Abschluss des Trainings werden die Modelle zur Generierung synthetischer Volumina eingesetzt. Pro Modell und Sampler werden 1024 Samples erzeugt. Für das Sampling werden die EMA-Gewichte aus~\autoref{Sec:hyper} verwendet.
+
+\paragraph{Sampler}
+Als Sampling-Verfahren stehen vier Schemata aus der \texttt{diffusers}-Bibliothek zur Verfügung: \ac{DDPM}~\cite{ho_denoising_2020}, \ac{DDIM}~\cite{song_denoising_2022}, DPM-Solver++~\cite{lu_dpm-solver_2022} und \ac{UniPC}~\cite{zhao_unipc_nodate}. \ac{DDPM} durchläuft den vollständigen Trainings-Schedule mit 250 Schritten, während die schnelleren Solver mit deutlich weniger Schritten auskommen. \ac{DDIM} mit 50, DPM-Solver++ mit 25 und \ac{UniPC} mit 10. Pro generiertem Sample wird ein eigener Seed verwendet, sodass die Volumina untereinander unabhängig und der Vorgang reproduzierbar bleibt.
+
+\paragraph{Unconditional}
+Bei den unconditional trainierten Modellen startet jeder Sample-Vorgang aus einem unabhängig gezogenen Gaußschen Rauschtensor. Gestartet werden sowohl die fünf $32^3$-Ablationsvarianten als auch die $48^3$-Baseline.
+
+\paragraph{Conditional}
+Für das Maske-zu-MRT-Modell wird pro Sample eine Tumormaske zufällig aus den vorverarbeiteten \ac{BraTS}-Segmentierungen gezogen. Das Klassen-zu-Maske-Modell durchläuft hingegen die drei Größenklassen nacheinander, sodass alle gleich oft vertreten sind. %Beide Modelle wenden zusätzlich die in~\autoref{Sec:cond}  eingeführte Classifier-Free Guidance mit einer Guidance Scale von $3{,}0$ an.
+
+\paragraph{Pipeline}
+Das Vorgehen für die Pipeline-Generierung ist in~\autoref{Sec:pipe} beschrieben. Sie kann wahlweise mit zyklisch durchlaufenen oder mit einer fest vorgegebenen Größenklasse betrieben werden.
+
+\paragraph{Aufgezeichnete Werte während des Samplings}
+Pro Sample werden der verwendete Seed, die Generierungsdauer sowie die Voxel-Statistiken (Minimum, Maximum, Mittelwert, Standardabweichung) festgehalten. Bei den conditional Modellen wird zusätzlich die verwendete Konditionierung erfasst: die Datei der Eingangsmaske beim Maske-zu-MRT-Modell und die Größenklasse beim Klassen-zu-Maske-Modell. Für die Pipeline kommen der Referenz-Tumormittelpunkt aus dem realen Datensatz sowie der angewandte Verschiebungsvektor hinzu. Pro Generierungslauf werden außerdem die Sampler-Konfiguration und der Peak-GPU-Speicherverbrauch in einer JSON-Datei abgelegt.
+
+\todo{Werte nochmal durchlesen. Abändern in den Anhang}
+
+\section{Testdurchlauf}
+Nach der Sample-Generierung werden die in~\autoref{Sec:metrics} vorgestellten Metriken auf die erzeugten Datensätze angewendet. Die Auswertung läuft über ein eigenständiges Jupyter-Notebook, das nach der Sample-Generierung gestartet wird. Es wählt je nach gewähltem Modus die passende Paarungsstrategie und legt die Ergebnisse sowohl pro Sample als auch aggregiert als CSV-Datei ab.
+
+\paragraph{Auswertungsmodi}
+Das Notebook unterscheidet vier Modi. \textit{Unconditional} bewertet die unconditional erzeugten MRT-Volumina gegen den realen \ac{BraTS}-Datensatz. \textit{Maske zu MRT} vergleicht die Ausgaben des Maske-zu-MRT-Modells mit den echten T1N-Volumina derselben Probanden. \textit{Klasse zu Maske} setzt die generierten Tumormasken gegen reale Masken der gleichen Größenklasse. \textit{Pipeline} schließlich bewertet die voll-synthetischen Gehirn-Volumina aus der Generierungs-Pipeline gegen den realen T1N-Datensatz.
+
+\paragraph{Paarung}
+Da die Full-Reference-Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} ein Referenzbild voraussetzen, muss jedem generierten Volumen ein reales Gegenstück zugeordnet werden. Bei \textit{Unconditional} und \textit{Pipeline} ist keine inhärente Zuordnung gegeben, daher wird mit festem Seed zufällig gepaart. Im Modus \textit{Maske zu MRT} ermöglicht die in der \texttt{stats.json} mitgeschriebene Samples eine exakte Zuordnung zu den realen T1N-Volumina derselben Subjekte. \textit{Klasse zu Maske} paart ebenfalls zufällig, jedoch nur innerhalb der gleichen Größenklasse, damit die Klassenverteilung erhalten bleibt.
+
+\paragraph{Berechnung der Metriken}
+\ac{SSIM} und \ac{PSNR} werden direkt auf den 3D-Volumina mittels der \texttt{scikit-image}-Bibliothek berechnet. Der Wertebereich ist auf $\Delta = 2{,}0$ gesetzt, da die Volumina im Intervall $[-1, 1]$ liegen. \ac{LPIPS} arbeitet auf zweidimensionalen Bildern (vortrainiertes AlexNet~\cite{zhang_unreasonable_2018}) und wird daher schichtweise auf die axialen Schnitte angewendet und über diese gemittelt. \ac{FID} nutzt ein Inception-V3-Netzwerk ohne Klassifikationskopf. Die axialen Schnitte werden auf $299 \times 299$ Pixel skaliert, im RGB-Raum repliziert und mit ImageNet-Statistiken normalisiert, bevor die 2048-dimensionalen Merkmalsvektoren entnommen werden. Der Dice-Koeffizient kommt ausschließlich im Modus \textit{Klasse zu Maske} zum Einsatz: die generierten Werte werden auf die diskreten \ac{BraTS}-Labels zurückquantisiert, anschließend Dice pro Vordergrundklasse berechnet und über die drei Tumor-Subregionen gemittelt.
+
+\paragraph{Ergebnisausgabe}
+Pro Auswertungslauf werden zwei CSV-Dateien geschrieben. Die Aggregat-Datei enthält eine Zeile mit Mittelwert und Standardabweichung sämtlicher Metriken. Die Detail-Datei führt die Werte pro Sample auf. %und ermöglicht damit Verteilungsdarstellungen im Ergebniskapitel.
