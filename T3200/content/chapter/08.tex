@@ -243,3 +243,29 @@ Von \ac{DDPM} (250 Schritte) zu \ac{UniPC} (10 Schritte) sinkt die mittlere Gene
 \end{table}
 %
 In \autoref{tab:generation_time_pipeline} sind die Laufzeiten der Generierungs-Pipeline aus Klasse-zu-Maske- und Maske-zu-MRT-Modell dargestellt. Die mittlere Gesamtdauer pro Pipeline-Durchlauf beträgt $95{,}49$\,s (\ac{DDPM}), $18{,}03$\,s (\ac{DDIM}), $8{,}85$\,s (DPM-Solver++) und $3{,}63$\,s (\ac{UniPC}). Der Peak-VRAM-Verbrauch der Pipeline liegt für alle vier Sampler ungefähr bei $6{,}9$\,GB.
+
+\section{Verteilungsanalyse}\label{Sec:eval_distribution}
+Zur Beurteilung, ob die generierten Volumina die statistischen Eigenschaften des realen Datensatzes treffen, werden zwei direkte Verteilungs\-vergleiche herangezogen: die Voxel-Intensitätsverteilung der unconditional generierten Volumina und die Tumorgrößen\-verteilung der von der Pipeline erzeugten Segmentierungsmasken, jeweils gegenüber dem vollständigen \ac{BraTS}-2023-Datensatz (1251 Volumina bzw. Masken).
+
+\paragraph{Intensitätsverteilung}
+\autoref{fig:intensity_hist} überlagert die globale Verteilung der Voxel-Intensitäten der realen T1N-Volumina mit den Verteilungen der fünf $32^3$-Modelle (jeweils \ac{FID}-bester Sampler). Die reale Verteilung weist ein dominantes Maximum bei $-1$ (Hintergrund nach Padding) und eine breite Verteilung der Hirnvoxel im Bereich von $-0{,}6$ bis $+0{,}4$ auf.
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{example-image-a} % TODO: figures/intensity_histogram_real_vs_generated.pdf
+    \caption{Voxel-Intensitätsverteilung der realen \ac{BraTS}-T1N-Volumina (graue Fläche, 1251 Volumina) im Vergleich zu den von den fünf $32^3$-Modellen generierten Verteilungen (jeweils 1024 Volumina). Y-Achse logarithmisch skaliert.}
+    \label{fig:intensity_hist}
+\end{figure}
+%
+
+\paragraph{Tumorgrößenverteilung}
+\autoref{fig:tumor_size} stellt die Tumor-Voxelanzahl der realen Segmentierungsmasken den von der Generierungs-Pipeline (\ac{UniPC}-Sampler) erzeugten Masken gegenüber. Links die Verteilung der gesamten Tumor\-voxel\-anzahl pro Volumen, rechts die Aufschlüsselung nach den drei Subregionen des \ac{BraTS}-2023-Schemas (nekrotischer Tumorkern, peritumorales Ödem, anreichernder Tumor) als Box-Plot.
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{example-image-b} % TODO: figures/tumor_size_distribution.pdf
+    \caption{Tumorgrößenverteilung: reale \ac{BraTS}-Segmentierungsmasken (grau, 1251 Patienten) vs. von der Pipeline (\ac{UniPC}, 1024 Durchläufe) generierte Masken. Links: gesamte Tumor-Voxelanzahl als Histogramm. Rechts: Voxelanzahl pro Subregion als Box-Plot (Whisker bei 1,5$\times$IQR, Ausreißer ausgeblendet).}
+    \label{fig:tumor_size}
+\end{figure}
+%
+22 von 1024 generierten Masken (2{,}1\,\%) enthielten keinerlei Tumorvoxel. Die mittlere Tumor-Voxelanzahl der generierten Masken liegt bei \todo{X}, gegenüber \todo{Y} im realen Datensatz.
