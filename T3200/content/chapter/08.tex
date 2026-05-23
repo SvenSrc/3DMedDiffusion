@@ -2,7 +2,7 @@
 Dieses Kapitel stellt die Ergebnisse der durchgeführten Experimente vor. Zunächst werden die während des Trainings aufgezeichneten Verlaufsmetriken berichtet, anschließend die quantitativen Auswertungen der einzelnen Modelle. Den Abschluss bildet eine qualitative Gegenüberstellung ausgewählter generierter Volumina. Eine Einordnung und Diskussion der Ergebnisse erfolgt in~\autoref{Ch:auswertung}.
 
 \section{Trainingsverlauf}\label{Sec:training_verlauf}
-Insgesamt wurden acht Modelle mit 300 Epochen trainiert: fünf $32^3$-Ablationsvarianten, die $48^3$-Baseline sowie die beiden conditional Modelle für die in~\autoref{Sec:pipe} beschriebene Generierungs-Pipeline. \autoref{verlauf} fasst die zentralen Verlaufsmetriken zusammen.
+Insgesamt wurden acht Modelle mit 300 Epochen trainiert: fünf $32^3$-Ablationsvarianten, die $48^3$-Baseline sowie die beiden conditional Modelle für die in~\autoref{Sec:pipe} beschriebene Generierungs-Pipeline. \autoref{tab:verlauf} fasst die zentralen Verlaufsmetriken zusammen.
 %
 \begin{table}[H]
     \centering
@@ -26,7 +26,7 @@ Insgesamt wurden acht Modelle mit 300 Epochen trainiert: fünf $32^3$-Ablationsva
         Klasse $\rightarrow$ Maske       &  63{,}72 & 10 & 0{,}00006 & 0{,}0211 & 0{,}0168 & 158 \\
         \bottomrule
     \end{tabular}
-    \label{verlauf}
+    \label{tab:verlauf}
     \caption{Zusammenfassung des Trainingsverlaufs aller Modelle über 300 Epochen. \emph{Beste Epoche} bezeichnet die Epoche mit dem niedrigsten Validierungs-Loss.}
 \end{table}
 %
@@ -53,7 +53,6 @@ Pro Modell und Sampler wurden 1024 Samples generiert und gegen den realen \ac{Br
 
 \begin{table}[H]
     \centering
-    \label{tab:metrics_uncond_32}
     \footnotesize
     \begin{tabular}{llrrrr}
         \toprule
@@ -90,23 +89,25 @@ Pro Modell und Sampler wurden 1024 Samples generiert und gegen den realen \ac{Br
             & UniPC       & 497{,}78 & $-0{,}022$ & 3{,}87 & 0{,}522 \\
         \bottomrule
     \end{tabular}
+    \label{tab:metrics_uncond_32}
     \caption{Quantitative Auswertung der fünf $32^3$-Modelle über 1024 generierte Samples je Sampler. Niedrigere Werte sind besser bei FID und LPIPS, höhere bei SSIM und PSNR. Beste Werte je Modell sind fett markiert.}
 \end{table}
 
 Über alle $32^3$-Konfigurationen weist die Baseline mit \ac{DDPM} den niedrigsten Gesamt-\ac{FID} ($24{,}77$) auf. Die niedrigsten \ac{FID}-Werte je Modell werden bei vier von fünf Varianten mit dem \ac{DDPM}-Sampler erreicht. Einzige Ausnahme ist das Data-Augmentation-Modell, bei dem \ac{UniPC} mit $27{,}90$ am besten abschneidet. Die Noise-Prediction-Variante liefert in allen vier Samplern negative \ac{SSIM}-Werte und \ac{PSNR}-Werte unter $8$\,dB.
 
 \paragraph{Visualisierung der Metrikverteilung} \autoref{fig:metrics_box_uncond} stellt die Verteilung der pro Sample berechneten Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} als Boxplots dar.
-
+%
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\linewidth]{example-image-c} % TODO: figures/boxplot_uncond_32.pdf
     \caption{Verteilung der paarweisen Metriken über 1024 Samples für die fünf $32^3$-Modelle, dargestellt jeweils für den \ac{FID}-besten Sampler je Modell.}
     \label{fig:metrics_box_uncond}
 \end{figure}
+%
 
 \section{Erhöhte Auflösung ($48^3$)}\label{Sec:eval_48}
 Die Baseline wurde zusätzlich in einer Auflösung von $48^3$ Voxeln trainiert und mit denselben vier Samplern ausgewertet. \autoref{tab:metrics_48} zeigt die Ergebnisse.
-
+%
 \begin{table}[H]
     \centering
     \caption{Quantitative Auswertung der $48^3$-Baseline über 1024 generierte Samples je Sampler. Beste Werte je Spalte sind fett markiert.}
@@ -122,7 +123,7 @@ Die Baseline wurde zusätzlich in einer Auflösung von $48^3$ Voxeln trainiert und
         \bottomrule
     \end{tabular}
 \end{table}
-
+%
 Wie bei den $32^3$-Modellen erreicht der \ac{DDPM}-Sampler die niedrigste \ac{FID}. Der \ac{SSIM} der $48^3$-Variante mit \ac{DDPM} ($0{,}525$) liegt oberhalb des entsprechenden Werts der $32^3$-Baseline ($0{,}504$); \ac{PSNR} und \ac{LPIPS} fallen in der höheren Auflösung niedriger aus.
 
 \section{Generierungs-Pipeline}\label{Sec:eval_pipeline}
@@ -168,23 +169,24 @@ Im Folgenden werden ausgewählte Sample-Volumina dargestellt. Jede Abbildung zeig
 \end{figure}
 
 \paragraph{Vergleich der Sampler} \autoref{fig:samples_sampler_compare} zeigt dasselbe Startrauschen, also den gleichen Seed, durch die vier Sampler verarbeitet.
-
+%
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{example-image-b} % TODO: figures/samples_sampler_compare.pdf
     \caption{Identisches Startrauschen für die Baseline $32^3$, dekodiert durch \ac{DDPM} (250 Schritte), \ac{DDIM} (50), DPM-Solver++ (25) und \ac{UniPC} (10).}
     \label{fig:samples_sampler_compare}
 \end{figure}
+%
 
 \paragraph{Generierungs-Pipeline} \autoref{fig:samples_pipeline} zeigt die End-zu-End-Ausgabe der Pipeline, jeweils mit der zugehörigen generierten Tumormaske als Überlagerung.
-
+%
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\linewidth]{example-image-c} % TODO: figures/samples_pipeline_grid.pdf
     \caption{Sechs Pipeline-Ausgaben mit \ac{UniPC}: generierte Tumormaske (links), zugehöriges generiertes T1N-Volumen (Mitte) und Überlagerung beider (rechts).}
     \label{fig:samples_pipeline}
 \end{figure}
-
+%
 \paragraph{Denoising-Trajektorie} \autoref{fig:denoising_trajectory} zeigt den iterativen Übergang von reinem Rauschen zum finalen Volumen.
 
 \begin{figure}[H]
@@ -193,3 +195,51 @@ Im Folgenden werden ausgewählte Sample-Volumina dargestellt. Jede Abbildung zeig
     \caption{Denoising-Trajektorie eines Samples der Baseline $32^3$ mit \ac{DDIM}, dargestellt an acht äquidistanten Zwischenschritten von $t=T$ (links) bis $t=0$ (rechts).}
     \label{fig:denoising_trajectory}
 \end{figure}
+
+\section{Sample-Generierung}\label{Sec:eval_generation}
+Für jede Modell-Sampler-Kombination wurden 1024 Volumina generiert. Die in~\autoref{Sec:samp} eingeführten Sampler unterscheiden sich in der Anzahl der Denoising-Schritte (\ac{DDPM}: 250, \ac{DDIM}: 50, DPM-Solver++: 25, \ac{UniPC}: 10) und damit in der Generierungsdauer. \autoref{tab:generation-time} fasst die gemessene Laufzeit und den Peak-VRAM-Verbrauch der unconditional Baseline für beide Auflösungen zusammen.
+%
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \begin{tabular}{llrrrr}
+        \toprule
+        Auflösung & Sampler & Schritte & $\varnothing$ Zeit/Sample (s) & Gesamt (min) & Peak VRAM (GB) \\
+        \midrule
+        \multirow{4}{*}{$32^3$}
+            & DDPM         & 250 & 47{,}81 &  816{,}0 & 3{,}86 \\
+            & DDIM         &  50 &  9{,}28 &  158{,}3 & 3{,}89 \\
+            & DPM-Solver++ &  25 &  4{,}60 &   78{,}5 & 3{,}86 \\
+            & UniPC        &  10 &  1{,}68 &   28{,}7 & 4{,}28 \\
+        \midrule
+        \multirow{4}{*}{$48^3$}
+            & DDPM         & 250 & 151{,}45 & 2582{,}3 & 6{,}52 \\
+            & DDIM         &  50 &  29{,}98 &  511{,}6 & 4{,}26 \\
+            & DPM-Solver++ &  25 &  14{,}92 &  254{,}7 & 4{,}66 \\
+            & UniPC        &  10 &   5{,}70 &   97{,}3 & 4{,}34 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Generierungsleistung der vier Sampler für die unconditional Baseline auf einer NVIDIA GeForce GTX 1080 Ti, gemittelt über 1024 generierte Volumina je Konfiguration. Peak-VRAM laut \texttt{nvidia-smi} (Gesamtbelegung der GPU). Vollständige Werte für die übrigen Ablationsvarianten siehe Anhang.}
+    \label{tab:generation-time}
+\end{table}
+%
+Von \ac{DDPM} (250 Schritte) zu \ac{UniPC} (10 Schritte) sinkt die mittlere Generierungsdauer pro Sample bei $32^3$ um den Faktor $28{,}5$ und bei $48^3$ um den Faktor $26{,}6$. Bei einer Erhöhung der Voxel-Kantenlänge von $32$ auf $48$ verlängert sich die Generierungsdauer um den Faktor $3{,}2$ (\ac{DDPM}) bis $3{,}4$ (\ac{UniPC}). Der Peak-VRAM-Verbrauch liegt bei $32^3$ im Bereich von $3{,}86$ bis $4{,}28$\,GB und bei $48^3$ zwischen $4{,}26$ und $6{,}52$\,GB.
+%
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \begin{tabular}{lrrrrr}
+        \toprule
+        Sampler & Schritte & Klasse $\rightarrow$ Maske (s) & Maske $\rightarrow$ MRT (s) & Gesamt (s) & Peak VRAM (GB) \\
+        \midrule
+        DDPM         & 250 & 47{,}72 & 47{,}77 & 95{,}49 & 6{,}87 \\
+        DDIM         &  50 &  9{,}02 &  9{,}01 & 18{,}03 & 6{,}89 \\
+        DPM-Solver++ &  25 &  4{,}40 &  4{,}45 &  8{,}85 & 6{,}89 \\
+        UniPC        &  10 &  1{,}81 &  1{,}82 &  3{,}63 & 6{,}90 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Generierungsleistung der vier Sampler für die Generierungs-Pipeline (Klasse $\rightarrow$ Maske $\rightarrow$ MRT) in $32^3$, gemittelt über 1024 Pipeline-Durchläufe. Die Gesamtdauer setzt sich aus den Laufzeiten der beiden conditional Modelle zusammen.}
+    \label{tab:generation_time_pipeline}
+\end{table}
+%
+In \autoref{tab:generation_time_pipeline} sind die Laufzeiten der Generierungs-Pipeline aus Klasse-zu-Maske- und Maske-zu-MRT-Modell dargestellt. Die mittlere Gesamtdauer pro Pipeline-Durchlauf beträgt $95{,}49$\,s (\ac{DDPM}), $18{,}03$\,s (\ac{DDIM}), $8{,}85$\,s (DPM-Solver++) und $3{,}63$\,s (\ac{UniPC}). Der Peak-VRAM-Verbrauch der Pipeline liegt für alle vier Sampler ungefähr bei $6{,}9$\,GB.
