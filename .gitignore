@@ -49,6 +49,7 @@ build/
 *.tps
 *.tcp
 *.pyc
+final/
 
 __pycache__
 
