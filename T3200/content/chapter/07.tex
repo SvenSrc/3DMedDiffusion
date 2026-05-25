@@ -33,6 +33,8 @@ Das kubische Volumen wird mittels trilinearer Interpolation auf die Zielauflösun
 \paragraph{Normalisierung}
 Abschließend werden die Intensitätswerte je Volumen per Min-Max-Skalierung auf den Wertebereich $[-1, 1]$ abgebildet. Dies ist die gängige Konvention für Diffusionsmodelle, da der Rauschprozess auf einem standardisierten Wertebereich arbeitet.
 
+\todo{Abbildungs pipeline vom DAtenprozess?}
+
 \paragraph{Segmentierungsmasken}
 Die Tumor-Segmentierungsmasken durchlaufen eine reduzierte Variante derselben Pipeline. Die Vordergrund-Bounding-Box wird nicht aus der Maske selbst, sondern aus dem zugehörigen T1N-Volumen übernommen, damit Bild und Maske räumlich übereinander liegen. Auf die Intensitätsbegrenzung und die Normalisierung wird verzichtet, da die Maske diskrete Klassenlabels enthält. Das Resizing erfolgt entsprechend per Nearest-Neighbor-Interpolation, sodass die Labelwerte erhalten bleiben. Die vier Labelwerte des \ac{BraTS}-2023-Schemas bezeichnen Hintergrund (0), nekrotischen Tumorkern (1), peritumorales Ödem (2) und anreichernden Tumor (3).
 

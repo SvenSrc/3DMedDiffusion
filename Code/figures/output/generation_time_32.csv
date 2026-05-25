@@ -1,5 +1,0 @@
-Sampler,Schritte,Zeit/Sample (s),Gesamtzeit (min),Peak VRAM (GB)
-DDPM,250,47.81,816.0,3.86
-DDIM,50,9.28,158.3,3.89
-DPMSolverPP,25,4.6,78.5,3.86
-UniPC,10,1.68,28.7,4.28
