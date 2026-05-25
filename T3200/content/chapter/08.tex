@@ -1,215 +1,349 @@
-\chapter{Ergebnis}
+\chapter{Ergebnis}\label{Ch:results}
+Dieses Kapitel stellt die Ergebnisse der durchgeführten Experimente vor. Zunächst werden die während des Trainings aufgezeichneten Verlaufsmetriken berichtet, dann die Generierungsleistung der vier Sampler. Anschließend folgen die quantitativen Auswertungen der einzelnen Modelle und ein Vergleich der Verteilungen zwischen realen und generierten Volumina. Den Abschluss bildet eine qualitative Gegenüberstellung ausgewählter generierter Volumina. Eine Einordnung und Diskussion der Ergebnisse erfolgt in~\autoref{Ch:auswertung}.
 
-% \section{Trainingsergebnisse}
+\section{Trainingsverlauf}\label{Sec:training_verlauf}
+Insgesamt wurden acht Modelle mit 300 Epochen trainiert: fünf $32^3$-Ablationsvarianten, die $48^3$-Baseline sowie die beiden conditional Modelle für die in~\autoref{Sec:pipe} beschriebene Generierungs-Pipeline. \autoref{tab:verlauf} fasst die zentralen Verlaufsmetriken zusammen.
+%
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \begin{tabular}{lrrrrrr}
+        \toprule
+        Modell & Dauer (h) & Batch & Train-Loss & Val-Loss & Min. Val-Loss & Beste Epoche \\
+        \midrule
+        \multicolumn{7}{l}{\emph{Unconditional $32^3$}} \\
+        Baseline               &  56{,}05 & 10 & 0{,}00051 & 0{,}1092 & 0{,}0573 & 45  \\
+        Data Augmentation      &  55{,}80 & 10 & 0{,}00164 & 0{,}1039 & 0{,}0612 & 102 \\
+        Linearer Schedule      &  57{,}53 & 10 & 0{,}00052 & 0{,}0995 & 0{,}0568 & 39  \\
+        Ohne Self-Attention    &  56{,}61 & 10 & 0{,}00071 & 0{,}1102 & 0{,}0579 & 45  \\
+        Noise-Prediction       &  58{,}07 & 10 & 0{,}00118 & 0{,}0549 & 0{,}0366 & 76  \\
+        \midrule
+        \multicolumn{7}{l}{\emph{Unconditional $48^3$}} \\
+        Baseline               & 187{,}41 &  3 & 0{,}00821 & 0{,}0611 & 0{,}0445 & 276 \\
+        \midrule
+        \multicolumn{7}{l}{\emph{Conditional $32^3$}} \\
+        Maske $\rightarrow$ MRT          &  62{,}56 & 10 & 0{,}00100 & 0{,}1095 & 0{,}0631 & 54  \\
+        Klasse $\rightarrow$ Maske       &  63{,}72 & 10 & 0{,}00006 & 0{,}0211 & 0{,}0168 & 158 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Zusammenfassung des Trainingsverlaufs aller Modelle über 300 Epochen. \emph{Beste Epoche} bezeichnet die Epoche mit dem niedrigsten Validierungs-Loss.}
+    \label{tab:verlauf}
+\end{table}
+%
+\autoref{fig:loss_curves} stellt die Trainings- und Validierungsverläufe aller Modelle über 300 Epochen gegenüber. Der Train-Loss misst den mittleren v-Prediction-Fehler (bzw. $\epsilon$-Prediction bei der Noise-Prediction-Variante) auf den 1126 Trainings-Volumina pro Epoche, der Val-Loss denselben Fehler auf den 125 Validierungs-Volumina. Die Differenz beider Werte dient als Indikator für Overfitting. Die Epoche mit minimalstem Val-Loss ist Punkt mit der besten Generalisierung.
+\abschnitt
+Sechs der acht Modelle folgen demselben Verlauf: monoton fallender Train-Loss, Val-Loss-Minimum innerhalb der ersten 100 Epochen, danach leichter Wiederanstieg. Die absoluten Loss-Werte sind zwischen den Modellen nur eingeschränkt vergleichbar: Das Klasse-zu-Maske-Modell erreicht durch die geringere Werteverteilung (nur vier diskrete Klassen) binärer Masken deutlich niedrigere Werte (Min-Val-Loss 0{,}0168). Die Data-Augmentation-Variante zeigt einen leicht flacheren Anstieg des Val-Loss nach Erreichen des Minimums.
+\abschnitt
+Vereinzelte Loss-Spikes traten bei fünf der acht Modelle auf, jeweils ohne nachfolgende Destabilisierung. Das Klasse-zu-Maske-Modell wies mit dreizehn Spikes die meisten Ereignisse auf, das $48^3$-Baseline-Modell zusätzlich fünf isolierte NaN-/Inf-Werte. Der Loss-Spike am Ende des $48^3$-Baseline-Trainings entstand durch einen nicht relevanten Hardware-Crash. Der Trainingslauf wurde vom letzten gespeicherten Checkpoint (Epoche 275) fortgesetzt. Detaillierte epochenweise Verläufe sowie eine Visualisierung der Modell-Evolution über die Checkpoints sind im Anhang dargestellt (\autoref{Sec:appendix_training_log}, \autoref{Sec:appendix_training_progression}).
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{./results/loss_curves.pdf}
+    \caption{Trainings- (durchgezogen) und Validierungs-Loss (gestrichelt) über 300 Epochen für alle acht Modelle.}
+    \label{fig:loss_curves}
+\end{figure}
+%
+\todo{Sortierung ähnlich wie bei Tabelle machen}
+\todo{Legen unten nur einmalig einbinden}
+\todo{Val und Loss in Theorie noch einfügen}
 
-% Dieses Kapitel präsentiert die während des Trainings erfassten Metriken für drei Diffusionsmodelle unterschiedlicher Volumengröße und Konfiguration. Die Ergebnisse zeigen den Lernfortschritt über 300 Epochen anhand von Trainings- und Validierungsverlust.
+\section{Sample-Generierung}\label{Sec:eval_generation}
+Für jede Modell-Sampler-Kombination wurden 1024 Volumina generiert. Die in~\autoref{Sec:samp} eingeführten Sampler unterscheiden sich in der Anzahl der Denoising-Schritte (\ac{DDPM}: 250, \ac{DDIM}: 50, DPM-Solver++: 25, \ac{UniPC}: 10) und damit in der Generierungsdauer. \autoref{tab:generation-time} fasst die gemessene Laufzeit und den Peak-VRAM-Verbrauch der unconditional Baseline für beide Auflösungen zusammen. Der jeweils beste Wert pro Modell und Metrik ist fett hervorgehoben.
+%
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \begin{tabular}{llrrrr}
+        \toprule
+        Auflösung & Sampler & Schritte & $\varnothing$ Zeit/Sample (s) & Gesamt (min) & Peak VRAM (GB) \\
+        \midrule
+        \multirow{4}{*}{$32^3$}
+            & DDPM         & 250 & 47{,}81 &  816{,}0 & \textbf{3{,}86} \\
+            & DDIM         &  50 &  9{,}28 &  158{,}3 & 3{,}89 \\
+            & DPM-Solver++ &  25 &  4{,}60 &   78{,}5 & \textbf{3{,}86} \\
+            & UniPC        &  10 &  \textbf{1{,}68} &   \textbf{28{,}7} & 4{,}28 \\
+        \midrule
+        \multirow{4}{*}{$48^3$}
+            & DDPM         & 250 & 151{,}45 & 2582{,}3 & 6{,}52 \\
+            & DDIM         &  50 &  29{,}98 &  511{,}6 & \textbf{4{,}26} \\
+            & DPM-Solver++ &  25 &  14{,}92 &  254{,}7 & 4{,}66 \\
+            & UniPC        &  10 &   \textbf{5{,}70} &   \textbf{97{,}3} & 4{,}34 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Generierungsleistung der vier Sampler für die unconditional Baseline auf einer NVIDIA GeForce GTX 1080 Ti, gemittelt über 1024 generierte Volumina je Konfiguration. Peak-VRAM laut \texttt{nvidia-smi} (Gesamtbelegung der GPU). Vollständige Werte für die übrigen Ablationsvarianten siehe~\autoref{tab:appendix_generation_time_full}.}
+    \label{tab:generation-time}
+\end{table}
+%
+Von \ac{DDPM} (250 Schritte) zu \ac{UniPC} (10 Schritte) sinkt die mittlere Generierungsdauer pro Sample bei $32^3$ um den Faktor $\approx 28{,}5$ und bei $48^3$ um den Faktor $\approx 26{,}6$. Bei einer Erhöhung der Voxel-Kantenlänge von $32$ auf $48$ verlängert sich die Generierungsdauer um den Faktor $\approx 3{,}2$ (\ac{DDPM}) bis $\approx 3{,}4$ (\ac{UniPC}). Der Peak-VRAM-Verbrauch liegt bei $32^3$ im Bereich von $3{,}86$ bis $4{,}28$\,GB und bei $48^3$ zwischen $4{,}26$ und $6{,}52$\,GB.
+%
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \begin{tabular}{lrrrrr}
+        \toprule
+        Sampler & Schritte & Klasse $\rightarrow$ Maske (s) & Maske $\rightarrow$ MRT (s) & Gesamt (s) & Peak VRAM (GB) \\
+        \midrule
+        DDPM         & 250 & 47{,}72 & 47{,}77 & 95{,}49 & \textbf{6{,}87} \\
+        DDIM         &  50 &  9{,}02 &  9{,}01 & 18{,}03 & 6{,}89 \\
+        DPM-Solver++ &  25 &  4{,}40 &  4{,}45 &  8{,}85 & 6{,}89 \\
+        UniPC        &  10 &  \textbf{1{,}81} &  \textbf{1{,}82} &  \textbf{3{,}63} & 6{,}90 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Generierungsleistung der vier Sampler für die Generierungs-Pipeline (Klasse $\rightarrow$ Maske $\rightarrow$ MRT) in $32^3$, gemittelt über 1024 Pipeline-Durchläufe. Die Gesamtdauer setzt sich aus den Laufzeiten der beiden conditional Modelle zusammen.}
+    \label{tab:generation_time_pipeline}
+\end{table}
+%
+\autoref{tab:generation_time_pipeline} zeigt die Laufzeiten der Generierungs-Pipeline aus Klasse-zu-Maske- und Maske-zu-MRT-Modell. Beide Pipeline-Schritte benötigen nahezu die gleiche Zeit. Die mittlere Gesamtdauer pro Pipeline-Durchlauf beträgt $95{,}49$\,s (\ac{DDPM}), $18{,}03$\,s (\ac{DDIM}), $8{,}85$\,s (DPM-Solver++) und $3{,}63$\,s (\ac{UniPC}). Von \ac{DDPM} zu \ac{UniPC} ergibt dies einen Faktor $\approx 26{,}3$. Die Gesamtdauer liegt jeweils etwa beim Doppelten der unconditional Baseline (siehe~\autoref{tab:generation-time}). Der Peak-VRAM-Verbrauch der Pipeline liegt für alle vier Sampler bei $\approx 6{,}9$\,GB.
 
-% \subsection{Modellkonfigurationen}
+\section{Quantitative Auswertung}\label{Sec:eval_quantitative}
+Pro Konfiguration und Sampler wurden 1024 Samples generiert und gegen den realen \ac{BraTS}-2023-Datensatz mit den in~\autoref{Sec:hyper} beschriebenen Metriken ausgewertet. Die \ac{FID} wurde über alle 1251 realen Volumina als Referenzmenge berechnet. \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} wurden paarweise gegen ein zufällig zugeordnetes reales Volumen bestimmt. In allen folgenden Tabellen ist der jeweils beste Wert fett hervorgehoben.
 
-% Alle Modelle teilen eine gemeinsame Basis-Architektur und Trainingsinfrastruktur, die nachfolgend erl\"autert wird.
+\subsection{Unconditional Modelle ($32^3$)}\label{Sec:eval_uncond_32}
+\autoref{tab:metrics_uncond_32} fasst die Ergebnisse der fünf $32^3$-Modelle zusammen.
+%
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \begin{tabular}{llrrrr}
+        \toprule
+        Modell & Sampler & FID $\downarrow$ & SSIM $\uparrow$ & PSNR $\uparrow$ & LPIPS $\downarrow$ \\
+        \midrule
+        \multirow{4}{*}{Baseline}
+            & DDPM        & \textbf{24{,}77} & \textbf{0{,}504} & \textbf{17{,}98} & \textbf{0{,}035} \\
+            & DDIM        & 44{,}75 & 0{,}501 & 17{,}81 & 0{,}037 \\
+            & DPM-Solver++& 40{,}95 & 0{,}503 & 17{,}85 & 0{,}037 \\
+            & UniPC       & 43{,}93 & 0{,}503 & 17{,}85 & 0{,}037 \\
+        \midrule
+        \multirow{4}{*}{Data Augmentation}
+            & DDPM        & 37{,}91 & 0{,}463 & 16{,}41 & \textbf{0{,}036} \\
+            & DDIM        & 40{,}19 & 0{,}456 & 16{,}43 & 0{,}038 \\
+            & DPM-Solver++& 29{,}60 & 0{,}465 & 16{,}57 & 0{,}037 \\
+            & UniPC       & \textbf{27{,}90} & \textbf{0{,}469} & \textbf{16{,}65} & 0{,}037 \\
+        \midrule
+        \multirow{4}{*}{Linearer Schedule}
+            & DDPM        & \textbf{73{,}95} & \textbf{0{,}238} & \textbf{12{,}85} & \textbf{0{,}089} \\
+            & DDIM        & 130{,}62 & 0{,}144 & 10{,}91 & 0{,}144 \\
+            & DPM-Solver++& 129{,}23 & 0{,}147 & 10{,}98 & 0{,}140 \\
+            & UniPC       & 133{,}76 & 0{,}145 & 10{,}97 & 0{,}140 \\
+        \midrule
+        \multirow{4}{*}{Ohne Self-Attention}
+            & DDPM        & \textbf{30{,}77} & \textbf{0{,}516} & \textbf{18{,}08} & \textbf{0{,}035} \\
+            & DDIM        & 48{,}57 & 0{,}510 & 17{,}86 & 0{,}038 \\
+            & DPM-Solver++& 45{,}35 & 0{,}511 & 17{,}89 & 0{,}037 \\
+            & UniPC       & 50{,}70 & 0{,}509 & 17{,}89 & 0{,}038 \\
+        \midrule
+        \multirow{4}{*}{Noise-Prediction}
+            & DDPM        & \textbf{217{,}16} & \textbf{$-0{,}029$} & \textbf{3{,}82} & \textbf{0{,}507} \\
+            & DDIM        & 260{,}40 & $-0{,}059$ & 7{,}39 & 0{,}363 \\
+            & DPM-Solver++& 489{,}92 & $-0{,}023$ & 3{,}86 & 0{,}520 \\
+            & UniPC       & 497{,}78 & $-0{,}022$ & 3{,}87 & 0{,}522 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Quantitative Auswertung der fünf $32^3$-Modelle über 1024 generierte Samples je Sampler. Niedrigere Werte sind besser bei \ac{FID} und \ac{LPIPS}, höhere bei \ac{SSIM} und \ac{PSNR}. Beste Werte je Modell sind fett markiert.}
+    \label{tab:metrics_uncond_32}
+\end{table}
+%
+Über alle $32^3$-Konfigurationen weist die Baseline mit \ac{DDPM} den niedrigsten Gesamt-\ac{FID} ($24{,}77$) auf. Die niedrigsten \ac{FID}-Werte je Modell werden bei vier von fünf Varianten mit dem \ac{DDPM}-Sampler erreicht. Einzige Ausnahme ist das Data-Augmentation-Modell, bei dem \ac{UniPC} mit $27{,}90$ am besten abschneidet. Die Noise-Prediction-Variante liefert in allen vier Samplern negative \ac{SSIM}-Werte und \ac{PSNR}-Werte unter $8$\,dB.
+\abschnitt
+Die Verteilung der pro Sample berechneten Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} je Modell und Sampler ist im Anhang dargestellt (\autoref{fig:appendix_boxplot_uncond_32}).
 
-% \subsubsection*{Gemeinsame Hyperparameter und Techniken}
+\subsection{Erhöhte Auflösung ($48^3$)}\label{Sec:eval_48}
+Die Baseline wurde zusätzlich in einer Auflösung von $48^3$ Voxeln trainiert und mit denselben vier Samplern ausgewertet. \autoref{tab:metrics_48} zeigt die Ergebnisse.
+%
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lrrrr}
+        \toprule
+        Sampler & FID $\downarrow$ & SSIM $\uparrow$ & PSNR $\uparrow$ & LPIPS $\downarrow$ \\
+        \midrule
+        DDPM         & \textbf{57{,}11} & \textbf{0{,}525} & \textbf{16{,}41} & \textbf{0{,}117} \\
+        DDIM         & 65{,}42 & 0{,}465 & 15{,}69 & 0{,}147 \\
+        DPM-Solver++ & 63{,}44 & 0{,}484 & 15{,}94 & 0{,}138 \\
+        UniPC        & 65{,}97 & 0{,}483 & 16{,}02 & 0{,}142 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Quantitative Auswertung der $48^3$-Baseline über 1024 generierte Samples je Sampler. Beste Werte je Spalte sind fett markiert.}
+    \label{tab:metrics_48}
+\end{table}
+%
+Wie bei den $32^3$-Modellen erreicht der \ac{DDPM}-Sampler die niedrigste \ac{FID}. Der \ac{SSIM} der $48^3$-Variante mit \ac{DDPM} liegt mit $0{,}525$ leicht über dem Wert der $32^3$-Baseline ($0{,}504$). \ac{FID}, \ac{PSNR} und \ac{LPIPS} schneiden in der höheren Auflösung schlechter ab.
+\abschnitt
+Die Verteilung der paarweisen Metriken pro Sampler ist im Anhang dargestellt (\autoref{fig:appendix_boxplot_48}).
 
-% \begin{itemize}
-%     \item \textbf{Epochen:} 300 -- Eine Epoche bezeichnet einen vollst\"andigen Durchlauf des gesamten Trainingsdatensatzes. Nach 300 Epochen hat das Modell jeden Scan hunderte Male in verschiedenen Rauschzust\"anden gesehen.
+\subsection{Generierungs-Pipeline}\label{Sec:eval_pipeline}
+Die in~\autoref{Sec:pipe} beschriebene Pipeline aus Klasse-zu-Maske- und Maske-zu-MRT-Modell wurde ebenfalls für 1024 Durchläufe je Sampler ausgewertet. Die so erzeugten voll-synthetischen Hirnvolumina wurden zufällig mit realen T1N-Volumina gepaart und mit denselben Metriken bewertet. \autoref{tab:metrics_pipeline} fasst die Ergebnisse zusammen.
+%
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lrrrr}
+        \toprule
+        Sampler & FID $\downarrow$ & SSIM $\uparrow$ & PSNR $\uparrow$ & LPIPS $\downarrow$ \\
+        \midrule
+        DDPM         & 28{,}82 & \textbf{0{,}520} & \textbf{18{,}04} & \textbf{0{,}034} \\
+        DDIM         & 36{,}88 & 0{,}508 & 17{,}79 & 0{,}038 \\
+        DPM-Solver++ & 28{,}45 & 0{,}512 & 17{,}84 & 0{,}037 \\
+        UniPC        & \textbf{25{,}46} & 0{,}511 & 17{,}85 & 0{,}036 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Quantitative Auswertung der Generierungs-Pipeline (Klasse $\rightarrow$ Maske $\rightarrow$ MRT) in $32^3$ über 1024 generierte Samples je Sampler. Beste Werte je Spalte sind fett markiert.}
+    \label{tab:metrics_pipeline}
+\end{table}
+%
+Die niedrigste \ac{FID} der Pipeline wird mit \ac{UniPC} bei $25{,}46$ erreicht. \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} der Pipeline-Samples weichen nur ein bisschen von den Werten der unconditional Baseline in $32^3$ ab.
+\abschnitt
+Die Verteilung der paarweisen Metriken pro Sampler ist im Anhang dargestellt (\autoref{fig:appendix_boxplot_pipeline}).
 
-%     \item \textbf{Batch-Gr\"o\ss e:} Gibt an, wie viele Trainingsvolumen gleichzeitig in den Grafikkartensp eicher geladen und verarbeitet werden. Gr\"o\ss ere Batches stabilisieren den Gradienten, ben\"otigen aber mehr VRAM. Bei 32\textsuperscript{3} wurden 10 Volumen pro Schritt verarbeitet; bei 48\textsuperscript{3} musste die Batch-Gr\"o\ss e auf 3 reduziert werden, da jedes Volumen 3.4$\times$ mehr Speicher belegt ($48^3 / 32^3 \approx 3.4$).
+\section{Verteilungsanalyse}\label{Sec:eval_distribution}
+Die statistischen Eigenschaften der generierten Volumina werden über zwei Verteilungsvergleiche bewertet. Verglichen werden die Voxel-Intensitätsverteilung der generierten Volumina und die Tumorgrößenverteilung der von der Pipeline erzeugten Segmentierungsmasken. Referenz ist in beiden Fällen der vollständige \ac{BraTS}-2023-Datensatz (1251 Volumina bzw. Masken).
 
-%     \item \textbf{Lernrate (Learning Rate):} Steuert, wie stark die Gewichte nach jedem Schritt angepasst werden. Zu gro\ss e Lernraten f\"uhren zu Instabilit\"at, zu kleine zu langsamem Lernen. Es wird ein Warmup von der initialen Rate auf den Peak von $2 \times 10^{-4}$ verwendet, gefolgt von kosinus-annealing Abk\"uhlung auf 0.
+\subsection{Intensitätsverteilung}\label{Sec:eval_intensity}
+\autoref{fig:intensity_hist} zeigt die Voxel-Intensitätsverteilung pro Sampler. Jedes Subplot überlagert die reale T1N-Verteilung mit den Verteilungen der fünf $32^3$-Modelle, der $48^3$-Baseline und der Generierungs-Pipeline.
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{./results/intensity_histogram_real_vs_generated.pdf}
+    \caption{Voxel-Intensitätsverteilung pro Sampler (DDPM, DDIM, DPM-Solver++, UniPC). Reale \ac{BraTS}-T1N-Volumina als graue Fläche (1251 Volumina), generierte Verteilungen als farbige Linien (je 1024 Volumina). Y-Achse logarithmisch skaliert.}
+    \label{fig:intensity_hist}
+\end{figure}
+%
+Die reale Verteilung hat ein dominantes Maximum bei $-1$. Es entsteht durch den Hintergrund nach dem Padding. Die Hirnvoxel liegen breit verteilt zwischen $-0{,}6$ und $+0{,}4$.
+\abschnitt
+Baseline, Data Augmentation, Ohne Self-Attention und Linearer Schedule reproduzieren die globale Form der realen Verteilung. Die Noise-Prediction-Variante weicht qualitativ ab.
+%was zu den schlechten Werten in~\autoref{tab:metrics_uncond_32} passt. 
+Die $48^3$-Baseline und die Pipeline folgen ebenfalls der Grobform der realen Verteilung.
+\abschnitt
+Da der dominante Hintergrund-Peak die Unterschiede zwischen den Modellen im Bereich der Hirnvoxel überdeckt, ist eine Detailansicht je Modell und Sampler im Anhang dargestellt (\autoref{fig:appendix_intensity_detail}).
 
-%     \item \textbf{v-Prediction:} Anstatt direkt das Rauschen $\epsilon$ vorherzusagen (standard DDPM), sagt das Modell eine Kombination aus Signal und Rauschen voraus -- die sogenannte \textit{velocity} $v$. Dies f\"uhrt zu numerisch stabileren Gradienten und besserer Qualit\"at bei kleinen Rauschst\"arken.
+\subsection{Tumorgrößenverteilung}\label{Sec:eval_tumor_size}
+\autoref{fig:tumor_size} stellt die Verteilung der gesamten Tumor-Voxelanzahl der realen \ac{BraTS}-Segmentierungsmasken und den von der Generierungs-Pipeline erzeugten Masken gegenüber, getrennt nach den vier Samplern.
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{./results/tumor_size_distribution.pdf}
+    \caption{Tumorgrößenverteilung pro Sampler: reale \ac{BraTS}-Segmentierungsmasken (grau, 1251 Patienten) im Vergleich zu den von der Pipeline (je 1024 Durchläufe) erzeugten Masken. Histogramm der gesamten Tumor-Voxelanzahl pro Volumen, normiert auf Dichte.}
+    \label{fig:tumor_size}
+\end{figure}
+%
+Die reale Verteilung hat ihren häufigsten Wert bei etwa $500$ Voxeln und reicht bis über $1750$ Voxel. Die Pipeline-Verteilungen liegen im kleineren Bereich und erreichen die größeren Tumorvolumina kaum. Die mittlere Tumor-Voxelanzahl der Pipeline liegt je nach Sampler zwischen $204{,}6$ (\ac{DDPM}) und $281{,}8$ (\ac{UniPC}). Der reale Mittelwert beträgt dagegen $545{,}9$. Die maximale erzeugte Tumorgröße erreicht über alle vier Sampler nur $\approx 750$ Voxel.
+\abschnitt
+\ac{DDPM} weist einen ausgeprägten Peak bei $0$ Voxeln auf, der deutlich höher liegt als bei den drei übrigen Samplern. Der Anteil leerer Masken variiert je Sampler stark: $126$ von $1024$ ($12{,}3\,\%$) bei \ac{DDPM}, $25$ ($2{,}4\,\%$) bei \ac{DDIM}, $24$ ($2{,}3\,\%$) bei DPM-Solver++ und $22$ ($2{,}1\,\%$) bei \ac{UniPC}.
+\todo{vllt umschreiben und anpassen auf tabelle falls diese kommt gleiche gilt für unten}
+\abschnitt
+Die mittlere Voxelanzahl pro Subregion liegt für \ac{UniPC} bei NCR\,$=38{,}5$, ED\,$=169{,}6$ und ET\,$=73{,}8$ und damit um etwa Faktor 2 unter den realen Werten (NCR\,$=81{,}4$, ED\,$=341{,}9$, ET\,$=122{,}6$). Die vollständigen Werte je Sampler sind im Anhang dargestellt (\autoref{tab:appendix_tumor_subregions}).
 
-%     \item \textbf{Kosinus-Annealing Schedule (Noise Schedule):} Definiert, wie viel Rauschen bei jedem Diffusionsschritt hinzugef\"ugt wird. Ein Kosinus-Verlauf sorgt f\"ur einen glatteren \"Ubergang zwischen reinem Signal und reinem Rauschen im Vergleich zu einem linearen Schedule, was die Lernstabilit\"at verbessert.
+\todo{Macht die Aktuelle Darstellung sinn? Bezogen auf die Balken, da sie vielliecht zu dick sind und irgenwdwie 1-5 darstellen und nicht einen einzelnen WErt auf der X-AChse}
 
-%     \item \textbf{Min-SNR Weighting:} Eine Gewichtungsstrategie f\"ur den Trainingsloss. Diffusionsschritte mit sehr niedrigem oder sehr hohem Signal-Rausch-Verh\"altnis (SNR) werden weniger stark gewichtet, da sie schwieriger zu lernen sind und den Gradienten destabilisieren k\"onnen. Dies verbessert die Trainingseffizienz und Stabilit\"at.
+\todo{darstellen welche als klein, mittel und groß dargestellt werden. Verteilung???}
 
-%     \item \textbf{EMA (Exponential Moving Average):} Zus\"atzlich zu den eigentlichen Modellgewichten werden parallel gemittelte Gewichte mitgef\"uhrt: $\theta_{\text{EMA}} = \alpha \cdot \theta_{\text{EMA}} + (1-\alpha) \cdot \theta$ mit Decay $\alpha = 0.9999$. Die EMA-Gewichte reagieren tr\"ager auf kurzfristige Schwankungen und liefern daher stabilere, qualitativ bessere Generierungsergebnisse. F\"ur die Inferenz werden ausschlie\ss lich die EMA-Gewichte verwendet.
+\section{Qualitative Ergebnisse}\label{Sec:eval_qualitativ}
+Im Folgenden werden ausgewählte Sample-Volumina dargestellt. Die Auswahl der Samples erfolgte zufällig mit festem Seed, ohne nachträgliche Selektion.
 
-%     \item \textbf{Optimizer (AdamW):} Adaptiver Optimierer, der individuelle Lernraten pro Parameter berechnet und zus\"atzlich L2-Regularisierung (Weight Decay) anwendet, um \"Uberanpassung zu reduzieren.
+\subsection{Räumliche Darstellung}\label{Sec:eval_qual_spatial}
 
-%     \item \textbf{Gradient Clipping:} Wenn Gradienten w\"ahrend des Backward Pass einen Schwellwert \"uberschreiten, werden sie auf diesen begrenzt. Dies verhindert explodierende Gradienten, die das Training destabilisieren oder zum Absturz bringen k\"onnen.
-% \end{itemize}
+\subsubsection{Unconditional Baseline ($32^3$ und $48^3$)} 
+\autoref{fig:triplanar} zeigt je ein generiertes Volumen der Baseline $32^3$ und der Baseline $48^3$ in den drei anatomischen Schnittebenen (axial, koronal, sagittal) sowie als 3D-Ansicht, daneben ein reales T1N-Volumen aus \ac{BraTS}-2023 als Referenz. \autoref{fig:isosurface} stellt dieselben drei Volumen als 3D-Isofläche aus Vorder-, Seiten- und Hinteransicht dar.
+\abschnitt
+Die $48^3$-Variante zeigt klar Details. Bei der $32^3$-Variante sind diese Details aufgrund der geringeren Auflösung nicht aufgelöst. 
+%Beide Auflösungen reproduzieren die grobe Hüllgeometrie eines Hirns, erreichen aber nicht die Detailtiefe des realen Volumens.
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{./results/triplanar_views.png}
+    \caption{Triplanare Ansicht je eines generierten Volumens der Baseline $32^3$ und der Baseline $48^3$ in axialer, koronaler und sagittaler Schnittführung sowie als 3D-Ansicht. Zum Vergleich oben ein reales T1N-Volumen aus \ac{BraTS}-2023.}
+    \label{fig:triplanar}
+\end{figure}
+%
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{./results/isosurface_3d.png}
+    \caption{3D-Isoflächenrendering der Baseline $32^3$, der Baseline $48^3$ und eines realen \ac{BraTS}-Volumens aus Vorder-, Seiten- und Hinteransicht.}
+    \label{fig:isosurface}
+\end{figure}
+%
 
-% \subsubsection*{Experiment 1: 32\textsuperscript{3} Baseline}
+\subsubsection{Generierungs-Pipeline}
+\autoref{fig:triplanar_pipeline} und \autoref{fig:isosurface_pipeline} zeigen je ein Pipeline-Volumen mit zugehöriger Tumormaske als Overlay, gegenübergestellt einem realen \ac{BraTS}-Volumen mit eingezeichneter Original-Segmentierung.
+\abschnitt
+Die Pipeline generiert eine räumlich konsistente Tumormaske innerhalb des Hirnvolumens. Im 3D-Rendering ist der Tumor als roter Bereich an der Hirnoberfläche erkennbar.
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{./results/triplanar_pipeline.png}
+    \caption{Triplanare Ansicht eines Pipeline-Volumens mit Tumor-Overlay (untere Reihe), darüber ein reales \ac{BraTS}-T1N-Volumen mit Original-Segmentierung.}
+    \label{fig:triplanar_pipeline}
+\end{figure}
+%
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{./results/isosurface_pipeline.png}
+    \caption{3D-Isoflächenrendering eines Pipeline-Volumens und eines realen \ac{BraTS}-Volumens aus Vorder-, Seiten- und Hinteransicht. Tumormaske jeweils in rot hervorgehoben.}
+    \label{fig:isosurface_pipeline}
+\end{figure}
+%
 
-% \begin{itemize}
-%     \item \textbf{Volumengr\"o\ss e:} $32 \times 32 \times 32$ Voxel
-%     \item \textbf{Trainingsdauer:} 56h 2m 46s (56.05 GPU-Stunden)
-%     \item \textbf{Batch-Gr\"o\ss e:} 10
-%     \item \textbf{Trainings-/Validierungssamples:} 1126 / 125
-%     \item \textbf{Beste Epoche:} 45 (niedrigster Validierungs-Loss)
-%     \item \textbf{Besonderheit:} Referenzkonfiguration ohne Augmentierung
-% \end{itemize}
+\subsection{Vergleich der Modelle ($32^3$)}\label{Sec:eval_qual_models}
+\autoref{fig:samples_model_x_sampler} stellt die fünf Ablationsvarianten allen vier Samplern gegenüber, jeweils ein zufällig ausgewählter Sample pro Kombination.
+\abschnitt
+Die ersten vier Modelle (Baseline, Data Augmentation, Ohne Self-Attention) erzeugen über alle Sampler hinweg visuell ähnliche, hirnähnliche Volumina. Linearer Schedule erzeugt nicht anatomisch korrekte Volumina und die Noise-Prediction-Variante liefert in allen Samplern verrauschte Ausgaben.
+%Auswertung: was zu den \ac{FID}-Werten über $200$ in~\autoref{tab:metrics_uncond_32} passt.
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{./results/samples_appendix_model_x_sampler_32.png}
+    \caption{Generierte Volumen-Mittelschnitte der fünf $32^3$-Modelle (Zeilen) für die vier Sampler (Spalten). Identischer Seed pro Spalte.}
+    \label{fig:samples_model_x_sampler}
+\end{figure}
+%
 
-% \vspace{0.3cm}
-% \textbf{Trainingsmetriken:}
-% \begin{itemize}
-%     \item Initialer Trainings-Loss (Epoch 0): $0.438$
-%     \item Finaler Trainings-Loss (Epoch 299): $0.00051$
-%     \item Minimaler Trainings-Loss: $0.00046$
-%     \item Reduktion: 99.88\%
-% \end{itemize}
+\subsection{Vergleich der Auflösungen}\label{Sec:eval_qual_resolution}
+\autoref{fig:samples_resolution_compare} stellt die Baseline in beiden Auflösungen direkt gegenüber. 
+\abschnitt
+Die $48^3$-Variante zeigt erkennbare Details. Bei der $32^3$-Variante sind diese Details aufgrund der geringeren Auflösung nicht aufgelöst und schwerer erkennbar.
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{./results/samples_32_vs_48.png}
+    \caption{Vergleich der Baseline in $32^3$ (obere Reihe) und $48^3$ (untere Reihe), je sechs zufällig ausgewählte Samples mit \ac{DDPM}-Sampler.}
+    \label{fig:samples_resolution_compare}
+\end{figure}
+%
 
-% \vspace{0.3cm}
-% \textbf{Validierungsmetriken:}
-% \begin{itemize}
-%     \item Initialer Validierungs-Loss: $0.320$
-%     \item Finaler Validierungs-Loss: $0.109$
-%     \item Minimaler Validierungs-Loss: $0.0573$ (beste Performance, Epoch 45)
-%     \item Reduktion: 65.91\%
-% \end{itemize}
+\subsection{Vergleich der Sampler}\label{Sec:eval_qual_sampler}
+\autoref{fig:samples_sampler_compare} zeigt dasselbe Startrauschen also denselben Seed durch die vier Sampler verarbeitet, dargestellt am Beispiel der Baseline $48^3$. 
+\abschnitt
+Trotz unterschiedlicher Schrittzahl ($10$ bis $250$) erzeugen alle vier Sampler visuell sehr ähnliche Volumina. Form, Helligkeitsverteilung und grobe Struktur stimmen weitgehend überein. Eine direkte Gegenüberstellung mit der $32^3$-Variante findet sich im Anhang (\autoref{fig:appendix_samples_sampler_compare}).
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_48.png}
+    \caption{Identisches Startrauschen für die Baseline $48^3$, dekodiert durch \ac{DDPM} (250 Schritte), \ac{DDIM} (50), DPM-Solver++ (25) und \ac{UniPC} (10).}
+    \label{fig:samples_sampler_compare}
+\end{figure}
+%
 
-% \subsubsection*{Experiment 2: 32\textsuperscript{3} Data Augmentation}
+\subsection{Pipeline-Ausgaben}\label{Sec:eval_qual_pipeline}
+\autoref{fig:samples_pipeline} zeigt sechs End-zu-End-Ausgaben der Pipeline mit \ac{UniPC} Die Tumore variieren zwischen den Samples. 
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=1.35\linewidth]{./results/samples_pipeline_grid.png}
+    \caption{Sechs Pipeline-Ausgaben mit \ac{UniPC}: generierte Tumormaske (links), zugehöriges generiertes T1N-Volumen (Mitte) und Überlagerung beider (rechts).}
+    \label{fig:samples_pipeline}
+\end{figure}
+%
 
-% \begin{itemize}
-%     \item \textbf{Volumengr\"o\ss e:} $32 \times 32 \times 32$ Voxel
-%     \item \textbf{Trainingsdauer:} 55h 47m 51s (55.80 GPU-Stunden)
-%     \item \textbf{Batch-Gr\"o\ss e:} 10
-%     \item \textbf{Trainings-/Validierungssamples:} 1126 / 125
-%     \item \textbf{Beste Epoche:} 102 (niedrigster Validierungs-Loss)
-%     \item \textbf{Besonderheit:} On-the-fly zuf\"allige links-rechts Flip-Augmentierung (p=0.5)
-% \end{itemize}
+\subsection{Denoising-Trajektorie}\label{Sec:eval_qual_trajectory}
+\autoref{fig:denoising_trajectory_48} zeigt den Übergang von reinem Rauschen zum finalen Volumen für alle vier Sampler bei identischem Startrauschen. 
+\abschnitt
+Über alle vier Sampler hinweg dominiert das reine Rauschen bis etwa zur Mitte der Trajektorie. Anatomische Struktur tritt erst in den letzten zwei bis drei Schritten hervor. Trotz der unterschiedlichen Schrittzahl erreichen alle Sampler ein visuell sehr ähnliches Endvolumen. Die Trajektorie für die $32^3$-Variante ist im Anhang dargestellt (\autoref{fig:denoising_trajectory_32}).
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{./results/denoising_trajectory_48.png}
+    \caption{Denoising-Trajektorie der Baseline $48^3$ für die vier Sampler. Jede Zeile zeigt acht äquidistante Zwischenschritte von $t=T$ (links, reines Rauschen) bis $t=0$ (rechts, finales Volumen) bei identischem Startrauschen.}
+    \label{fig:denoising_trajectory_48}
+\end{figure}
 
-% \vspace{0.3cm}
-% \textbf{Trainingsmetriken:}
-% \begin{itemize}
-%     \item Initialer Trainings-Loss: $0.438$
-%     \item Finaler Trainings-Loss: $0.00164$
-%     \item Minimaler Trainings-Loss: $0.00156$
-%     \item Reduktion: 99.63\%
-% \end{itemize}
-
-% \vspace{0.3cm}
-% \textbf{Validierungsmetriken:}
-% \begin{itemize}
-%     \item Initialer Validierungs-Loss: $0.353$
-%     \item Finaler Validierungs-Loss: $0.104$
-%     \item Minimaler Validierungs-Loss: $0.0612$ (beste Performance, Epoch 102)
-%     \item Reduktion: 70.60\%
-% \end{itemize}
-
-% \subsubsection*{Experiment 3: 48\textsuperscript{3} Baseline}
-
-% \begin{itemize}
-%     \item \textbf{Volumengr\"o\ss e:} $48 \times 48 \times 48$ Voxel
-%     \item \textbf{Trainingsdauer:} 187h 24m 26s (187.41 GPU-Stunden)
-%     \item \textbf{Batch-Gr\"o\ss e:} 3 (reduziert aufgrund h\"oherer Speicheranforderungen)
-%     \item \textbf{Trainings-/Validierungssamples:} 1077 / 119
-%     \item \textbf{Beste Epoche:} 276 (direkt nach dem Loss-Spike bei Epoch 275)
-%     \item \textbf{Besonderheit:} H\"ohere r\"aumliche Aufl\"osung, keine Augmentierung
-% \end{itemize}
-
-% \vspace{0.3cm}
-% \textbf{Trainingsmetriken:}
-% \begin{itemize}
-%     \item Initialer Trainings-Loss: $0.344$
-%     \item Finaler Trainings-Loss: $0.0082$
-%     \item Minimaler Trainings-Loss: $0.0046$
-%     \item Reduktion: 97.62\%
-% \end{itemize}
-
-% \vspace{0.3cm}
-% \textbf{Validierungsmetriken:}
-% \begin{itemize}
-%     \item Initialer Validierungs-Loss: $0.214$
-%     \item Finaler Validierungs-Loss: $0.0611$
-%     \item Minimaler Validierungs-Loss: $0.0445$ (beste Performance, Epoch 275)
-%     \item Reduktion: 71.46\%
-% \end{itemize}
-
-% \subsection{Wichtigste Erkenntnisse}
-
-% \paragraph{1. Generalisierungsverhalten}
-% Der initiale Validierungs-Loss ist in allen Modellen deutlich niedriger als der Trainings-Loss (32\textsuperscript{3} Baseline: 0.32 vs. 0.44; 48\textsuperscript{3} Baseline: 0.21 vs. 0.34). Dies deutet darauf hin, dass die Trainings- und Validierungsverteilungen \"ahnlich sind und das Modell nicht stark \"uberanpasst. Der Trainings-Loss sinkt kontinuierlich bis nahe Null, w\"ahrend der Validierungs-Loss ein Plateau erreicht, was typisches Verhalten f\"ur gut regulierte Diffusionsmodelle ist.
-
-% \paragraph{2. Auswirkung von Datenaugmentierung}
-% Die Data-Augmentation (32\textsuperscript{3} Baseline vs. 32\textsuperscript{3} DA) zeigt folgende Effekte:
-% \begin{itemize}
-%     \item Trainings-Loss ist leicht h\"oher (0.00051 vs. 0.00164), da die augmentierten Daten mehr Variabilit\"at aufweisen
-%     \item Validierungs-Loss-Reduktion ist st\"arker (65.91\% vs. 70.60\%), was bessere Generalisierung andeutet
-%     \item Beste Epoche liegt sp\"ater (45 vs. 102), was auf langsamere, aber robustere Konvergenz hindeutet
-%     \item Das 32\textsuperscript{3} DA Modell zeigt ab Epoche 132 erste Anzeichen von \"Uberanpassung
-% \end{itemize}
-% Die Augmentierung verbessert die Robustheit des Modells durch Exposition gegen\"uber r\"aumlichen Variationen und f\"ordert das Erlernen invarianter Merkmale.
-
-% \paragraph{3. Effekt der Volumengr\"o\ss e}
-% Der Vergleich 32\textsuperscript{3} vs. 48\textsuperscript{3} zeigt:
-% \begin{itemize}
-%     \item 48\textsuperscript{3} trainiert 3.3$\times$ l\"anger (187.41 GPU-h vs. 56.05 GPU-h) aufgrund der h\"oheren r\"aumlichen Komplexit\"at
-%     \item Batch-Gr\"o\ss e musste von 10 auf 3 reduziert werden, um in den VRAM zu passen
-%     \item Initialer Loss ist niedriger (0.344 vs. 0.438 f\"ur Trainings-Loss), was auf effizientere Initialisierung hindeutet
-%     \item Finaler Validierungs-Loss ist besser (0.0445 vs. 0.0573), was zeigt, dass gr\"o\ss ere Volumen mit mehr Kontextinformation profitieren
-%     \item Die h\"ohere Aufl\"osung erm\"oglicht feinere anatomische Details in der Generierung und bessere r\"aumliche Koh\"arenz
-% \end{itemize}
-
-% \paragraph{4. Lernkurven und Konvergenz}
-% Alle Modelle zeigen generell stabile, monoton fallende Lernkurven \"uber 300 Epochen. Die exponentielle Abnahme des Trainings-Loss gegen\"uber der sublinearen Abnahme des Validierungs-Loss ist typisch f\"ur Diffusionsmodelle.
-
-% \textbf{Anomalien - Loss Spikes:}
-% \begin{itemize}
-%     \item \textbf{32\textsuperscript{3} DA, Epoch 4:} Fr\"uher Loss-Spike (Train: 0.0807, Val: 0.1883) zu Beginn des Trainings, danach stabile Konvergenz.
-%     \item \textbf{48\textsuperscript{3} Baseline, Epoch 7:} Zweiter fr\"uher Spike (Train: 0.0708, Val: 0.1939), typisch f\"ur die Eingewöhnungsphase.
-%     \item \textbf{48\textsuperscript{3} Baseline, Epoch 275:} Hauptanomalie -- Trainings-Loss springt von 0.00457 auf 0.0322 (ca. 600\% Anstieg). Paradoxerweise sinkt der Validierungs-Loss gleichzeitig auf sein globales Minimum (0.0445). Das Modell stabilisiert sich ab Epoch 276 vollst\"andig.
-% \end{itemize}
-
-% \textbf{Interpretation des Epoch-275-Ereignisses:} Der Crash ist nicht kritisch. Das Modell erholt sich vollst\"andig und erreicht danach sogar die beste Validierungsperformance (beste Epoche: 276). Dies k\"onnte ein kritischer Reorganisationspunkt sein, an dem das Modell seinen internen Repr\"asentationsraum neu strukturiert. Keine NaN/Inf-Ereignisse wurden beim 32\textsuperscript{3}-Modell registriert; beim 48\textsuperscript{3}-Modell traten 5 isolierte NaN/Inf-Ereignisse auf, die jedoch keine unkontrollierte numerische Instabilit\"at verursachten. \"Ahnliche Ph\"anomene wurden in Deep Learning beobachtet, insbesondere bei gro\ss en 3D-Modellen mit komplexem Gradientenfluss.
-
-% \subsection{Detaillierte Metriken-Analyse}
-
-% Neben den Loss-Kurven wurden weitere kritische Trainings-Metriken analysiert:
-
-% \subsubsection*{Computational Efficiency - Timing Breakdown}
-
-% Ein Trainingsschritt besteht aus drei Phasen, deren Zeitanteile gemessen wurden:
-
-% \begin{itemize}
-%     \item \textbf{Forward Pass} bezeichnet die Vorw\"artsberechnung: Das ver\"auschte Volumen wird durch alle Schichten des Netzwerks geleitet, um die vorhergesagte Velocity $v$ zu berechnen. Dies entspricht reiner Modell-Inferenz und ist verh\"altnism\"a\ss ig schnell ($\sim$1--2\% bei 32\textsuperscript{3}, $\sim$2.5\% bei 48\textsuperscript{3}).
-
-%     \item \textbf{Backward Pass} berechnet die Gradienten durch R\"uckw\"artspropagation (Backpropagation): F\"ur jeden der Millionen Modellparameter wird bestimmt, wie stark er den Loss beeinflusst. Bei 3D-Architekturen mit vielen Schichten und 3D-Faltungen ist dies rechnerisch sehr aufwendig und dominiert die Trainingszeit (32\textsuperscript{3}: $\sim$72\%, 48\textsuperscript{3}: $\sim$60\%).
-
-%     \item \textbf{Data Loading} umfasst das Lesen der NIfTI-Volumina von Disk, Normalisierung und Rausch-Sampling. Der geringe Zeitanteil ($<$1\%) zeigt, dass die Datenpipeline nicht der Flaschenhals ist -- die GPU wartet nicht auf Daten.
-% \end{itemize}
-
-% Der relativ niedrigere Backward-Pass-Anteil beim 48\textsuperscript{3}-Modell (60\% vs. 72\%) erkl\"art sich durch den proportional gr\"o\ss eren Forward Pass bei h\"oherer r\"aumlicher Aufl\"osung.
-
-% \subsubsection*{Gradient \& Stability Metrics}
-
-% Stabilit\"ats-Indikatoren zeigen die numerische Robustheit w\"ahrend des Trainings:
-
-% \begin{itemize}
-%     \item \textbf{Gradient Clipping Events:} Z\"ahlt, wie oft der Gradient in einem Trainingsschritt den definierten Schwellwert \"uberschritt und begrenzt wurde. Hohe Werte (617 bei 32\textsuperscript{3} Baseline, 888 bei 32\textsuperscript{3} DA, 442 bei 48\textsuperscript{3}) sind bei Diffusionsmodellen normal und zeigen, dass der Mechanismus aktiv arbeitet. Die h\"ohere Anzahl beim DA-Modell ist auf die gr\"o\ss ere Variabilit\"at durch die Augmentierung zur\"uckzuf\"uhren.
-
-%     \item \textbf{NaN/Inf Events:} Treten auf, wenn eine Berechnung numerisch undefiniert wird (z.\,B. Division durch Null oder Overflow). 0 Ereignisse bei den 32\textsuperscript{3}-Modellen zeigen vollst\"andige numerische Stabilit\"at. Die 5 isolierten Ereignisse beim 48\textsuperscript{3}-Modell f\"uhrten zu keiner Destabilisierung -- das Modell konnte sich selbst korrigieren.
-
-%     \item \textbf{Loss Spikes:} Pl\"otzliche sprunghafte Anstiege des Loss \"uber mehrere Standardabweichungen hinaus. 0 Spikes beim 32\textsuperscript{3} Baseline best\"atigen stabiles Training; 1 fr\"uher Spike beim 32\textsuperscript{3} DA-Modell (Epoch 4) ist in der Anfangsphase mit Augmentierung typisch; die 2 Spikes beim 48\textsuperscript{3}-Modell (Epochen 7 und 275) wurden vollst\"andig \"uberwunden.
-
-%     \item \textbf{Durchschnittliche Gradienten-Norm:} Ma\ss  f\"ur die Gesamt-Gr\"o\ss e des Gradienten \"uber alle Parameter. Ein konsistenter Wert ($\sim$0.19--0.24) \"uber das Training zeigt, dass das Modell stabil lernt und weder zu aggressiv noch zu zaghaft aktualisiert wird. Werte nahe Null am Ende ($\sim$0.019--0.025) deuten auf Konvergenz hin.
-
-%     \item \textbf{EMA Divergence:} Misst den Abstand zwischen den aktuellen Modellgewichten und den EMA-Gewichten. Ein moderater, stabiler Wert ($\sim$45--49) zeigt, dass die EMA-Gewichte dem Training folgen, ohne zu stark zu divergieren -- ein Zeichen f\"ur gesunde Lernfortschritte.
-% \end{itemize}
-
-% Das Training war insgesamt stabil mit nur isolierten, vollst\"andig \"uberwundenen Anomalien.
-
-% \subsubsection*{Ressourcennutzung}
-
-% \begin{itemize}
-%     \item \textbf{32\textsuperscript{3} Modelle:} $\sim$56 GPU-Stunden, Peak Memory $\sim$10.7 GB (91\% der GTX 1080 Ti VRAM), Batch-Gr\"o\ss e 10
-%     \item \textbf{48\textsuperscript{3} Modell:} $\sim$187 GPU-Stunden, Peak Memory $\sim$10.1 GB, Batch-Gr\"o\ss e 3 (durch VRAM-Beschr\"ankung)
-%     \item \textbf{Speicherauslastung:} Alle Modelle nutzen den verf\"ugbaren VRAM (11.7 GB) nahezu vollst\"andig aus
-% \end{itemize}
-
-% \subsection{Fazit}
-
-% Die Trainingsergebnisse demonstrieren, dass alle drei Konfigurationen erfolgreich trainieren und stabile Lernkurven aufweisen. Die 48\textsuperscript{3}-Aufl\"osung bietet sowohl bessere Validierungsmetriken als auch h\"ohere Pr\"azision f\"ur medizinische Bildgenerierung, rechtfertigt jedoch die 3.3$\times$ l\"angere Trainingsdauer und erfordert eine deutlich reduzierte Batch-Gr\"o\ss e (3 statt 10). Datenaugmentierung verbessert die Generalisierung messbar, f\"uhrt aber zu sp\"aterer Konvergenz (Epoche 102 statt 45) und ersten Anzeichen von \"Uberanpassung ab Epoche 132. Alle Loss-Spikes wurden vollst\"andig \"uberwunden, wobei der Spike bei 48\textsuperscript{3} in Epoch 275 paradoxerweise zum besten Validierungsergebnis f\"uhrte.
-
-% \subsection*{Visualisierungen}
-
-% Zwei zentrale Visualisierungen zeigen die Trainings-Performance:
-
-% \begin{enumerate}
-%     \item \textbf{Loss Curves (Abbildung 01):} Zeigt den Verlauf von Trainings- (blau, solid) und Validierungs-Loss (orange, gestrichelt) \"uber 300 Epochen f\"ur alle drei Modelle. Deutlich sichtbar sind die Loss-Spikes, insbesondere bei 48\textsuperscript{3} in Epoch 275.
-
-%     \item \textbf{Training Time (Abbildung 05):} Horizontales Balken-Diagramm der GPU-Stunden zeigt die drastisch h\"ohere Trainingszeit des 48\textsuperscript{3} Modells (187h vs. 56h f\"ur 32\textsuperscript{3}).
-% \end{enumerate}
-
-% Diese Visualisierungen dienen als direkte Referenzen f\"ur die oben beschriebenen analytischen Ergebnisse.
+%\todo{Datei \texttt{samples\_appendix\_model\_x\_sampler\_32.png} umbenennen, falls Figur im Haupttext bleibt (aktueller Name suggeriert Anhang). Alternativ: Figur in den Anhang verschieben und im Haupttext nur Verweis lassen.}

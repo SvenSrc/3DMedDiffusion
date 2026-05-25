@@ -44,6 +44,7 @@
 .bak 
 .mtc
 build/
+final/
 *.svg
 *.eps
 *.tps
