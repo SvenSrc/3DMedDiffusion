@@ -114,7 +114,7 @@ In \autoref{eq:lpips} steht $\phi_l(x)_{h,w}$ für den normalisierten Merkmalsvek
 \abschnitt
 Ein niedriger \ac{LPIPS}-Wert bedeutet hohe wahrgenommene Ähnlichkeit. Im Vergleich zu klassischen Metriken wie $\ell_2$, \ac{SSIM} oder FSIM stimmt \ac{LPIPS} deutlich stärker mit menschlichen Urteilen überein, benötigt aber wie andere \ac{FR}-Metriken ein Referenzbild~\cite[vgl.][S.~7]{zhang_unreasonable_2018}.
 
-\subsubsection{Dice Similarity Coeffecient}
+\subsubsection{Dice Similarity Coefficient}
 Der \acfi{DSC} ist eine Überlappungsmetrik aus der Bildsegmentierung. Er wurde ursprünglich 1945 von \citeauthor{dice_measures_1945} als \textit{coincidence index} für ökologische Anwendungen eingeführt~\cite[vgl.][S.~298]{dice_measures_1945}. Jedoch hat es sich später in der medizinischen Bildverarbeitung als Standardmaß zur Bewertung von Segmentierungen etabliert~\cite[vgl.][S.~2]{zou_statistical_2004}. Er misst die räumliche Überlappung zweier Segmentierungen, einer erzeugten und einer als Referenz dienenden Segmentierung. Für zwei Mengen $A$ und $B$, die die jeweiligen segmentierten Bereiche darstellen, ist er definiert als~\cite[vgl.][S.~4]{zou_statistical_2004}:
 %
 \begin{equation}
