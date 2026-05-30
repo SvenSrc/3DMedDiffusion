@@ -98,6 +98,26 @@
 % \end{longtable}
 % ###
 
+\subsection*{Symbole}
+
+\begin{longtable}{@{}p{3cm}p{11cm}@{}}
+$x_{0}$            & Originaldaten (sauberes Volumen) \\
+$x_{t}$            & Verrauschter Zustand zum Zeitschritt $t$ \\
+$x_{T}$            & Reines Gaußsches Rauschen \\
+$t,\ T$            & Aktueller Zeitschritt und Gesamtzahl der Zeitschritte \\
+$\beta_{t}$        & Noise Schedule (Varianz pro Schritt) \\
+$\alpha_{t},\ \bar{\alpha}_{t}$ & Signalanteil und dessen kumulatives Produkt \\
+$\epsilon$         & Gaußsches Rauschen, $\epsilon\sim\mathcal{N}(0,I)$ \\
+$\epsilon_{\theta}$ & Vom Netz vorhergesagtes Rauschen \\
+$\theta$           & Lernbare Modellparameter \\
+$\mathcal{N}(\mu,\sigma^{2})$ & Normalverteilung \\
+$v$                & Velocity (Vorhersageziel der v-Prediction) \\
+$w$                & Guidance-Stärke (Classifier-Free Guidance) \\
+$\gamma$           & Min-SNR-Gewichtungsparameter \\
+$z$                & Latente Variable bzw. Rauschvektor \\
+\end{longtable}
+
+
 \subsection*{Abkürzungen}
 
 % Abstand zwischen Abkürzung und Beschreibung; ggf. anpassen
@@ -105,9 +125,11 @@
 
 \begin{acronym}[]  % leere Liste nach acronym, sonst funktioniert die neu definierte textbox nicht und die Labels sind fett gegruckt.
     \itemsep=1.5pt  % Anpassung des vertikalen Abstands
+    \acro{ADNI}{Alzheimer's Disease Neuroimaging Initiative}
     \acro{ANN}{Artificial Neural Networks}
     \acro{BAPPS}{Berkeley-Adobe Perceptual Patch Similarity}
-    \acro{cGAN}{conditional Generative Adversary Network}
+    \acro{BraTS}{Brain Tumor Segmentation}
+    \acro{cGAN}{conditional Generative Adversarial Network}        
     \acro{CNN}{Convolutional Neural Network}
     \acro{CT}{Computertomographie}
     \acro{DDIM}{Diffusion Denoising Implicit Model}
@@ -115,26 +137,29 @@
     \acro{DGM}{Deep Generative Model}
     \acro{DSC}{Dice Similarity Coefficient}
     \acro{ELBO}{Evidence Lower Bound}
+    \acro{EMA}{Exponential Moving Average}
     \acro{FID}{Fréchet Inception Distance}
     \acro{FNN}{Feedforward Neural Network}
     \acro{FR}{full-reference}
-    \acro{GAN}{Generative Adversary Network}
-    \acro{HA-GAN}{Hierarchical Amortized Generative Adversary Network}
+    \acro{GAN}{Generative Adversarial Network}                
+    \acro{HA-GAN}{Hierarchical Amortized Generative Adversarial Network}
     \acro{IQMs}{Image Quality Metrics}
-    \acro{IS}{Inception score}
+    \acro{IS}{Inception Score}
+    \acro{IXI}{Information eXtraction from Images}
     \acro{KI}{Künstliche Intelligenz}
     \acro{LDM}{Latent Diffusion Model}
     \acro{LPIPS}{Learned Perceptual Image Patch Similarity}
-    \acro{LSGAN}{Last Squares Generative Adversarial Networks}
+    \acro{LSGAN}{Least Squares Generative Adversarial Networks}
     \acro{MDP}{Markov Decision Process}
     \acro{ML}{Machine Learning}
     \acro{MLP}{Multi-Layer Perceptron}
     \acro{MRT}{Magnetresonanztomographie}
-    \acro{MSE}{Mean squared Error}
+    \acro{MSE}{Mean Squared Error}
     \acro{NIfTI}{Neuroimaging Informatics Technology Initiative}
     \acro{NIH}{National Institutes of Health}
     \acro{NLP}{Natural Language Processing}
     \acro{NR}{no-reference}
+    \acro{OASIS}{Open Access Series of Imaging Studies}
     \acro{ODE}{Ordinary Differential Equation}
     \acro{PSNR}{Peak Signal-to-Noise Ratio}
     \acro{ReLU}{Rectified Linear Unit}
@@ -145,9 +170,4 @@
     \acro{VAE}{Variational Autoencoder Network}
     \acro{VQ-GAN}{Vector Quantized Generative Adversarial Network}
     \acro{WDM}{Wavelet Diffusion Model}
-    \acro{EMA}{Exponential Moving Average}
-    \acro{BraTS}{Brain Tumor Segmentation}
-    \acro{ADNI}{Alzheimer's Disease Neuroimaging Initiative}
-    \acro{IXI}{Information eXtraction from Images}
-    \acro{OASIS}{Open Access Series of Imaging Studies}
 \end{acronym}
