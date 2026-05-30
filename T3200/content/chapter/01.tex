@@ -1,13 +1,23 @@
 \chapter{Einleitung}\label{Ch:Einleitung}
-
-% In der Medizin werden mithilfe von 3D-Bildgebung bessere Diagnosen von Krankheiten und genauere Eingriffe durchgeführt. Dabei bringt die steigende Entwicklung von generativer KI neue Möglichkeiten für medizinische Bilddaten.
-
-% Diffusion Models haben sich als leistungsfähige Methode zur realistischen Bildsynthese etabliert. In der datengetriebenen Medizin besteht ein wachsender Bedarf an hochwertigen, vielfältigen und datenschutzkonformen Bilddaten, insbesondere für das Training von KI-Systemen. Dieses Projekt widmet sich der Entwicklung eines Diffusion Models zur Generierung synthetischer 3D-medizinischer Volumendaten, die für Forschungszwecke, Augmentierung und Trainingsprozesse genutzt werden können.
+Die medizinische Bildgebung ist eine der wichtigsten Grundlagen für Diagnose und Behandlung. Gleichzeitig gewinnen datengetriebene \acs{KI}-Verfahren in der Radiologie zunehmend an Bedeutung, etwa für die automatische Segmentierung von Tumoren. Solche Verfahren benötigen große Mengen an Trainingsdaten. Diese Daten sind in der Medizin jedoch knapp.
+\abschnitt
+Generative \acs{KI} bietet hier einen Lösungsansatz. Diffusionsmodelle haben sich in den letzten Jahren als leistungsfähige Methode zur realistischen Bildsynthese etabliert und erzeugen mittlerweile auch dreidimensionale medizinische Volumina. Diese Arbeit untersucht, ob sich mit einem solchen Modell synthetische 3D-Hirn-\acsp{MRT} erzeugen lassen, die den chronischen Mangel an echten Trainingsdaten lindern können.
 
 \section{Problemstellung}\label{Sec:Problemstellung}
-% Für generative KI-Modelle besteht ein wachsender Bedarf an Daten, um ein Model darauf zu trainieren. Allerdings ist die Verfügbarkeit dieser Daten eingeschränkt durch Datenschutzbestimmungen und an der Bildakquise von seltenen Krankheiten. Durch diese Limitierung besteht eine Erschwerung des Trainieren solcher Modelle. Es besteht daher ein Bedarf an synthetischen aber realistischen Bilddaten, die sowohl qualitativ und ethisch vertretbar sind.
+Für das Training von \acs{KI}-Modellen in der Medizin besteht ein wachsender Bedarf an Daten. Die Verfügbarkeit echter Patientendaten ist jedoch stark eingeschränkt. Datenschutzbestimmungen wie die DSGVO begrenzen den Zugang zu Gesundheitsdaten, die Akquise ist teuer und aufwendig. Seltene Krankheitsbilder sind von Natur aus nur selten dokumentiert. Dadurch wird das Trainieren leistungsfähiger Modelle erschwert.
+\abschnitt
+Synthetische, aber realistische Bilddaten könnten dieses Problem senken. Sie enthalten keine direkten Bezüge zu realen Personen und lassen sich in beliebiger Menge erzeugen. Voraussetzung ist, dass die erzeugten Daten qualitativ hochwertig, anatomisch plausibel und ethisch vertretbar sind.
 
 \section{Zielsetzung}\label{Sec:Zielsetzung}
-% Ziel dieser Studienarbeit ist die Entwicklung eines generativen KI-Systems, das mittels Diffusion Models realistische 3D-medizinische Bilddaten erzeugt.
+Ziel dieser Studienarbeit ist die Entwicklung eines Diffusionsmodells, das realistische synthetische 3D-medizinische Volumendaten erzeugt. Als Anwendungsfall dienen Hirn-\acsp{MRT} mit Tumoren aus dem \acs{BraTS}-2023-Datensatz. Daraus ergibt sich die leitende Forschungsfrage:
+%
+\begin{quote}
+\enquote{Lassen sich mit einem Diffusionsmodell synthetische 3D-Hirn-\acsp{MRT} erzeugen, die realistisch genug sind, um als Trainingsdaten zu dienen?}
+\end{quote}
+%
+Um diese Frage zu beantworten, wird ein unconditional Basismodell aufgebaut und schrittweise erweitert. Einzelne Komponenten werden in Ablationsstudien untersucht und mehrere Sampling-Verfahren verglichen. Hinzu wird eine conditional Pipeline entwickelt, die vollständig synthetische Volumina mit Tumor erzeugt. Die erzeugten Daten werden anschließend quantitativ und qualitativ gegen den realen Datensatz bewertet.
 
 \section{Vorgehensweise}\label{Sec:Vorgehensweise}
+Die Arbeit gliedert sich in einen theoretischen und einen praktischen Teil. Zunächst werden die Grundlagen der medizinischen Bildgebung, der künstlichen Intelligenz und der generativen Modelle eingeführt. Darauf folgt der Stand der Forschung zu \acs{GAN}-, \acs{VAE}- und diffusionsbasierten Ansätzen sowie die theoretische Beschreibung der Diffusionsmodelle.
+\abschnitt
+Im praktischen Teil werden die Implementierung, der experimentelle Aufbau und die Trainingskonfiguration beschrieben. Anschließend werden die Ergebnisse der Experimente vorgestellt und in einem eigenen Kapitel ausgewertet und diskutiert. Den Abschluss bilden ein Fazit, das die Forschungsfrage beantwortet, sowie ein Ausblick auf weiterführende Arbeiten.
