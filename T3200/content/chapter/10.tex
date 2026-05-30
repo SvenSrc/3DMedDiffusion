@@ -6,6 +6,8 @@ Ziel dieser Arbeit war es, ein Diffusionsmodell zu entwickeln, das realistische 
 \abschnitt
 Der praktische Beitrag der Arbeit besteht aus zwei Punkten. Erstens einer empirisch validierten Kombination aus $v$-Prediction, cosine-Schedule, Min-SNR-Gewichtung und \ac{EMA}, die sich über alle Experimente hinweg als robustes Standard-Setup erwiesen hat und deren Komponenten sich nicht beliebig austauschen lassen. Zweitens einer vollsynthetischen, modularen Klasse-zu-Maske-zu-MRT-Pipeline, die ohne vorgegebene Maske auskommt und dennoch das \ac{FID}-Niveau der unconditional Baseline erreicht.
 \abschnitt
+Wirtschaftlich betrachtet sparen synthetische Daten teure Annotationsarbeit, verursachen aber selbst Kosten für Training und Hardware. Ob sich das lohnt, hängt davon ab, wie gut die Daten in der Praxis nutzbar sind.
+\abschnitt
 Insgesamt zeigt die Arbeit, dass diffusionsbasierte 3D-Synthese ein realistischer Weg ist, um den Mangel an echten medizinischen Daten zu lindern. Vorausgesetzt, Verzerrungen wie die hier gezeigte Tumorgrößen-Unterschätzung werden gezielt adressiert.
 
 \section{Ausblick}\label{Sec:Ausblick}
