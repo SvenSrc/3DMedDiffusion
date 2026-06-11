@@ -64,7 +64,7 @@ Aufgrund der Markov-Eigenschaft kann die gemeinsame Wahrscheinlichkeit der gesam
 \end{equation}
 %
 Diese Faktorisierung ist für Diffusionsmodelle von zentraler Bedeutung
-%Im Vorwärtsprozess wird die Notation $q$ verwendet, um die festen (nicht trainierbaren) Übergangswahrscheinlichkeiten zu kennzeichnen, während $p_\theta$ im Rückwärtsprozess die vom neuronalen Netz parametrisierten Übergänge bezeichnet
+%Im Forward Process wird die Notation $q$ verwendet, um die festen (nicht trainierbaren) Übergangswahrscheinlichkeiten zu kennzeichnen, während $p_\theta$ im Rückwärtsprozess die vom neuronalen Netz parametrisierten Übergänge bezeichnet
 ~\cite[vgl.][S. 153 f.]{okadome_essentials_2025}~\cite[vgl.][S. 608 f.]{bishop_pattern_2006}. Die Gedächtnislosigkeit der Markov-Kette erweist sich als vorteilhaft für Diffusionsprozesse, da jeder Schritt sowohl beim Hinzufügen als auch beim Entfernen von Rauschen ausschließlich vom aktuellen Zustand abhängt.
 %Diese Eigenschaft motiviert die Modellierung des Rückwärtsprozesses ebenfalls als Markov-Kette~\cite[S. 154]{okadome_essentials_2025}.
 %%
@@ -97,31 +97,31 @@ Allerdings wurde beobachtet, dass der lineare Schedule in den späten Schritten z
 %
 wobei $s$ ein kleiner Offset-Parameter ist, der verhindert, dass $\beta_t$ in der Nähe von $t = 0$ zu klein wird. Der Cosine Schedule führt zu einem gleichmäßigeren Rauschverlauf und verbessert die Bildqualität insbesondere bei niedrigen Auflösungen.
 
-\subsection{Vorwärtsprozess}
-Die \autoref{fig:markov-diffusion} stellt den Vorwärts- und Rückwärtsprozess an einem Bild dar.
+\subsection{Forward Process}
+Die \autoref{fig:markov-diffusion} stellt den Forward und Reverse Process an einem Bild dar.
 %
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{./bilder/Diffusion-Model/Markov-Diffusion.png}
-    \caption{Darstellung der Vorwärts- und Rückwärtsprozesse}
+    \caption{Darstellung der Forward und Reverse Process}
     \label{fig:markov-diffusion}
 \end{figure}
 %
-Der Vorwärtsprozess (engl. \textit{Forward Process}) ist fest vorgegeben, wird nicht trainiert und dient als Encoder. Er fügt einem Signal $x_0$ schrittweise Gaußsches Rauschen hinzu bis am Ende reines Rauschen übrig ist. Die Übergangsverteilung für einen einzelnen Schritt ist definiert als~\cite[vgl.][S. 155 f.]{okadome_essentials_2025}:
+Der \textit{Forward Process} (de: \textit{Vorwärtsprozess}) ist fest vorgegeben, wird nicht trainiert und dient als Encoder. Er fügt einem Signal $x_0$ schrittweise Gaußsches Rauschen hinzu bis am Ende reines Rauschen übrig ist. Die Übergangsverteilung für einen einzelnen Schritt ist definiert als~\cite[vgl.][S. 155 f.]{okadome_essentials_2025}:
 %
 \begin{equation}
     q(x_t \mid x_{t-1}) = \mathcal{N}\!\left(x_t;\; \sqrt{1 - \beta_t}\, x_{t-1},\; \beta_t\, I\right)
     \label{eq:forward_step}
 \end{equation}
 %
-Hierbei wird das Signal aus dem vorherigen Schritt mit dem Faktor $\sqrt{1 - \beta_t}$ skaliert und Gaußsches Rauschen mit Varianz $\beta_t$ hinzugefügt. Wobei eben $ 0 < \beta_1 < \beta_T < 1$ gilt. Da jeder Schritt nur vom vorherigen Zustand abhängt, kann die gemeinsame Verteilung des gesamten Vorwärtsprozesses gemäß der Markov-Eigenschaft  faktorisiert werden mit~\cite[vgl.][S. 156]{okadome_essentials_2025}~\cite[vgl.][S. 2]{ho_denoising_2020}:
+Hierbei wird das Signal aus dem vorherigen Schritt mit dem Faktor $\sqrt{1 - \beta_t}$ skaliert und Gaußsches Rauschen mit Varianz $\beta_t$ hinzugefügt. Wobei eben $ 0 < \beta_1 < \beta_T < 1$ gilt. Da jeder Schritt nur vom vorherigen Zustand abhängt, kann die gemeinsame Verteilung des gesamten Forward Process gemäß der Markov-Eigenschaft  faktorisiert werden mit~\cite[vgl.][S. 156]{okadome_essentials_2025}~\cite[vgl.][S. 2]{ho_denoising_2020}:
 %
 \begin{equation}
     q(x_{1:T} \mid x_0) = \prod_{t=1}^{T} q(x_t \mid x_{t-1})
     \label{eq:forward_joint}
 \end{equation}
 %
-Dies bedeutet, dass ein Bild $x_0$ nach $T$ schritten vollständig zerstört wird und das Ergebnis $x_T$ reinem Gaußschem Rauschen $\mathcal{N}(0, I)$ entspricht. Ein Vorteil des Vorwärtsprozesses ist, dass $x_t$ nicht iterativ berechnet werden muss. Mithilfe der Definitionen $\alpha_t = 1 - \beta_t$ und $\bar{\alpha}_t = \prod_{k=1}^{t} \alpha_k$  lässt sich $x_t$ direkt aus dem Originalbild $x_0$ berechnen~\cite[vgl.][S.~156]{okadome_essentials_2025}~\cite[vgl.][S. 2]{ho_denoising_2020}~\cite[vgl.][S.~44\,f.]{lai_principles_2025}:
+Dies bedeutet, dass ein Bild $x_0$ nach $T$ schritten vollständig zerstört wird und das Ergebnis $x_T$ reinem Gaußschem Rauschen $\mathcal{N}(0, I)$ entspricht. Ein Vorteil des Forward Process ist, dass $x_t$ nicht iterativ berechnet werden muss. Mithilfe der Definitionen $\alpha_t = 1 - \beta_t$ und $\bar{\alpha}_t = \prod_{k=1}^{t} \alpha_k$  lässt sich $x_t$ direkt aus dem Originalbild $x_0$ berechnen~\cite[vgl.][S.~156]{okadome_essentials_2025}~\cite[vgl.][S. 2]{ho_denoising_2020}~\cite[vgl.][S.~44\,f.]{lai_principles_2025}:
 %
 \begin{equation}
     q(x_t \mid x_0) = \mathcal{N}\!\left(x_t;\; \sqrt{\bar{\alpha}_t}\, x_0,\; 
@@ -140,8 +140,8 @@ Daraus ergibt sich die folgende Formel~\cite[S.~156]{okadome_essentials_2025}~\c
 Dadurch kann direkt zu einem beliebigen Rauschzustand $x_t$ gesprungen werden ohne alle Zwischenschritte $x_0, x_1, \ldots, x_{t-1}$ durchlaufen zu müssen.
 Dies ermöglicht dann ein effizientes, da zufällige Zeitschritte $t$ gesampelt werden können~\cite[vgl.][S. 2 f.]{ho_denoising_2020}.
 
-\subsection{Rückwärtsprozess}
-Der Rückwärtsprozess (engl. \textit{Reverse Process}) ist das Gegenstück zum Vorwärtsprozess und dient als lernbarer Decoder. Er startet bei reinem Rauschen $x_T \sim \mathcal{N}(0, I)$ und entfernt in jedem Schritt einen Teil des Rauschens, bis ein sinnvolles Datensample $x_0$ rekonstruiert ist. Auch dieser Prozess wird als Markov-Kette dargestellt~\cite[vgl.][S. 2]{ho_denoising_2020}:
+\subsection{Reverse Process}
+Der \textit{Reverse Process} (de: \textit{Rückwärtsprozess}) ist das Gegenstück zum Forward Process und dient als lernbarer Decoder. Er startet bei reinem Rauschen $x_T \sim \mathcal{N}(0, I)$ und entfernt in jedem Schritt einen Teil des Rauschens, bis ein sinnvolles Datensample $x_0$ rekonstruiert ist. Auch dieser Prozess wird als Markov-Kette dargestellt~\cite[vgl.][S. 2]{ho_denoising_2020}:
 %
 \begin{equation}
     p_\theta(x_{0:T}) = p(x_T) \prod_{t=1}^{T} p_\theta(x_{t-1} \mid x_t)
@@ -156,14 +156,14 @@ Da die wahren Übergangswahrscheinlichkeiten $q(x_{t-1} \mid x_t)$ von der unbeka
 \end{equation}
 %
 \subsubsection{Parametrisierung des Mittelwerts}
-Anstatt den Mittelwert $\mu_\theta$ direkt zu schätzen, wird das Netzwerk darauf trainiert, das hinzugefügte Rauschen $\epsilon_\theta(x_t, t)$ vorherzusagen. Aus der \autoref{eq:reparametrization_forward} des Vorwärtsprozesses lässt sich der Mittelwert dann wie folgt berechnen~\cite[vgl.][S. 4]{ho_denoising_2020}
+Anstatt den Mittelwert $\mu_\theta$ direkt zu schätzen, wird das Netzwerk darauf trainiert, das hinzugefügte Rauschen $\epsilon_\theta(x_t, t)$ vorherzusagen. Aus der \autoref{eq:reparametrization_forward} des Forward Processes lässt sich der Mittelwert dann wie folgt berechnen~\cite[vgl.][S. 4]{ho_denoising_2020}
 %
 \begin{equation}
     \mu_\theta(x_t, t) = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}}\, \epsilon_\theta(x_t, t) \right)
     \label{eq:mu_theta}
 \end{equation}
 %
-Diese Parametrisierung ist vorteilhaft, da die Vorhersage des Rauschens stabiler zu optimieren ist als die direkte Mittelwertschätzung. Damit ergibt sich der vollständige Sampling-Schritt im Rückwärtsprozess als~\cite[vgl.][S. 4]{ho_denoising_2020}:
+Diese Parametrisierung ist vorteilhaft, da die Vorhersage des Rauschens stabiler zu optimieren ist als die direkte Mittelwertschätzung. Damit ergibt sich der vollständige Sampling-Schritt im Reverse Process als~\cite[vgl.][S. 4]{ho_denoising_2020}:
 %
 \begin{equation}
     x_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}}\, \epsilon_\theta(x_t, t) \right) + \sigma_t\, z, \qquad z \sim \mathcal{N}(0, I)
@@ -173,13 +173,13 @@ Diese Parametrisierung ist vorteilhaft, da die Vorhersage des Rauschens stabiler
 Die Varianz $\sigma_t^2$ wird üblicherweise als fester Wert gesetzt, wobei $\sigma_t^2 = \beta_t$ oder $\sigma_t^2 = \tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t} \beta_t$ verwendet wird und für $z$ entweder $z \sim \mathcal{N}(0, I)$ oder $z = 0$ gilt, wenn es für den letzten Schritt $t = 1$ gilt~\cite[vgl.][S. 4]{ho_denoising_2020}.
 
 \subsection{Sampling}
-Das Sampling beschreibt den Prozess der Datengenerierung, bei dem von reinem Rauschen $x_T \sim \mathcal{N}(0, I)$ schrittweise der Rückwärtsprozess durchlaufen wird~\cite[vgl.][S. 4]{ho_denoising_2020}. Die Wahl des Sampling-Verfahrens beeinflusst sowohl die Qualität der generierten Daten als auch die benötigte Rechenzeit.
+Das Sampling beschreibt den Prozess der Datengenerierung, bei dem von reinem Rauschen $x_T \sim \mathcal{N}(0, I)$ schrittweise der Reverse Process durchlaufen wird~\cite[vgl.][S. 4]{ho_denoising_2020}. Die Wahl des Sampling-Verfahrens beeinflusst sowohl die Qualität der generierten Daten als auch die benötigte Rechenzeit.
  
 \subsubsection{Diffusion Denoising Probabilistic Model}
-Das \ac{DDPM}-Sampling implementiert den stochastischen Rückwärtsprozess aus \autoref{eq:sampling_step} und entspricht damit der ursprünglichen Sampling-Prozedur von \citeauthor{ho_denoising_2020}. Ausgehend von reinem gaußschen Rauschen $x_T \sim \mathcal{N}(0, I)$ wird in jedem Schritt $t \to t-1$ eine kleine Menge des in $x_t$ enthaltenen Rauschens entfernt, wobei das trainierte Netzwerk $\epsilon_\theta(x_t, t)$ diese Rauschkomponente vorhersagt. Der erste Klammerausdruck aus \autoref{eq:sampling_step} entspricht dem geschätzten Mittelwert der Rückwärtsverteilung $p_\theta(x_{t-1} \mid x_t)$, während über das hinzugefügte Rauschen $\sigma_t\, z$ mit $z \sim \mathcal{N}(0, I)$ die für den Markov-Prozess charakteristische Stochastizität eingebracht wird~\cite[vgl.][S. 4]{ho_denoising_2020}. Für die Varianz kann $\sigma_t^2 = \beta_t$ gewählt werden~\cite[vgl.][S. 3]{ho_denoising_2020}. Der Prozess durchläuft alle $T$ Zeitschritte, wobei in der Praxis $T = 1000$ mit einem linearen $\beta$-Schedule von $\beta_1 = 10^{-4}$ bis $\beta_T = 0{,}02$ verwendet wird~\cite[vgl.][S. 5]{ho_denoising_2020}. Da bei jedem dieser Schritte eine vollständige Auswertung des neuronalen Netzes erforderlich ist, liefert das Verfahren zwar qualitativ hochwertige Ergebnisse, ist jedoch rechenintensiv und in der Praxis deutlich langsamer als alternative generative Modelle~\cite[vgl.][S. 3]{song_denoising_2022}.
+Das \acfi{DDPM}-Sampling implementiert den stochastischen Reverse Process aus \autoref{eq:sampling_step} und entspricht damit der ursprünglichen Sampling-Prozedur von \citeauthor{ho_denoising_2020}. Ausgehend von reinem gaußschen Rauschen $x_T \sim \mathcal{N}(0, I)$ wird in jedem Schritt $t \to t-1$ eine kleine Menge des in $x_t$ enthaltenen Rauschens entfernt, wobei das trainierte Netzwerk $\epsilon_\theta(x_t, t)$ diese Rauschkomponente vorhersagt. Der erste Klammerausdruck aus \autoref{eq:sampling_step} entspricht dem geschätzten Mittelwert der Rückwärtsverteilung $p_\theta(x_{t-1} \mid x_t)$, während über das hinzugefügte Rauschen $\sigma_t\, z$ mit $z \sim \mathcal{N}(0, I)$ die für den Markov-Prozess charakteristische Stochastizität eingebracht wird~\cite[vgl.][S. 4]{ho_denoising_2020}. Für die Varianz kann $\sigma_t^2 = \beta_t$ gewählt werden~\cite[vgl.][S. 3]{ho_denoising_2020}. Der Prozess durchläuft alle $T$ Zeitschritte, wobei in der Praxis $T = 1000$ mit einem linearen $\beta$-Schedule von $\beta_1 = 10^{-4}$ bis $\beta_T = 0{,}02$ verwendet wird~\cite[vgl.][S. 5]{ho_denoising_2020}. Da bei jedem dieser Schritte eine vollständige Auswertung des neuronalen Netzes erforderlich ist, liefert das Verfahren zwar qualitativ hochwertige Ergebnisse, ist jedoch rechenintensiv und in der Praxis deutlich langsamer als alternative generative Modelle~\cite[vgl.][S. 3]{song_denoising_2022}.
  
 \subsubsection{Diffusion Denoising Implicit Model}
-Im Gegensatz zum \ac{DDPM}-Sampling müssen beim \ac{DDIM}-Sampling nicht alle $T$ Schritte durchlaufen werden. Dies wird dadurch ermöglicht, dass der Vorwärtsprozess auch als nicht-Markov-Prozess interpretiert werden kann~\cite[vgl.][S. 3]{song_denoising_2022}. Dadurch lassen sich Teilsequenzen der Zeitschritte verwenden, und über den Parameter $\sigma_t$ kann zusätzlich der Grad der Stochastizität eingestellt werden, bis zu einem vollständig deterministischen Sampling~\cite[vgl.][S. 5]{song_denoising_2022}. Das \ac{DDIM}-Sampling wird wie folgt beschrieben\cite[vgl.][S. 5]{song_denoising_2022}:
+Im Gegensatz zum \ac{DDPM}-Sampling müssen beim \acfi{DDIM}-Sampling nicht alle $T$ Schritte durchlaufen werden. Dies wird dadurch ermöglicht, dass der Forward Process auch als nicht-Markov-Prozess interpretiert werden kann~\cite[vgl.][S. 3]{song_denoising_2022}. Dadurch lassen sich Teilsequenzen der Zeitschritte verwenden, und über den Parameter $\sigma_t$ kann zusätzlich der Grad der Stochastizität eingestellt werden, bis zu einem vollständig deterministischen Sampling~\cite[vgl.][S. 5]{song_denoising_2022}. Das \ac{DDIM}-Sampling wird wie folgt beschrieben\cite[vgl.][S. 5]{song_denoising_2022}:
 %
 \begin{equation}
     x_{t-1} = \sqrt{\bar{\alpha}_{t-1}} 
@@ -207,7 +207,7 @@ In der Praxis kommt überwiegend die Multistep-Variante zweiter Ordnung DPM-Solve
 Der erste Iterationsschritt wird durch eine Aktualisierung erster Ordnung initialisiert, die dem deterministischen \ac{DDIM}-Sampling entspricht~\cite[vgl.][S. 9]{lu_dpm-solver_2025}. Aus der Forschung erzeugt DPM-Solver++(2M) bereits in 15 bis 20 Schritten Bilder vergleichbarer Qualität wie ein \ac{DDIM}-Sampling mit mehreren hundert Schritten~\cite[vgl.][S. 11]{lu_dpm-solver_2025}.
 
 \subsubsection{Unified Predictor-Corrector}
-\ac{UniPC} ist ein trainingsfreies Sampling-Verfahren, das insbesondere bei sehr wenigen Schritten (< 10) eine bessere Sampling-Qualität als vergleichbare Verfahren erreicht~\cite[vgl.][S. 1 f.]{zhao_unipc_nodate}. Die Grundidee besteht darin, jeden Sampling-Schritt in zwei Teilschritte aufzuteilen. Zuerst erzeugt der Prädiktor (UniP) analog zum DPM-Solver++ eine erste Schätzung des nachfolgenden Zustands $\tilde{x}_{t_i}$. Anschließend verbessert der Korrektor (UniC) diese Schätzung zu einem korrigierten Wert $\tilde{x}^{c}_{t_i}$, indem die Modellauswertung am vorhergesagten Punkt als zusätzlicher Stützpunkt einbezogen wird~\cite[vgl.][S. 2]{zhao_unipc_nodate}. Dadurch erhöht sich die Genauigkeitsordnung des Verfahrens um eins~\cite[vgl.][S. 4]{zhao_unipc_nodate}. Der wesentliche Unterschied zu klassischen Predictor-Corrector-Verfahren aus der Mathematik liegt darin, dass UniC keine zusätzlichen Auswertungen des neuronalen Netzes benötigt. Die im Korrekturschritt berechnete Modellauswertung wird im darauffolgenden Sampling-Schritt wiederverwendet, sodass pro Iteration nur eine einzige Netzauswertung erforderlich ist~\cite[vgl.][S. 5]{zhao_unipc_nodate}.
+\acfi{UniPC} ist ein trainingsfreies Sampling-Verfahren, das insbesondere bei sehr wenigen Schritten (< 10) eine bessere Sampling-Qualität als vergleichbare Verfahren erreicht~\cite[vgl.][S. 1 f.]{zhao_unipc_nodate}. Die Grundidee besteht darin, jeden Sampling-Schritt in zwei Teilschritte aufzuteilen. Zuerst erzeugt der Prädiktor (UniP) analog zum DPM-Solver++ eine erste Schätzung des nachfolgenden Zustands $\tilde{x}_{t_i}$. Anschließend verbessert der Korrektor (UniC) diese Schätzung zu einem korrigierten Wert $\tilde{x}^{c}_{t_i}$, indem die Modellauswertung am vorhergesagten Punkt als zusätzlicher Stützpunkt einbezogen wird~\cite[vgl.][S. 2]{zhao_unipc_nodate}. Dadurch erhöht sich die Genauigkeitsordnung des Verfahrens um eins~\cite[vgl.][S. 4]{zhao_unipc_nodate}. Der wesentliche Unterschied zu klassischen Predictor-Corrector-Verfahren aus der Mathematik liegt darin, dass UniC keine zusätzlichen Auswertungen des neuronalen Netzes benötigt. Die im Korrekturschritt berechnete Modellauswertung wird im darauffolgenden Sampling-Schritt wiederverwendet, sodass pro Iteration nur eine einzige Netzauswertung erforderlich ist~\cite[vgl.][S. 5]{zhao_unipc_nodate}.
 \abschnitt
 Wie der DPM-Solver++ basiert \ac{UniPC} auf der Lösung der Diffusion-\ac{ODE} im log-SNR-Bereich. Mit der Schrittweite $h_i := \lambda_{t_i} - \lambda_{t_{i-1}}$ und den Differenzen $D_m$ aus zusätzlichen Modellauswertungen ergibt sich der Korrekturschritt UniC-p zu:
 %
@@ -221,12 +221,12 @@ Wie der DPM-Solver++ basiert \ac{UniPC} auf der Lösung der Diffusion-\ac{ODE} im
 Die ersten beiden Terme entsprechen einer Aktualisierung erster Ordnung, die dem deterministischen \ac{DDIM}-Sampling entspricht. Der Summenterm bringt die Korrektur höherer Ordnung ein, indem die Differenzen $D_m$ vorangegangener Modellauswertungen mit den Koeffizienten $a_m$ gewichtet kombiniert werden~\cite[vgl.][S. 3 f.]{zhao_unipc_nodate}. Der Prädiktor UniP-p ergibt sich aus \autoref{eq:unipc} durch Weglassen des Terms $D_p$, da dieser die im Prädiktorschritt noch nicht verfügbare Modellauswertung am aktuellen Zeitschritt voraussetzt. Die Kombination beider Komponenten erreicht eine Genauigkeitsordnung von $p+1$. Da Prädiktor und Korrektor derselben analytischen Form folgen, lassen sich beliebige Ordnungen einheitlich formulieren, während der DPM-Solver++ nur bis zur dritten Ordnung explizit angegeben werden kann~\cite[vgl.][S. 5]{zhao_unipc_nodate}.
 
 \section{Grundlegende Architekturen}
-Sowohl der Rückwärtsprozess als auch die vorgestellten Sampling-Verfahren basieren auf einem neuronalen Netzwerk $\epsilon_\theta(x_t, t)$, das in jedem Schritt das im verrauschten Bild $x_t$ enthaltene Rauschen schätzt. Die hierfür eingesetzten Architekturen werden in den folgenden Abschnitten vorgestellt. Den Ausgangspunkt bildet das \acs{CNN} als Grundlage faltungsbasierter Bildverarbeitung, gefolgt von der darauf aufbauenden U-Net-Architektur, die sich als Standard für Diffusionsmodelle durchgesetzt hat~\cite[vgl.][S. 2]{ignacio_revisiting_2025}.
+Sowohl der Reverse Process als auch die vorgestellten Sampling-Verfahren basieren auf einem neuronalen Netzwerk $\epsilon_\theta(x_t, t)$, das in jedem Schritt das im verrauschten Bild $x_t$ enthaltene Rauschen schätzt. Die hierfür eingesetzten Architekturen werden in den folgenden Abschnitten vorgestellt. Den Ausgangspunkt bildet das \acs{CNN} als Grundlage faltungsbasierter Bildverarbeitung, gefolgt von der darauf aufbauenden U-Net-Architektur, die sich als Standard für Diffusionsmodelle durchgesetzt hat~\cite[vgl.][S. 2]{ignacio_revisiting_2025}.
 
 \subsection{Convolutional Neural Network}
-\acfi{CNN} ist eine Klasse neuronaler Netzwerke, die speziell für die Verarbeitung von Bilddaten entwickelt wurde~\cite[vgl.][S. 1]{oshea_introduction_2015}. Dies geschieht durch sogenannte Faltungsschichten (engl. \textit{convolutional layers}), die mithilfe von Filtern lokale Muster in der Datenstruktur erkennen. Diese Merkmalsextraktion ermöglicht es dem Modell, komplexe Strukturen mit hoher Genauigkeit zu identifizieren~\cite[vgl.][S. 1170]{hoang_deep_2025}.
+\acfi{CNN} ist eine Klasse neuronaler Netzwerke, die speziell für die Verarbeitung von Bilddaten entwickelt wurde~\cite[vgl.][S. 1]{oshea_introduction_2015}. Dies geschieht durch sogenannte convolutional layers (de: \textit{Faltungsschichten}), die mithilfe von Filtern lokale Muster in der Datenstruktur erkennen. Diese Merkmalsextraktion ermöglicht es dem Modell, komplexe Strukturen mit hoher Genauigkeit zu identifizieren~\cite[vgl.][S. 1170]{hoang_deep_2025}.
 \abschnitt
-Die Faltung (engl. \textit{convolution}) ist eine mathematische Operation, bei der ein Faltungskern (engl. \textit{kernel}) schrittweise über ein Bild geschoben wird. An jeder Position wird das elementweise Produkt zwischen Kernel und dem überdeckten Bildausschnitt aufsummiert. Formal ergibt sich für ein zweidimensionales 
+Die \textit{convolution} (de: \textit{Faltung}) ist eine mathematische Operation, bei der ein kernel (de: \textit{Faltungskern}) schrittweise über ein Bild geschoben wird. An jeder Position wird das elementweise Produkt zwischen Kernel und dem überdeckten Bildausschnitt aufsummiert. Formal ergibt sich für ein zweidimensionales 
 Bild $f$ mit Kernel $k$:
 %
 \begin{equation}
@@ -244,7 +244,7 @@ ist~\cite[vgl.][S. 14]{shen_hands-computer_2026}. \autoref{fig:conv} stellt dies
     \label{fig:conv}
 \end{figure}
 %
-In~\autoref{fig:cnn} wird ein \ac{CNN} dargestellt. Die Architektur basiert auf drei Schichttypen. In der Faltungsschicht wird, wie der Name es bezeichnet, die Faltung durchgeführt und Merkmale werden extrahiert~\cite[vgl.][S. 5 f.]{oshea_introduction_2015}. Im Anschluss an die Faltungsoperationen folgt eine Aktivierungsfunktion. Diese fügt eine Nichtlinearität hinzu und reduziert das Vanishing-Gradient-Problem~\cite[vgl.][S. 1169]{hoang_deep_2025}. Als Aktivierungsfunktion wird standardmäßig die \ac{ReLU} mit $f(x) = \max(0, x)$ eingesetzt, die ein schnelleres Training als traditionelle Funktionen wie $\tanh(x)$ ermöglicht~\cite[vgl.][S. 3]{krizhevsky_imagenet_2017}.
+In~\autoref{fig:cnn} wird ein \ac{CNN} dargestellt. Die Architektur basiert auf drei Schichttypen. In der Faltungsschicht wird, wie der Name es bezeichnet, die Faltung durchgeführt und Merkmale werden extrahiert~\cite[vgl.][S. 5 f.]{oshea_introduction_2015}. Im Anschluss an die Faltungsoperationen folgt eine Aktivierungsfunktion. Diese fügt eine Nichtlinearität hinzu und reduziert das Vanishing-Gradient-Problem~\cite[vgl.][S. 1169]{hoang_deep_2025}. Als Aktivierungsfunktion wird standardmäßig die \acfi{ReLU} mit $f(x) = \max(0, x)$ eingesetzt, die ein schnelleres Training als traditionelle Funktionen wie $\tanh(x)$ ermöglicht~\cite[vgl.][S. 3]{krizhevsky_imagenet_2017}.
 \abschnitt
 Darauf folgt die \textit{Pooling-Schicht}. Diese reduziert die räumliche Auflösung, typischerweise durch Max-Pooling mit $2\times2$-Fenstern, wodurch die Aktivierungskarte auf 25\% ihrer Größe verkleinert wird. Damit werden die Anzahl der Parameter sowie die Rechenkomplexität des Modells schrittweise reduziert~\cite[vgl.][S. 8]{oshea_introduction_2015}. 
 \abschnitt
@@ -274,7 +274,7 @@ U-Net ist eine \ac{CNN}-Architektur, die ursprünglich für die biomedizinische Bi
 In~\autoref{fig:unet-Architektur} wird die Architektur dargestellt.
 Das Grundprinzip von U-Net basiert auf einer symmetrischen Encoder-Decoder-Struktur. Der Encoder, auch als \textit{Contracting Path} bezeichnet, folgt dem Prinzip eines typischen \ac{CNN}s und besteht aus wiederholten Blöcken von zwei $3\times3$-Faltungen (unpadded) mit anschließender \ac{ReLU}-Aktivierung sowie einem $2\times2$ Max-Pooling mit Schrittweite 2 zum Downsampling~\cite[vgl.][S. 4]{ronneberger_u-net_2015}. Mit jeder Downsampling-Stufe verdoppelt sich die Anzahl der Feature-Kanäle, während die räumliche Auflösung schrittweise reduziert wird~\cite[vgl.][S. 4]{ronneberger_u-net_2015}. Dieser Prozess ermöglicht es dem Netzwerk, zunehmend abstrakte semantische Merkmale zu extrahieren und hierarchische Repräsentationen zu erlernen~\cite[vgl.][S. 6]{ignacio_revisiting_2025}.
 \abschnitt
-Der Decoder, auch \textit{Expansive Path} genannt, spiegelt diese Struktur symmetrisch und besteht aus Upsampling-Schritten mittels $2\times2$-Up-Convolutions, gefolgt von zwei $3\times3$-Faltungen mit \ac{ReLU}~\cite[vgl.][S. 4]{ronneberger_u-net_2015}. Das zentrale Merkmal der U-Net-Architektur sind die sogenannten Skip Connections, dargestellt als graue Pfeile in~\autoref{fig:unet-Architektur}. Diese verbinden korrespondierende Encoder- und Decoder-Ebenen direkt miteinander, indem die Feature-Maps konkateniert werden~\cite[vgl.][S. 4]{ronneberger_u-net_2015}~\cite[vgl.][S. 9]{ignacio_revisiting_2025}. Dadurch können feinkörnige räumliche Informationen, die beim Downsampling verloren gehen, im Decoder wiederhergestellt werden. Die finale Schicht verwendet eine $1\times1$-Faltung, um die Feature-Vektoren auf die gewünschte Anzahl von Klassen abzubilden~\cite[vgl.][S. 4]{ronneberger_u-net_2015}.
+Der Decoder, auch \textit{Expansive Path} genannt, spiegelt diese Struktur symmetrisch und besteht aus Upsampling-Schritten mittels $2\times2$-Up-Convolutions, gefolgt von zwei $3\times3$-Faltungen mit \ac{ReLU}~\cite[vgl.][S. 4]{ronneberger_u-net_2015}. Das zentrale Merkmal der U-Net-Architektur sind die sogenannten \textit{Skip Connections}, dargestellt als graue Pfeile in~\autoref{fig:unet-Architektur}. Diese verbinden korrespondierende Encoder- und Decoder-Ebenen direkt miteinander, indem die Feature-Maps konkateniert werden~\cite[vgl.][S. 4]{ronneberger_u-net_2015}~\cite[vgl.][S. 9]{ignacio_revisiting_2025}. Dadurch können feinkörnige räumliche Informationen, die beim Downsampling verloren gehen, im Decoder wiederhergestellt werden. Die finale Schicht verwendet eine $1\times1$-Faltung, um die Feature-Vektoren auf die gewünschte Anzahl von Klassen abzubilden~\cite[vgl.][S. 4]{ronneberger_u-net_2015}.
 \abschnitt
 Mathematisch lässt sich ein einzelner Faltungsschritt der Ebene $l$ beschreiben als~\cite[vgl.][S. 9]{ignacio_revisiting_2025}:
 %
