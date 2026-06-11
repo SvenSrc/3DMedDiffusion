@@ -1,9 +1,43 @@
 \chapter{Anhang A}\label{Ch:AnhangA}
 Dieser Anhang enthält weiterführende Abbildungen und Tabellen zu den in~\autoref{Ch:results} berichteten Ergebnissen. Aufgenommen sind ergänzende Visualisierungen des Trainingsverlaufs, vollständige Wertetabellen sowie erweiterte Sample-Galerien und Detailansichten, deren Inhalt im Hauptteil aus Platzgründen verkürzt dargestellt wurde.
 
-%==========================================================
-% Trainings-bezogen
-%==========================================================
+\section{Vorverarbeitungs-Pipeline}\label{App:preprocessing}
+\autoref{fig:preprocessing_pipeline} visualisiert die in~\autoref{Sec:data} beschriebene Vorverarbeitung an einem Beispielvolumen.
+
+\begin{landscape}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{./results/pipeline_t1n.png}
+    \caption{Visualisierung der Vorverarbeitungs-Pipeline an einem \ac{BraTS}-Volumen in axialer, koronaler und sagittaler Schnittebene. Von links nach rechts: (1)~Originalvolumen, (2)~Perzentil-Clipping ($0{,}5$--$99{,}5\,\%$), (3)~Vordergrund-Cropping, (4)~kubisches Zero-Padding, (5)~trilineares Resizing auf $32^3$, (6)~Min-Max-Normalisierung auf $[-1,1]$.}
+    \label{fig:preprocessing_pipeline}
+\end{figure}
+\end{landscape}
+
+
+\section{Modellgrößen}\label{App:model_params}
+\autoref{tab:appendix_model_params} listet die Parameterzahl aller trainierten Modelle. Die fünf $32^3$-Ablationen und die $48^3$-Baseline teilen dieselbe 3D-U-Net-Architektur; das Modell ohne Self-Attention besitzt entsprechend weniger Parameter, die conditional Modelle durch den zusätzlichen Konditionierungs-Eingang geringfügig mehr.
+
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \begin{tabular}{llr}
+        \toprule
+        Modell & Auflösung & Parameter \\
+        \midrule
+        Baseline             & $32^3$ & 156\,012\,001 \\
+        Data Augmentation    & $32^3$ & 156\,012\,001 \\
+        Linearer Schedule    & $32^3$ & 156\,012\,001 \\
+        Noise-Prediction     & $32^3$ & 156\,012\,001 \\
+        Ohne Self-Attention  & $32^3$ & 153\,643\,489 \\
+        Maske-zu-MRT         & $32^3$ & 156\,014\,593 \\
+        Klasse-zu-Maske      & $32^3$ & 156\,013\,537 \\
+        Baseline             & $48^3$ & 156\,012\,001 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Parameterzahl der trainierten 3D-U-Net-Modelle ($\approx 156$\,M). Das Modell ohne Self-Attention hat rund $2{,}4$\,M Parameter weniger; die conditional Modelle einige Tausend mehr durch den Konditionierungs-Eingang.}
+    \label{tab:appendix_model_params}
+\end{table}
+
 
 \section{Trainingsdauer}\label{App:training_time}
 \autoref{fig:training_time} visualisiert die in~\autoref{tab:verlauf} aufgeführten Trainingsdauern aller acht Modelle als Balkendiagramm.
@@ -27,11 +61,6 @@ Während des Trainings werden zu festgelegten Epochen Checkpoints gespeichert (vg
 
 \section{Sonstige Verlaufsmetriken des Trainings}\label{Sec:appendix_training_log}
 Während des Trainings werden pro Epoche neben Trainings- und Validierungsverlust weitere Metriken protokolliert (vgl.~\autoref{Sec:hyper}). Dazu zählen die aktuelle Lernrate, die Epochendauer, der GPU-Speicherverbrauch, die Gradientennorm, die Anzahl der durch Gradient Clipping begrenzten Updates sowie pro Epoche das Auftreten von Loss-Spikes und NaN-/Inf-Werten. Die vollständigen Verlaufsdaten liegen pro Modell als JSON-Datei vor und sind dem digitalen Anhang beigefügt.
-\todo{Werte mitgeben}
-
-%==========================================================
-% Generation
-%==========================================================
 
 \section{Vollständige Generierungszeiten aller Ablationsvarianten}\label{Sec:appendix_generation_time}
 Im Hauptteil (\autoref{tab:generation-time}) werden lediglich die Generierungszeiten der Baseline berichtet. \autoref{tab:appendix_generation_time_full} listet die mittlere Generierungsdauer pro Sample für alle fünf $32^3$-Ablationsvarianten und alle vier Sampler. Die Werte liegen innerhalb jedes Samplers in einem engen Bereich, da die Modellarchitektur identisch ist und sich die Ablationen nur in Trainingskonfiguration oder Architekturdetails unterscheiden.
@@ -150,7 +179,7 @@ Im Hauptteil ist der Sampler-Vergleich nur für die Baseline $48^3$ dargestellt. 
 \end{figure}
 
 \section{Erweiterte Sample-Galerien je Sampler}\label{Sec:appendix_samples_full}
-Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Ablationsvarianten, jeweils für einen der vier Sampler. Im Hauptteil (\autoref{fig:samples_model_x_sampler}) ist pro Modell-Sampler-Kombination lediglich ein Sample dargestellt; die hier folgenden Galerien geben einen breiteren Eindruck der Generierungs-Variabilität. Aufgrund der besseren Lesbarkeit sind die Galerien im Querformat dargestellt.
+Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Ablationsvarianten, jeweils für einen der vier Sampler. Im Hauptteil (\autoref{fig:samples_model_x_sampler}) ist pro Modell-Sampler-Kombination lediglich ein Sample dargestellt; die hier folgenden Galerien geben einen breiteren Eindruck der Generierungs-Variabilität (\autoref{fig:appendix_samples_full_DDPM} bis \autoref{fig:appendix_samples_full_UniPC}).
 
 \begin{landscape}
 \begin{figure}[H]

@@ -207,11 +207,9 @@ Die statistischen Eigenschaften der generierten Volumina werden über zwei Vertei
 \end{figure}
 %
 
-\todo{Vllt. Abweichung zur Brats und den Modellen? Also wie arg die beiden Linien voneinader abweichen}
-
 Die reale Verteilung hat ein dominantes Maximum bei $-1$. Es entsteht durch den Hintergrund nach dem Padding. Die Hirnvoxel liegen breit verteilt zwischen $-0{,}6$ und $+0{,}4$.
 \abschnitt
-Baseline, Data Augmentation, Ohne Self-Attention und Linearer Schedule reproduzieren die globale Form der realen Verteilung. Die Noise-Prediction-Variante weicht qualitativ ab.
+Baseline, Data Augmentation und Ohne Self-Attention reproduzieren die globale Form der realen Verteilung. Die Noise-Prediction-Variante weicht qualitativ ab.
 %was zu den schlechten Werten in~\autoref{tab:metrics_uncond_32} passt. 
 Die $48^3$-Baseline und die Pipeline folgen ebenfalls der Grobform der realen Verteilung.
 \abschnitt
@@ -233,10 +231,6 @@ Die reale Verteilung hat ihren häufigsten Wert bei etwa $500$ Voxeln und reicht 
 \todo{vllt umschreiben und anpassen auf tabelle falls diese kommt gleiche gilt für unten}
 \abschnitt
 Die mittlere Voxelanzahl pro Subregion liegt für \ac{UniPC} bei NCR\,$=38{,}5$, ED\,$=169{,}6$ und ET\,$=73{,}8$ und damit um etwa Faktor 2 unter den realen Werten (NCR\,$=81{,}4$, ED\,$=341{,}9$, ET\,$=122{,}6$). Die vollständigen Werte je Sampler sind im Anhang dargestellt (\autoref{tab:appendix_tumor_subregions}).
-
-\todo{Macht die Aktuelle Darstellung sinn? Bezogen auf die Balken, da sie vielliecht zu dick sind und irgenwdwie 1-5 darstellen und nicht einen einzelnen WErt auf der X-AChse}
-
-\todo{darstellen welche als klein, mittel und groß dargestellt werden. Verteilung???}
 
 \section{Qualitative Ergebnisse}\label{Sec:eval_qualitativ}
 Im Folgenden werden ausgewählte Sample-Volumina dargestellt. Die Auswahl der Samples erfolgte zufällig mit festem Seed, ohne nachträgliche Selektion.
@@ -269,9 +263,6 @@ Die $48^3$-Variante zeigt klar Details. Bei der $32^3$-Variante sind diese Detai
 \autoref{fig:triplanar_pipeline} und \autoref{fig:isosurface_pipeline} zeigen je ein Pipeline-Volumen mit zugehöriger Tumormaske als Overlay, gegenübergestellt einem realen \ac{BraTS}-Volumen mit eingezeichneter Original-Segmentierung.
 \abschnitt
 Die Pipeline generiert eine räumlich konsistente Tumormaske innerhalb des Hirnvolumens. Im 3D-Rendering ist der Tumor als roter Bereich an der Hirnoberfläche erkennbar.
-
-\todo{3D Von allen Samplern. vielleicht in den Anhang}
-
 %
 \begin{figure}[H]
     \centering

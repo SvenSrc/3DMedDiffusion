@@ -97,8 +97,6 @@ Allerdings wurde beobachtet, dass der lineare Schedule in den späten Schritten z
 %
 wobei $s$ ein kleiner Offset-Parameter ist, der verhindert, dass $\beta_t$ in der Nähe von $t = 0$ zu klein wird. Der Cosine Schedule führt zu einem gleichmäßigeren Rauschverlauf und verbessert die Bildqualität insbesondere bei niedrigen Auflösungen.
 
-\todo{Vllt. Bild hinzufügen aus Nichol?}
-
 \subsection{Vorwärtsprozess}
 Die \autoref{fig:markov-diffusion} stellt den Vorwärts- und Rückwärtsprozess an einem Bild dar.
 %
@@ -237,7 +235,7 @@ Bild $f$ mit Kernel $k$:
 \end{equation}
 %
 Das Ergebnis ist eine \textit{Feature Map}, die beschreibt, wie stark ein bestimmtes Muster, wie eine Kante oder Textur an jeder Bildposition vorhanden 
-ist~\cite[vgl.][S. 14]{shen_hands-computer_2026}.
+ist~\cite[vgl.][S. 14]{shen_hands-computer_2026}. \autoref{fig:conv} stellt diese Faltungsoperations dar.
 %
 \begin{figure}[htbp]
     \centering

@@ -19,7 +19,7 @@ Die in~\autoref{tab:verlauf} berichteten Loss-Werte sind zwischen den Modellen n
 \abschnitt
 Der Loss-Spike am Ende des $48^3$-Baseline-Trainings entstand durch einen Hardware-Crash und beeinflusst die generierten Samples nicht maßgeblich.
 \abschnitt
-Bei der Data-Augmentation-Variante liegt der Train-Loss mit $0{,}00164$ ungefähr dreimal so hoch wie bei der Baseline ($0{,}00051$), während der Val-Loss leicht niedriger ausfällt. Das Modell lernt die Trainingsdaten weniger auswendig und generalisiert minimal besser. Data Augmentation wirkt damit als Regularisierer. Auf der \ac{FID}-Ebene bringt das jedoch keine Verbesserung. Der beste Wert liegt mit $27{,}90$ (\ac{UniPC}) über dem Baseline-Wert von $24{,}77$ (\ac{DDPM}).
+Bei der Data-Augmentation-Variante liegt der Train-Loss mit $0{,}00164$ ungefähr dreimal so hoch wie bei der Baseline ($0{,}00051$), während der finale Val-Loss leicht niedriger ausfällt ($0{,}1039$ gegen $0{,}1092$). Der Abstand zwischen Train- und Val-Loss ist damit kleiner. Das Modell lernt die Trainingsdaten weniger auswendig und überfittet zum Ende hin weniger. Der minimale Val-Loss liegt jedoch mit $0{,}0612$ geringfügig über dem der Baseline ($0{,}0573$), sodass sich am besten Generalisierungspunkt kein Vorteil zeigt. Data Augmentation wirkt damit als Regularisierer, bringt auf der \ac{FID}-Ebene aber keine Verbesserung (bester Wert $27{,}90$ mit \ac{UniPC} gegenüber $24{,}77$ mit \ac{DDPM}).
 
 \section{Sampler-Vergleich}\label{Sec:auswertung_sampler}
 Bei vier der fünf $32^3$-Modelle erreicht \ac{DDPM} mit 250 Schritten den niedrigsten FID. Das passt zu den Vergleichen von \citeauthor{song_denoising_2022}, bei denen DDPM mit voller Schrittzahl qualitativ besser abschneidet als mit einer geringeren Schrittzahl. Je feiner die Schritte sind, desto besser lässt sich der Rückwärtsprozess als Gauß-Verteilung modellieren~\cite[vgl.][S.~2]{ho_denoising_2020}.
@@ -102,7 +102,7 @@ Die $48^3$-Baseline trifft die Form der realen Verteilung besser als die $32^3$-
 %
 \paragraph{Einzeldatensatz} Alle Experimente wurden ausschließlich auf \ac{BraTS}~2023 durchgeführt. Eine Übertragbarkeit auf andere \ac{MRT}-Datensätze mit abweichenden Modalitäten, Scannern oder Akquisitionsprotokollen ist nicht geprüft.
 %
-\paragraph{Modellgröße} Die verwendeten $\approx 156$\,M Parameter sind vergleichsweise klein. Aktuelle Diffusionsmodelle für medizinische Volumina wie \ac{WDM}~\cite{friedrich_wdm_2025} oder Medical Diffusion~\cite{khader_medical_2023} arbeiten mit deutlich mehr Parametern in der Größe von mehrerer hundert Millionen. \todo{Parameter Größen der Modelle in den Anhang miteinbinden}
+\paragraph{Modellgröße} Die verwendeten $\approx 156$\,M (vgl.~\autoref{tab:appendix_model_params}) Parameter sind vergleichsweise klein. Aktuelle Diffusionsmodelle für medizinische Volumina wie \ac{WDM}~\cite{friedrich_wdm_2025} oder Medical Diffusion~\cite{khader_medical_2023} arbeiten mit deutlich mehr Parametern in der Größe von mehrerer hundert Millionen.
 %
 \paragraph{Kein direkter Vergleich mit \acp{GAN} oder \acp{VAE}} Eine direkte Gegenüberstellung mit anderen generativen Modellen wie \acp{GAN}~\cite{goodfellow_generative_nodate} oder \acp{VAE}~\cite{kingma_auto-encoding_2022} auf demselben Datensatz war nicht Teil dieser Arbeit. Die Aussage, dass Diffusionsmodelle in dieser Domäne \enquote{besser} seien, basiert damit auf der Literatur~\cite{dhariwal_diffusion_2021} und nicht auf eigenen Messungen.
 

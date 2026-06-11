@@ -13,7 +13,7 @@ Die Implementierung sämtlicher Modelle erfolgte in der Programmiersprache Python
 \abschnitt
 Für den Modellaufbau wurde das Deep-Learning-Framework PyTorch eingesetzt. Die Diffusionslogik einschließlich des Noise Schedulers, des Sampling-Verfahrens und der Trainingsschleife wurde auf Basis von PyTorch implementiert. Für das Laden und Speichern der medizinischen Bilddaten im NIfTI-Format wurde die Bibliothek nibabel verwendet. Die Visualisierung der Ergebnisse erfolgte mit Matplotlib. Die Implementierung basiert auf Python 3.12.3 und PyTorch 2.7.1 mit CUDA 11.8. Die Wahl der CUDA-Version ergibt sich aus der Tatsache, dass die NVIDIA GeForce GTX 1080 Ti auf der Pascal-Architektur (Compute Capability 6.1) basiert, welche von neueren CUDA-Versionen nicht mehr vollständig unterstützt wird.
 
-\section{Dataset und Datenvorverarbeitung}
+\section{Dataset und Datenvorverarbeitung}\label{Sec:data}
 Als Datengrundlage dient der öffentlich verfügbare Datensatz des \ac{BraTS} Challenge 2023~\cite{li_brain_2024}. Der Trainingsdatensatz umfasst 1251 multimodale \ac{MRT}-Untersuchungen von Patienten mit Hirntumoren. Die Aufnahmen stammen aus mehreren Kliniken. Für jeden Datensatz liegen vier \ac{MRT}-Sequenzen vor: T1-gewichtete (T1N), kontrastverstärkte T1-gewichtete (T1C), T2-gewichtete (T2W) sowie eine T2-FLAIR-Aufnahme. Dabei wurden alle Volumina bereits vorverarbeitet. Sie wurden räumlich ausgerichtet und auf das Gehirn freigestellt (skull-stripping). Zusätzlich enthält jeder Datensatz eine Tumor-Segmentierungsmaske. Für die Hausarbeit werden ausschließlich die nativen T1-gewichteten (T1N) Volumina sowie die zugehörigen Segmentierungsmasken verwendet. Die unconditional Modelle werden allein auf den T1N-Volumina trainiert, während die conditional Modelle zusätzlich auf die Segmentierungsmasken zurückgreifen.
 \abschnitt
 Vor dem Training wurden die \ac{MRT}-Volumina des \ac{BraTS}-2023-Datensatzes vorverarbeitet. Die Vorverarbeitung orientiert sich an der Datenverarbeitung von~\citeauthor{khader_medical_2023}~\cite[S.~4]{khader_medical_2023}. Es umfasst fünf Schritte, die im Folgenden beschrieben werden.
@@ -31,9 +31,7 @@ Da die Volumina nach dem Cropping unterschiedliche Dimensionen aufweisen, werden
 Das kubische Volumen wird mittels trilinearer Interpolation auf die Zielauflösung von 32\textsuperscript{3} oder 48\textsuperscript{3} Voxeln skaliert. Da das Volumen bereits kubisch ist, erfolgt die Skalierung in allen drei Raumrichtungen gleichmäßig.
 
 \paragraph{Normalisierung}
-Abschließend werden die Intensitätswerte je Volumen per Min-Max-Skalierung auf den Wertebereich $[-1, 1]$ abgebildet. Dies ist die gängige Konvention für Diffusionsmodelle, da der Rauschprozess auf einem standardisierten Wertebereich arbeitet.
-
-\todo{Abbildungs pipeline vom DAtenprozess?}
+Abschließend werden die Intensitätswerte je Volumen per Min-Max-Skalierung auf den Wertebereich $[-1, 1]$ abgebildet. Dies ist die gängige Konvention für Diffusionsmodelle, da der Rauschprozess auf einem standardisierten Wertebereich arbeitet. \autoref{fig:preprocessing_pipeline} zeigt die einzelnen Schritte an einem Beispielvolumen.
 
 \paragraph{Segmentierungsmasken}
 Die Tumor-Segmentierungsmasken durchlaufen eine reduzierte Variante derselben Pipeline. Die Vordergrund-Bounding-Box wird nicht aus der Maske selbst, sondern aus dem zugehörigen T1N-Volumen übernommen, damit Bild und Maske räumlich übereinander liegen. Auf die Intensitätsbegrenzung und die Normalisierung wird verzichtet, da die Maske diskrete Klassenlabels enthält. Das Resizing erfolgt entsprechend per Nearest-Neighbor-Interpolation, sodass die Labelwerte erhalten bleiben. Die vier Labelwerte des \ac{BraTS}-2023-Schemas bezeichnen Hintergrund (0), nekrotischen Tumorkern (1), peritumorales Ödem (2) und anreichernden Tumor (3).
@@ -97,8 +95,6 @@ Während des Trainings werden für jede Epoche verschiedene Metriken protokolliert
 \abschnitt 
 An festgelegten Epochen, bei 1 und 10 sowie anschließend alle 25 Epochen bis Epoche 300, werden Samples generiert, um die visuelle Qualität der erzeugten Volumina im Trainingsverlauf zu überprüfen. An denselben Epochen wird jeweils ein Checkpoint gespeichert; zusätzlich wird das Modell mit dem besten Validierungsverlust separat gesichert. Sämtliche Metriken werden nach jeder Epoche in der JSON-Datei aktualisiert, sodass der Trainingsverlauf auch nachträglich vollständig analysiert werden kann.
 
-\todo{Später auf Anhang referenzieren welch WErte tatsächläclich aufgenommen worden sind}
-
 \section{Conditional-Modelle}\label{Sec:cond}
 Neben dem unconditional trainierten Baseline-Modell werden zwei conditional Varianten trainiert, die der gleichen 3D-UNet-Architektur folgen, jedoch um eine Konditionierungs-Schnittstelle erweitert sind. Beide Modelle nutzen Classifier-Free Guidance, bei dem die Konditionierung während des Trainings mit einer Wahrscheinlichkeit von 15\% durch einen Null-Token ersetzt wird. Beim Sampling wird der Einfluss der Konditionierung mit einer Guidance Scale von $w = 3{,}0$ verstärkt.
 \abschnitt
@@ -123,8 +119,6 @@ Aus dem realen \ac{BraTS}-Datensatz wird ein Segmentierungs-Volumen zufällig aus
 Die platzierte Tumormaske wird auf das Intervall $[-1, 1]$ skaliert und dient als Konditionierung für das Maske-zu-MRT-Modell, welches das umliegende T1N-Gehirn-Volumen generiert. Pro Pipeline-Durchlauf werden zwei \ac{NIfTI}-Dateien gespeichert: die platzierte Tumormaske und das synthetisierte Gehirn-Volumen.
 \abschnitt
 Für jede der drei Stufen wird ein separater Seed verwendet, sodass Tumorform, räumliche Platzierung und Gehirntextur unabhängig voneinander kontrolliert werden können.
-
-\todo{Abbildung!!}
 
 \section{Sample-Generierung}\label{Sec:samp}
 Nach Abschluss des Trainings werden die Modelle zur Generierung synthetischer Volumina eingesetzt. Pro Modell und Sampler werden 1024 Samples erzeugt. Für das Sampling werden die EMA-Gewichte aus~\autoref{Sec:hyper} verwendet.
