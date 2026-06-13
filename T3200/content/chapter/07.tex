@@ -137,8 +137,6 @@ Das Vorgehen für die Pipeline-Generierung ist in~\autoref{Sec:pipe} beschrieben.
 \paragraph{Aufgezeichnete Werte während des Samplings}
 Pro Sample werden der verwendete Seed, die Generierungsdauer sowie die Voxel-Statistiken (Minimum, Maximum, Mittelwert, Standardabweichung) festgehalten. Bei den conditional Modellen wird zusätzlich die verwendete Konditionierung erfasst: die Datei der Eingangsmaske beim Maske-zu-MRT-Modell und die Größenklasse beim Klassen-zu-Maske-Modell. Für die Pipeline kommen der Referenz-Tumormittelpunkt aus dem realen Datensatz sowie der angewandte Verschiebungsvektor hinzu. Pro Generierungslauf werden außerdem die Sampler-Konfiguration und der Peak-GPU-Speicherverbrauch in einer JSON-Datei abgelegt.
 
-\todo{Werte nochmal durchlesen. Abändern in den Anhang}
-
 \section{Testdurchlauf}
 Nach der Sample-Generierung werden die in~\autoref{Sec:metrics} vorgestellten Metriken auf die erzeugten Datensätze angewendet. Die Auswertung läuft über ein eigenständiges Jupyter-Notebook, das nach der Sample-Generierung gestartet wird. Es wählt je nach gewähltem Modus die passende Paarungsstrategie und legt die Ergebnisse sowohl pro Sample als auch aggregiert als CSV-Datei ab.
 
