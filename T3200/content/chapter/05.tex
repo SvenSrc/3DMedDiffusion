@@ -46,7 +46,7 @@ Da die Erwartungswertbildung in Gleichung~\eqref{eq:vae_elbo} bezüglich $\phi$ n
 %
 wodurch der Gradient der \ac{ELBO} per Standard-Backpropagation durch das Netzwerk propagiert werden kann~\cite[vgl.][S.~4]{kingma_auto-encoding_2022}.
 
-\section{Diffusion Model}
+\section{Diffusionsmodell}
 Ein \textit{Diffusion Model}, im Deutschen meist \textit{Diffusionsmodell}, ist ein generatives Modell, das zur Klasse der latenten Variablenmodelle gehört~\cites[vgl.][S.~153]{okadome_essentials_2025}[S.~114]{feuerriegel_generative_2024}. Das grundlegende Prinzip besteht darin, einen Diffusionsprozess umzukehren, bei dem schrittweise Rauschen zu den Daten hinzugefügt wird. Durch die Umkehrung dieses Prozesses kann das Modell ausgehend von reinem Rauschen schrittweise neue Datenpunkte generieren. Dafür wird eine parametrisierte Markov-Kette mittels Variationsinferenz trainiert, deren Übergänge lernen, den Diffusionsprozess umzukehren~\cites[vgl.][S.~153]{okadome_essentials_2025}[S.~2]{ho_denoising_2020}.
 
 \subsection{Stand der Forschung}

@@ -13,6 +13,13 @@ Dieser Anhang enthält weiterführende Abbildungen und Tabellen zu den in~\autoref
 \end{figure}
 \end{landscape}
 
+\section{Digitaler Anhang}\label{App:digital}
+Der Quellcode und die trainierten Modelle dieser Arbeit sind öffentlich auf
+Hugging Face verfügbar:
+\begin{center}
+\href{https://huggingface.co/SvenSrc/DHBW-diffusion-3d}{\texttt{huggingface.co/NUTZER/REPO}}
+\end{center}
+
 
 \section{Modellgrößen}\label{App:model_params}
 \autoref{tab:appendix_model_params} listet die Parameterzahl aller trainierten Modelle. Die fünf $32^3$-Ablationen und die $48^3$-Baseline teilen dieselbe 3D-U-Net-Architektur; das Modell ohne Self-Attention besitzt entsprechend weniger Parameter, die conditional Modelle durch den zusätzlichen Konditionierungs-Eingang geringfügig mehr.
@@ -176,7 +183,7 @@ Im Hauptteil ist der Sampler-Vergleich nur für die Baseline $48^3$ dargestellt. 
 \begin{figure}[H]
     \centering
     \frame{\includegraphics[width=0.95\linewidth]{./results/denoising_trajectory_32.png}}
-    \caption[Denoising-Trajektorie der Baseline $32^3$]{Denoising-Trajektorie der Baseline $32^3$ für die vier Sampler. Jede Zeile zeigt acht äquidistante Zwischenschritte von $t=T$ (links, reines Rauschen) bis $t=0$ (rechts, finales Volumen) bei identischem Startrauschen.}
+    \caption[Denoising-Trajektorie der Baseline $32^3$]{Denoising-Trajektorie der Baseline $32^3$ für die vier Sampler. Jede Zeile zeigt acht  Zwischenschritte von $t=T$ (links, reines Rauschen) bis $t=0$ (rechts, finales Volumen) bei identischem Startrauschen.}
     \label{fig:denoising_trajectory_32}
 \end{figure}
 \end{landscape}
