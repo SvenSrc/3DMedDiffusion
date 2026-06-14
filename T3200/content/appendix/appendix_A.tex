@@ -1,17 +1,58 @@
 \chapter{Anhang A}\label{Ch:AnhangA}
 Dieser Anhang enthält weiterführende Abbildungen und Tabellen zu den in~\autoref{Ch:results} berichteten Ergebnissen. Aufgenommen sind ergänzende Visualisierungen des Trainingsverlaufs, vollständige Wertetabellen sowie erweiterte Sample-Galerien und Detailansichten, deren Inhalt im Hauptteil aus Platzgründen verkürzt dargestellt wurde.
 
-%==========================================================
-% Trainings-bezogen
-%==========================================================
+\section{Vorverarbeitungs-Pipeline}\label{App:preprocessing}
+\autoref{fig:preprocessing_pipeline} visualisiert die in~\autoref{Sec:data} beschriebene Vorverarbeitung an einem Beispielvolumen.
+
+\begin{landscape}
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{./results/pipeline_t1n.png}}
+    \caption[Vorverarbeitungs-Pipeline]{Visualisierung der Vorverarbeitungs-Pipeline an einem \ac{BraTS}-Volumen in axialer, koronaler und sagittaler Schnittebene. Von links nach rechts: (1)~Originalvolumen, (2)~Perzentil-Clipping ($0{,}5$--$99{,}5\,\%$), (3)~Vordergrund-Cropping, (4)~kubisches Zero-Padding, (5)~trilineares Resizing auf $32^3$, (6)~Min-Max-Normalisierung auf $[-1,1]$.}
+    \label{fig:preprocessing_pipeline}
+\end{figure}
+\end{landscape}
+
+\section{Digitaler Anhang}\label{App:digital}
+Der Quellcode und die trainierten Modelle dieser Arbeit sind öffentlich auf
+Hugging Face verfügbar:
+\begin{center}
+\href{https://huggingface.co/SvenSrc/DHBW-diffusion-3d}{\texttt{huggingface.co/NUTZER/REPO}}
+\end{center}
+
+
+\section{Modellgrößen}\label{App:model_params}
+\autoref{tab:appendix_model_params} listet die Parameterzahl aller trainierten Modelle. Die fünf $32^3$-Ablationen und die $48^3$-Baseline teilen dieselbe 3D-U-Net-Architektur; das Modell ohne Self-Attention besitzt entsprechend weniger Parameter, die conditional Modelle durch den zusätzlichen Konditionierungs-Eingang geringfügig mehr.
+
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \begin{tabular}{llr}
+        \toprule
+        Modell & Auflösung & Parameter \\
+        \midrule
+        Baseline             & $32^3$ & 156\,012\,001 \\
+        Data Augmentation    & $32^3$ & 156\,012\,001 \\
+        Linearer Schedule    & $32^3$ & 156\,012\,001 \\
+        Noise-Prediction     & $32^3$ & 156\,012\,001 \\
+        Ohne Self-Attention  & $32^3$ & 153\,643\,489 \\
+        Maske-zu-MRT         & $32^3$ & 156\,014\,593 \\
+        Klasse-zu-Maske      & $32^3$ & 156\,013\,537 \\
+        Baseline             & $48^3$ & 156\,012\,001 \\
+        \bottomrule
+    \end{tabular}
+    \caption[Parameterzahl der Modelle]{Parameterzahl der trainierten 3D-U-Net-Modelle ($\approx 156$\,M). Das Modell ohne Self-Attention hat rund $2{,}4$\,M Parameter weniger; die conditional Modelle einige Tausend mehr durch den Konditionierungs-Eingang.}
+    \label{tab:appendix_model_params}
+\end{table}
+
 
 \section{Trainingsdauer}\label{App:training_time}
 \autoref{fig:training_time} visualisiert die in~\autoref{tab:verlauf} aufgeführten Trainingsdauern aller acht Modelle als Balkendiagramm.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{./results/training_time.pdf}
-    \caption{Trainingsdauer der acht Modelle in GPU-Stunden auf einer NVIDIA GeForce GTX 1080 Ti.}
+    \frame{\includegraphics[width=0.7\linewidth]{./results/training_time.pdf}}
+    \caption[Trainingsdauer der Modelle]{Trainingsdauer der acht Modelle in GPU-Stunden auf einer NVIDIA GeForce GTX 1080 Ti.}
     \label{fig:training_time}
 \end{figure}
 
@@ -20,18 +61,13 @@ Während des Trainings werden zu festgelegten Epochen Checkpoints gespeichert (vg
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/training_progression.png}
-    \caption{Trainings-Evolution der Baseline $32^3$: Ein einzelner Sample mit identischem Seed, generiert nach 1, 10, 25, 50, 100, 150, 200, 250 und 300 Trainings-Epochen.}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/training_progression.png}}
+    \caption[Trainings-Evolution der Baseline $32^3$]{Trainings-Evolution der Baseline $32^3$: Ein einzelner Sample mit identischem Seed, generiert nach 1, 10, 25, 50, 100, 150, 200, 250 und 300 Trainings-Epochen.}
     \label{fig:appendix_training_progression}
 \end{figure}
 
 \section{Sonstige Verlaufsmetriken des Trainings}\label{Sec:appendix_training_log}
 Während des Trainings werden pro Epoche neben Trainings- und Validierungsverlust weitere Metriken protokolliert (vgl.~\autoref{Sec:hyper}). Dazu zählen die aktuelle Lernrate, die Epochendauer, der GPU-Speicherverbrauch, die Gradientennorm, die Anzahl der durch Gradient Clipping begrenzten Updates sowie pro Epoche das Auftreten von Loss-Spikes und NaN-/Inf-Werten. Die vollständigen Verlaufsdaten liegen pro Modell als JSON-Datei vor und sind dem digitalen Anhang beigefügt.
-\todo{Werte mitgeben}
-
-%==========================================================
-% Generation
-%==========================================================
 
 \section{Vollständige Generierungszeiten aller Ablationsvarianten}\label{Sec:appendix_generation_time}
 Im Hauptteil (\autoref{tab:generation-time}) werden lediglich die Generierungszeiten der Baseline berichtet. \autoref{tab:appendix_generation_time_full} listet die mittlere Generierungsdauer pro Sample für alle fünf $32^3$-Ablationsvarianten und alle vier Sampler. Die Werte liegen innerhalb jedes Samplers in einem engen Bereich, da die Modellarchitektur identisch ist und sich die Ablationen nur in Trainingskonfiguration oder Architekturdetails unterscheiden.
@@ -50,7 +86,7 @@ Im Hauptteil (\autoref{tab:generation-time}) werden lediglich die Generierungsze
         Noise-Prediction     & 47{,}41 & 9{,}43 & 4{,}76 & 1{,}92 \\
         \bottomrule
     \end{tabular}
-    \caption{Mittlere Generierungsdauer pro Sample in Sekunden für alle fünf $32^3$-Ablationsvarianten und alle vier Sampler, gemittelt über 1024 Samples je Konfiguration (Noise-Prediction $\times$ \ac{DDPM}: 1006 Samples).}
+    \caption[Generierungsdauer aller Ablationsvarianten]{Mittlere Generierungsdauer pro Sample in Sekunden für alle fünf $32^3$-Ablationsvarianten und alle vier Sampler, gemittelt über 1024 Samples je Konfiguration (Noise-Prediction $\times$ \ac{DDPM}: 1006 Samples).}
     \label{tab:appendix_generation_time_full}
 \end{table}
 
@@ -58,29 +94,29 @@ Im Hauptteil (\autoref{tab:generation-time}) werden lediglich die Generierungsze
 % Quantitative Metriken
 %==========================================================
 
-\section{Quantitative Metriken --- Verteilung}\label{App:boxplots}
+\section{Quantitative Metriken - Verteilung}\label{App:boxplots}
 Die folgenden Boxplots zeigen die Verteilung der paarweisen Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} über die jeweils 1024 generierten Samples.
 
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{./results/boxplot_quantitative_32_grid.pdf}
-    \caption{Verteilung der paarweisen Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} pro $32^3$-Modell und Sampler. Die Noise-Prediction-Spalte hat aufgrund extremer Werte eine eigene Y-Achsen-Skala.}
+    \frame{\includegraphics[width=\linewidth]{./results/boxplot_quantitative_32_grid.pdf}}
+    \caption[Metrikverteilung der $32^3$-Modelle]{Verteilung der paarweisen Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} pro $32^3$-Modell und Sampler. Die Noise-Prediction-Spalte hat aufgrund extremer Werte eine eigene Y-Achsen-Skala.}
     \label{fig:appendix_boxplot_uncond_32}
 \end{figure}
 \end{landscape}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{./results/boxplot_quantitative_48.pdf}
-    \caption{Verteilung der paarweisen Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} über 1024 Samples der $48^3$-Baseline, getrennt nach Sampler.}
+    \frame{\includegraphics[width=\linewidth]{./results/boxplot_quantitative_48.pdf}}
+    \caption[Metrikverteilung der $48^3$-Baseline]{Verteilung der paarweisen Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} über 1024 Samples der $48^3$-Baseline, getrennt nach Sampler.}
     \label{fig:appendix_boxplot_48}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{./results/boxplot_quantitative_pipeline.pdf}
-    \caption{Verteilung der paarweisen Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} über 1024 Pipeline-Durchläufe in $32^3$, getrennt nach Sampler.}
+    \frame{\includegraphics[width=\linewidth]{./results/boxplot_quantitative_pipeline.pdf}}
+    \caption[Metrikverteilung der Pipeline]{Verteilung der paarweisen Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} über 1024 Pipeline-Durchläufe in $32^3$, getrennt nach Sampler.}
     \label{fig:appendix_boxplot_pipeline}
 \end{figure}
 
@@ -88,19 +124,19 @@ Die folgenden Boxplots zeigen die Verteilung der paarweisen Metriken \ac{SSIM}, 
 % Verteilungsanalyse
 %==========================================================
 
-\section{Voxel-Intensitätsverteilung --- Detailansicht}\label{App:intensity_detail}
+\section{Voxel-Intensitätsverteilung - Detailansicht}\label{App:intensity_detail}
 Die Übersichtsdarstellung der Intensitätsverteilung in~\autoref{fig:intensity_hist} wird durch~\autoref{fig:appendix_intensity_detail} pro Modell-Sampler-Kombination aufgeschlüsselt. Dadurch werden die Abweichungen zwischen den einzelnen Konfigurationen und der realen Verteilung sichtbar, die in der Übersichtsdarstellung durch die Überlagerung mehrerer Linien schwer voneinander zu trennen sind. Die Darstellung erfolgt im Querformat, um alle Konfigurationen nebeneinander auflösen zu können.
 
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{./results/intensity_histogram_detail.pdf}
-    \caption{Voxel-Intensitätsverteilung pro Sampler (Zeilen) und Konfiguration (Spalten) im Vergleich zur realen \ac{BraTS}-Verteilung (graue Fläche).}
+    \frame{\includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{./results/intensity_histogram_detail.pdf}}
+    \caption[Intensitätsverteilung je Modell und Sampler]{Voxel-Intensitätsverteilung pro Sampler (Zeilen) und Konfiguration (Spalten) im Vergleich zur realen \ac{BraTS}-Verteilung (graue Fläche).}
     \label{fig:appendix_intensity_detail}
 \end{figure}
 \end{landscape}
 
-\section{Tumorgrößenverteilung --- Subregionen}\label{App:tumor_subregions}
+\section{Tumorgrößenverteilung - Subregionen}\label{App:tumor_subregions}
 \autoref{tab:appendix_tumor_subregions} listet die mittlere Tumor-Voxelanzahl je Subregion (NCR, ED, ET) für die reale Verteilung und für die vier Sampler der Generierungs-Pipeline.
 
 \begin{table}[H]
@@ -118,7 +154,7 @@ Die Übersichtsdarstellung der Intensitätsverteilung in~\autoref{fig:intensity_hi
         Pipeline \ac{UniPC} &  $38{,}5 \pm 47{,}9$  & $169{,}6 \pm 95{,}0$  &  $73{,}8 \pm 76{,}7$ \\
         \bottomrule
     \end{tabular}
-    \caption{Mittlere Tumor-Voxelanzahl pro Subregion (NCR: nekrotischer Tumorkern, ED: peritumorales Ödem, ET: anreichernder Tumor) als Mean $\pm$ Standardabweichung. Reale Werte aus 1251 \ac{BraTS}-Segmentierungsmasken, Pipeline-Werte aus je 1024 generierten Masken je Sampler.}
+    \caption[Tumor-Voxelanzahl pro Subregion]{Mittlere Tumor-Voxelanzahl pro Subregion (NCR: nekrotischer Tumorkern, ED: peritumorales Ödem, ET: anreichernder Tumor) als Mean $\pm$ Standardabweichung. Reale Werte aus 1251 \ac{BraTS}-Segmentierungsmasken, Pipeline-Werte aus je 1024 generierten Masken je Sampler.}
     \label{tab:appendix_tumor_subregions}
 \end{table}
 
@@ -126,37 +162,41 @@ Die Übersichtsdarstellung der Intensitätsverteilung in~\autoref{fig:intensity_hi
 % Qualitative Ergebnisse
 %==========================================================
 
-\section{Qualitative Ergebnisse --- Erweiterte Darstellungen}\label{App:qualitative_extra}
+\section{Qualitative Ergebnisse - Erweiterte Darstellungen}\label{App:qualitative_extra}
 
-\subsection{Sampler-Vergleich --- direkte Gegenüberstellung}
+\subsection{Sampler-Vergleich - direkte Gegenüberstellung}
 Im Hauptteil ist der Sampler-Vergleich nur für die Baseline $48^3$ dargestellt. \autoref{fig:appendix_samples_sampler_compare} zeigt die direkte Gegenüberstellung beider Auflösungen.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_32.png}\\[1em]
-    \includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_48.png}
-    \caption{Direkte Gegenüberstellung der Sampler-Wirkung bei identischem Startrauschen für die Baseline $32^3$ (oben) und $48^3$ (unten). Sampler von links nach rechts: \ac{DDPM} (250 Schritte), \ac{DDIM} (50), DPM-Solver++ (25), \ac{UniPC} (10).}
+    \frame{\includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_32.png}}
+    \\[1em]
+    \frame{\includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_48.png}}
+    \caption[Sampler-Vergleich beider Auflösungen]{Direkte Gegenüberstellung der Sampler-Wirkung bei identischem Startrauschen für die Baseline $32^3$ (oben) und $48^3$ (unten). Sampler von links nach rechts: \ac{DDPM} (250 Schritte), \ac{DDIM} (50), DPM-Solver++ (25), \ac{UniPC} (10).}
     \label{fig:appendix_samples_sampler_compare}
 \end{figure}
 
 \subsection{Denoising-Trajektorie ($32^3$)}
 \autoref{fig:denoising_trajectory_32} zeigt die Denoising-Trajektorie der Baseline $32^3$ analog zur im Hauptteil dargestellten $48^3$-Variante.
 
+\begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/denoising_trajectory_32.png}
-    \caption{Denoising-Trajektorie der Baseline $32^3$ für die vier Sampler. Jede Zeile zeigt acht äquidistante Zwischenschritte von $t=T$ (links, reines Rauschen) bis $t=0$ (rechts, finales Volumen) bei identischem Startrauschen.}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/denoising_trajectory_32.png}}
+    \caption[Denoising-Trajektorie der Baseline $32^3$]{Denoising-Trajektorie der Baseline $32^3$ für die vier Sampler. Jede Zeile zeigt acht  Zwischenschritte von $t=T$ (links, reines Rauschen) bis $t=0$ (rechts, finales Volumen) bei identischem Startrauschen.}
     \label{fig:denoising_trajectory_32}
 \end{figure}
+\end{landscape}
+
 
 \section{Erweiterte Sample-Galerien je Sampler}\label{Sec:appendix_samples_full}
-Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Ablationsvarianten, jeweils für einen der vier Sampler. Im Hauptteil (\autoref{fig:samples_model_x_sampler}) ist pro Modell-Sampler-Kombination lediglich ein Sample dargestellt; die hier folgenden Galerien geben einen breiteren Eindruck der Generierungs-Variabilität. Aufgrund der besseren Lesbarkeit sind die Galerien im Querformat dargestellt.
+Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Ablationsvarianten, jeweils für einen der vier Sampler. Im Hauptteil (\autoref{fig:samples_model_x_sampler}) ist pro Modell-Sampler-Kombination lediglich ein Sample dargestellt; die hier folgenden Galerien geben einen breiteren Eindruck der Generierungs-Variabilität (\autoref{fig:appendix_samples_full_DDPM} bis \autoref{fig:appendix_samples_full_UniPC}).
 
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DDPM.png}
-    \caption{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit \ac{DDPM} (250 Schritte).}
+    \frame{\includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DDPM.png}}
+    \caption[Sample-Galerie ($32^3$, \acs{DDPM})]{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit \ac{DDPM} (250 Schritte).}
     \label{fig:appendix_samples_full_DDPM}
 \end{figure}
 \end{landscape}
@@ -164,8 +204,8 @@ Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Abla
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DDIM.png}
-    \caption{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit \ac{DDIM} (50 Schritte).}
+    \frame{\includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DDIM.png}}
+    \caption[Sample-Galerie ($32^3$, \acs{DDIM})]{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit \ac{DDIM} (50 Schritte).}
     \label{fig:appendix_samples_full_DDIM}
 \end{figure}
 \end{landscape}
@@ -173,8 +213,8 @@ Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Abla
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DPMSolverPP.png}
-    \caption{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit DPM-Solver++ (25 Schritte).}
+    \frame{\includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DPMSolverPP.png}}
+    \caption[Sample-Galerie ($32^3$, DPM-Solver++)]{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit DPM-Solver++ (25 Schritte).}
     \label{fig:appendix_samples_full_DPMSolverPP}
 \end{figure}
 \end{landscape}
@@ -182,8 +222,8 @@ Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Abla
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_UniPC.png}
-    \caption{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit \ac{UniPC} (10 Schritte).}
+    \frame{\includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_UniPC.png}}
+    \caption[Sample-Galerie ($32^3$, \acs{UniPC})]{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit \ac{UniPC} (10 Schritte).}
     \label{fig:appendix_samples_full_UniPC}
 \end{figure}
 \end{landscape}

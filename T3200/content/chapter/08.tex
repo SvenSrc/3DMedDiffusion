@@ -26,7 +26,8 @@ Insgesamt wurden acht Modelle mit 300 Epochen trainiert: fünf $32^3$-Ablationsva
         Klasse $\rightarrow$ Maske       &  63{,}72 & 10 & 0{,}00006 & 0{,}0211 & 0{,}0168 & 158 \\
         \bottomrule
     \end{tabular}
-    \caption{Zusammenfassung des Trainingsverlaufs aller Modelle über 300 Epochen. \emph{Beste Epoche} bezeichnet die Epoche mit dem niedrigsten Validierungs-Loss.}
+    \caption[Trainingsverlauf aller Modelle]
+{Zusammenfassung des Trainingsverlaufs aller Modelle über 300 Epochen. \emph{Beste Epoche} bezeichnet die Epoche mit dem niedrigsten Validierungs-Loss.}
     \label{tab:verlauf}
 \end{table}
 %
@@ -38,17 +39,15 @@ Vereinzelte Loss-Spikes traten bei fünf der acht Modelle auf, jeweils ohne nachf
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\linewidth]{./results/loss_curves.pdf}
-    \caption{Trainings- (durchgezogen) und Validierungs-Loss (gestrichelt) über 300 Epochen für alle acht Modelle.}
+    \frame{\includegraphics[width=1.0\linewidth]{./results/loss_curves.pdf}}
+    \caption[Trainings- und Validierungs-Loss]
+{Trainings- (durchgezogen) und Validierungs-Loss (gestrichelt) über 300 Epochen für alle acht Modelle.}
     \label{fig:loss_curves}
 \end{figure}
 %
-\todo{Sortierung ähnlich wie bei Tabelle machen}
-\todo{Legen unten nur einmalig einbinden}
-\todo{Val und Loss in Theorie noch einfügen}
 
 \section{Sample-Generierung}\label{Sec:eval_generation}
-Für jede Modell-Sampler-Kombination wurden 1024 Volumina generiert. Die in~\autoref{Sec:samp} eingeführten Sampler unterscheiden sich in der Anzahl der Denoising-Schritte (\ac{DDPM}: 250, \ac{DDIM}: 50, DPM-Solver++: 25, \ac{UniPC}: 10) und damit in der Generierungsdauer. \autoref{tab:generation-time} fasst die gemessene Laufzeit und den Peak-VRAM-Verbrauch der unconditional Baseline für beide Auflösungen zusammen. Der jeweils beste Wert pro Modell und Metrik ist fett hervorgehoben.
+Für jede Modell-Sampler-Kombination wurden 1024 Volumina generiert. Die in~\autoref{Sec:samp} eingeführten Sampler unterscheiden sich in der Anzahl der Denoising-Schritte (\ac{DDPM}: 250, \ac{DDIM}: 50, DPM-Solver++: 25, \ac{UniPC}: 10) und damit in der Generierungsdauer. \autoref{tab:generation-time} fasst die gemessene Laufzeit und den Peak-VRAM-Verbrauch der unconditional Baseline für beide Auflösungen zusammen. Der jeweils beste Wert pro Auflösung und Metrik ist fett hervorgehoben.
 %
 \begin{table}[H]
     \centering
@@ -70,7 +69,8 @@ Für jede Modell-Sampler-Kombination wurden 1024 Volumina generiert. Die in~\auto
             & UniPC        &  10 &   \textbf{5{,}70} &   \textbf{97{,}3} & 4{,}34 \\
         \bottomrule
     \end{tabular}
-    \caption{Generierungsleistung der vier Sampler für die unconditional Baseline auf einer NVIDIA GeForce GTX 1080 Ti, gemittelt über 1024 generierte Volumina je Konfiguration. Peak-VRAM laut \texttt{nvidia-smi} (Gesamtbelegung der GPU). Vollständige Werte für die übrigen Ablationsvarianten siehe~\autoref{tab:appendix_generation_time_full}.}
+    \caption[Generierungsleistung der Sampler (Baseline)]
+{Generierungsleistung der vier Sampler für die unconditional Baseline auf einer NVIDIA GeForce GTX 1080 Ti, gemittelt über 1024 generierte Volumina je Konfiguration. Peak-VRAM laut \texttt{nvidia-smi} (Gesamtbelegung der GPU). Vollständige Werte für die übrigen Ablationsvarianten siehe~\autoref{tab:appendix_generation_time_full}.}
     \label{tab:generation-time}
 \end{table}
 %
@@ -89,7 +89,8 @@ Von \ac{DDPM} (250 Schritte) zu \ac{UniPC} (10 Schritte) sinkt die mittlere Gene
         UniPC        &  10 &  \textbf{1{,}81} &  \textbf{1{,}82} &  \textbf{3{,}63} & 6{,}90 \\
         \bottomrule
     \end{tabular}
-    \caption{Generierungsleistung der vier Sampler für die Generierungs-Pipeline (Klasse $\rightarrow$ Maske $\rightarrow$ MRT) in $32^3$, gemittelt über 1024 Pipeline-Durchläufe. Die Gesamtdauer setzt sich aus den Laufzeiten der beiden conditional Modelle zusammen.}
+    \caption[Generierungsleistung der Pipeline]
+{Generierungsleistung der vier Sampler für die Generierungs-Pipeline (Klasse $\rightarrow$ Maske $\rightarrow$ MRT) in $32^3$, gemittelt über 1024 Pipeline-Durchläufe. Die Gesamtdauer setzt sich aus den Laufzeiten der beiden conditional Modelle zusammen.}
     \label{tab:generation_time_pipeline}
 \end{table}
 %
@@ -139,7 +140,8 @@ Pro Konfiguration und Sampler wurden 1024 Samples generiert und gegen den realen
             & UniPC       & 497{,}78 & $-0{,}022$ & 3{,}87 & 0{,}522 \\
         \bottomrule
     \end{tabular}
-    \caption{Quantitative Auswertung der fünf $32^3$-Modelle über 1024 generierte Samples je Sampler. Niedrigere Werte sind besser bei \ac{FID} und \ac{LPIPS}, höhere bei \ac{SSIM} und \ac{PSNR}. Beste Werte je Modell sind fett markiert.}
+    \caption[Quantitative Auswertung der $32^3$-Modelle]
+{Quantitative Auswertung der fünf $32^3$-Modelle über 1024 generierte Samples je Sampler. Niedrigere Werte sind besser bei \ac{FID} und \ac{LPIPS}, höhere bei \ac{SSIM} und \ac{PSNR}. Beste Werte je Modell sind fett markiert.}
     \label{tab:metrics_uncond_32}
 \end{table}
 %
@@ -162,7 +164,8 @@ Die Baseline wurde zusätzlich in einer Auflösung von $48^3$ Voxeln trainiert und
         UniPC        & 65{,}97 & 0{,}483 & 16{,}02 & 0{,}142 \\
         \bottomrule
     \end{tabular}
-    \caption{Quantitative Auswertung der $48^3$-Baseline über 1024 generierte Samples je Sampler. Beste Werte je Spalte sind fett markiert.}
+    \caption[Quantitative Auswertung der $48^3$-Baseline]
+{Quantitative Auswertung der $48^3$-Baseline über 1024 generierte Samples je Sampler. Beste Werte je Spalte sind fett markiert.}
     \label{tab:metrics_48}
 \end{table}
 %
@@ -185,7 +188,8 @@ Die in~\autoref{Sec:pipe} beschriebene Pipeline aus Klasse-zu-Maske- und Maske-z
         UniPC        & \textbf{25{,}46} & 0{,}511 & 17{,}85 & 0{,}036 \\
         \bottomrule
     \end{tabular}
-    \caption{Quantitative Auswertung der Generierungs-Pipeline (Klasse $\rightarrow$ Maske $\rightarrow$ MRT) in $32^3$ über 1024 generierte Samples je Sampler. Beste Werte je Spalte sind fett markiert.}
+    \caption[Quantitative Auswertung der Pipeline]
+{Quantitative Auswertung der Generierungs-Pipeline (Klasse $\rightarrow$ Maske $\rightarrow$ MRT) in $32^3$ über 1024 generierte Samples je Sampler. Beste Werte je Spalte sind fett markiert.}
     \label{tab:metrics_pipeline}
 \end{table}
 %
@@ -201,17 +205,16 @@ Die statistischen Eigenschaften der generierten Volumina werden über zwei Vertei
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/intensity_histogram_real_vs_generated.pdf}
-    \caption{Voxel-Intensitätsverteilung pro Sampler (DDPM, DDIM, DPM-Solver++, UniPC). Reale \ac{BraTS}-T1N-Volumina als graue Fläche (1251 Volumina), generierte Verteilungen als farbige Linien (je 1024 Volumina). Y-Achse logarithmisch skaliert.}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/intensity_histogram_real_vs_generated.pdf}}
+    \caption[Voxel-Intensitätsverteilung pro Sampler]
+{Voxel-Intensitätsverteilung pro Sampler (DDPM, DDIM, DPM-Solver++, UniPC). Reale \ac{BraTS}-T1N-Volumina als graue Fläche (1251 Volumina), generierte Verteilungen als farbige Linien (je 1024 Volumina). Y-Achse logarithmisch skaliert.}
     \label{fig:intensity_hist}
 \end{figure}
 %
 
-\todo{Vllt. Abweichung zur Brats und den Modellen? Also wie arg die beiden Linien voneinader abweichen}
-
 Die reale Verteilung hat ein dominantes Maximum bei $-1$. Es entsteht durch den Hintergrund nach dem Padding. Die Hirnvoxel liegen breit verteilt zwischen $-0{,}6$ und $+0{,}4$.
 \abschnitt
-Baseline, Data Augmentation, Ohne Self-Attention und Linearer Schedule reproduzieren die globale Form der realen Verteilung. Die Noise-Prediction-Variante weicht qualitativ ab.
+Baseline, Data Augmentation und Ohne Self-Attention reproduzieren die globale Form der realen Verteilung. Die Noise-Prediction-Variante weicht qualitativ ab.
 %was zu den schlechten Werten in~\autoref{tab:metrics_uncond_32} passt. 
 Die $48^3$-Baseline und die Pipeline folgen ebenfalls der Grobform der realen Verteilung.
 \abschnitt
@@ -222,21 +225,16 @@ Da der dominante Hintergrund-Peak die Unterschiede zwischen den Modellen im Bere
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/tumor_size_distribution.pdf}
-    \caption{Tumorgrößenverteilung pro Sampler: reale \ac{BraTS}-Segmentierungsmasken (grau, 1251 Patienten) im Vergleich zu den von der Pipeline (je 1024 Durchläufe) erzeugten Masken. Histogramm der gesamten Tumor-Voxelanzahl pro Volumen, normiert auf Dichte.}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/tumor_size_distribution.pdf}}
+    \caption[Tumorgrößenverteilung pro Sampler]{Tumorgrößenverteilung pro Sampler: reale \ac{BraTS}-Segmentierungsmasken (grau, 1251 Patienten) im Vergleich zu den von der Pipeline (je 1024 Durchläufe) erzeugten Masken. Histogramm der gesamten Tumor-Voxelanzahl pro Volumen, normiert auf Dichte.}
     \label{fig:tumor_size}
 \end{figure}
 %
 Die reale Verteilung hat ihren häufigsten Wert bei etwa $500$ Voxeln und reicht bis über $1750$ Voxel. Die Pipeline-Verteilungen liegen im kleineren Bereich und erreichen die größeren Tumorvolumina kaum. Die mittlere Tumor-Voxelanzahl der Pipeline liegt je nach Sampler zwischen $204{,}6$ (\ac{DDPM}) und $281{,}8$ (\ac{UniPC}). Der reale Mittelwert beträgt dagegen $545{,}9$. Die maximale erzeugte Tumorgröße erreicht über alle vier Sampler nur $\approx 750$ Voxel.
 \abschnitt
 \ac{DDPM} weist einen ausgeprägten Peak bei $0$ Voxeln auf, der deutlich höher liegt als bei den drei übrigen Samplern. Der Anteil leerer Masken variiert je Sampler stark: $126$ von $1024$ ($12{,}3\,\%$) bei \ac{DDPM}, $25$ ($2{,}4\,\%$) bei \ac{DDIM}, $24$ ($2{,}3\,\%$) bei DPM-Solver++ und $22$ ($2{,}1\,\%$) bei \ac{UniPC}.
-\todo{vllt umschreiben und anpassen auf tabelle falls diese kommt gleiche gilt für unten}
 \abschnitt
 Die mittlere Voxelanzahl pro Subregion liegt für \ac{UniPC} bei NCR\,$=38{,}5$, ED\,$=169{,}6$ und ET\,$=73{,}8$ und damit um etwa Faktor 2 unter den realen Werten (NCR\,$=81{,}4$, ED\,$=341{,}9$, ET\,$=122{,}6$). Die vollständigen Werte je Sampler sind im Anhang dargestellt (\autoref{tab:appendix_tumor_subregions}).
-
-\todo{Macht die Aktuelle Darstellung sinn? Bezogen auf die Balken, da sie vielliecht zu dick sind und irgenwdwie 1-5 darstellen und nicht einen einzelnen WErt auf der X-AChse}
-
-\todo{darstellen welche als klein, mittel und groß dargestellt werden. Verteilung???}
 
 \section{Qualitative Ergebnisse}\label{Sec:eval_qualitativ}
 Im Folgenden werden ausgewählte Sample-Volumina dargestellt. Die Auswahl der Samples erfolgte zufällig mit festem Seed, ohne nachträgliche Selektion.
@@ -251,16 +249,16 @@ Die $48^3$-Variante zeigt klar Details. Bei der $32^3$-Variante sind diese Detai
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/triplanar_views.png}
-    \caption{Triplanare Ansicht je eines generierten Volumens der Baseline $32^3$ und der Baseline $48^3$ in axialer, koronaler und sagittaler Schnittführung sowie als 3D-Ansicht. Zum Vergleich oben ein reales T1N-Volumen aus \ac{BraTS}-2023.}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/triplanar_views.png}}
+    \caption[Triplanare Ansicht der Baseline ($32^3$ und $48^3$)]{Triplanare Ansicht je eines generierten Volumens der Baseline $32^3$ und der Baseline $48^3$ in axialer, koronaler und sagittaler Schnittführung sowie als 3D-Ansicht. Zum Vergleich oben ein reales T1N-Volumen aus \ac{BraTS}-2023.}
     \label{fig:triplanar}
 \end{figure}
 %
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/isosurface_3d.png}
-    \caption{3D-Isoflächenrendering der Baseline $32^3$, der Baseline $48^3$ und eines realen \ac{BraTS}-Volumens aus Vorder-, Seiten- und Hinteransicht.}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/isosurface_3d.png}}
+    \caption[3D-Isoflächenrendering der Baseline]{3D-Isoflächenrendering der Baseline $32^3$, der Baseline $48^3$ und eines realen \ac{BraTS}-Volumens aus Vorder-, Seiten- und Hinteransicht.}
     \label{fig:isosurface}
 \end{figure}
 %
@@ -269,22 +267,19 @@ Die $48^3$-Variante zeigt klar Details. Bei der $32^3$-Variante sind diese Detai
 \autoref{fig:triplanar_pipeline} und \autoref{fig:isosurface_pipeline} zeigen je ein Pipeline-Volumen mit zugehöriger Tumormaske als Overlay, gegenübergestellt einem realen \ac{BraTS}-Volumen mit eingezeichneter Original-Segmentierung.
 \abschnitt
 Die Pipeline generiert eine räumlich konsistente Tumormaske innerhalb des Hirnvolumens. Im 3D-Rendering ist der Tumor als roter Bereich an der Hirnoberfläche erkennbar.
-
-\todo{3D Von allen Samplern. vielleicht in den Anhang}
-
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/triplanar_pipeline.png}
-    \caption{Triplanare Ansicht eines Pipeline-Volumens mit Tumor-Overlay (untere Reihe), darüber ein reales \ac{BraTS}-T1N-Volumen mit Original-Segmentierung.}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/triplanar_pipeline.png}}
+    \caption[Triplanare Ansicht eines Pipeline-Volumens]{Triplanare Ansicht eines Pipeline-Volumens mit Tumor-Overlay (untere Reihe), darüber ein reales \ac{BraTS}-T1N-Volumen mit Original-Segmentierung.}
     \label{fig:triplanar_pipeline}
 \end{figure}
 %
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/isosurface_pipeline.png}
-    \caption{3D-Isoflächenrendering eines Pipeline-Volumens und eines realen \ac{BraTS}-Volumens aus Vorder-, Seiten- und Hinteransicht. Tumormaske jeweils in rot hervorgehoben.}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/isosurface_pipeline.png}}
+    \caption[3D-Isoflächenrendering eines Pipeline-Volumens]{3D-Isoflächenrendering eines Pipeline-Volumens und eines realen \ac{BraTS}-Volumens aus Vorder-, Seiten- und Hinteransicht. Tumormaske jeweils in rot hervorgehoben.}
     \label{fig:isosurface_pipeline}
 \end{figure}
 %
@@ -297,8 +292,8 @@ Baseline und Data Augmentation erzeugen über alle Sampler hinweg visuell hirnähn
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/samples_appendix_model_x_sampler_32.png}
-    \caption{Generierte Volumen-Mittelschnitte der fünf $32^3$-Modelle (Zeilen) für die vier Sampler (Spalten). Identischer Seed pro Spalte.}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/samples_appendix_model_x_sampler_32.png}}
+    \caption[Modellvergleich je Sampler ($32^3$)]{Generierte Volumen-Mittelschnitte der fünf $32^3$-Modelle (Zeilen) für die vier Sampler (Spalten). Identischer Seed pro Spalte.}
     \label{fig:samples_model_x_sampler}
 \end{figure}
 %
@@ -310,8 +305,8 @@ Die $48^3$-Variante zeigt erkennbare Details. Bei der $32^3$-Variante sind diese
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{./results/samples_32_vs_48.png}
-    \caption{Vergleich der Baseline in $32^3$ (obere Reihe) und $48^3$ (untere Reihe), je sechs zufällig ausgewählte Samples mit \ac{DDPM}-Sampler.}
+    \frame{\includegraphics[width=0.85\linewidth]{./results/samples_32_vs_48.png}}
+    \caption[Vergleich der Baseline-Auflösungen]{Vergleich der Baseline in $32^3$ (obere Reihe) und $48^3$ (untere Reihe), je sechs zufällig ausgewählte Samples mit \ac{DDPM}-Sampler.}
     \label{fig:samples_resolution_compare}
 \end{figure}
 %
@@ -323,8 +318,8 @@ Trotz unterschiedlicher Schrittzahl ($10$ bis $250$) erzeugen alle vier Sampler 
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_48.png}
-    \caption{Identisches Startrauschen für die Baseline $48^3$, dekodiert durch \ac{DDPM} (250 Schritte), \ac{DDIM} (50), DPM-Solver++ (25) und \ac{UniPC} (10).}
+    \frame{\includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_48.png}}
+    \caption[Sampler-Vergleich der Baseline $48^3$]{Identisches Startrauschen für die Baseline $48^3$, dekodiert durch \ac{DDPM} (250 Schritte), \ac{DDIM} (50), DPM-Solver++ (25) und \ac{UniPC} (10).}
     \label{fig:samples_sampler_compare}
 \end{figure}
 %
@@ -334,8 +329,8 @@ Trotz unterschiedlicher Schrittzahl ($10$ bis $250$) erzeugen alle vier Sampler 
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[height=1.35\linewidth]{./results/samples_pipeline_grid.png}
-    \caption{Sechs Pipeline-Ausgaben mit \ac{UniPC}: generierte Tumormaske (links), zugehöriges generiertes T1N-Volumen (Mitte) und Überlagerung beider (rechts).}
+    \frame{\includegraphics[height=1.35\linewidth]{./results/samples_pipeline_grid.png}}
+    \caption[Pipeline-Ausgaben mit \acs{UniPC}]{Sechs Pipeline-Ausgaben mit \ac{UniPC}: generierte Tumormaske (links), zugehöriges generiertes T1N-Volumen (Mitte) und Überlagerung beider (rechts).}
     \label{fig:samples_pipeline}
 \end{figure}
 %
@@ -347,8 +342,8 @@ Trotz unterschiedlicher Schrittzahl ($10$ bis $250$) erzeugen alle vier Sampler 
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/denoising_trajectory_48.png}
-    \caption{Denoising-Trajektorie der Baseline $48^3$ für die vier Sampler. Jede Zeile zeigt acht äquidistante Zwischenschritte von $t=T$ (links, reines Rauschen) bis $t=0$ (rechts, finales Volumen) bei identischem Startrauschen.}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/denoising_trajectory_48.png}}
+    \caption[Denoising-Trajektorie der Baseline $48^3$]{Denoising-Trajektorie der Baseline $48^3$ für die vier Sampler. Jede Zeile zeigt acht Zwischenschritte von $t=T$ (links, reines Rauschen) bis $t=0$ (rechts, finales Volumen) bei identischem Startrauschen.}
     \label{fig:denoising_trajectory_48}
 \end{figure}
 

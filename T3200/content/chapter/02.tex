@@ -23,14 +23,14 @@ Hirntumor-Bildgebung~\cite[vgl.][S.~3]{kazerooni_brain_nodate}.
 Die \acfi{CT} beruht auf der Messung der Röntgenstrahlungsschwächung beim Durchgang durch das Gewebe. Aus den so gewonnenen Projektionen wird rechnergestützt ein dreidimensionaler Datensatz rekonstruiert. Die \ac{CT} ist in der radiologischen Routine das am weitesten verbreitete bildgebende Verfahren und insbesondere in der Traumadiagnostik etabliert, geht aber mit einer Strahlenbelastung einher~\cite[vgl.][S.~1\,ff.]{buzug_computed_2008}.
 
 \section{Datenformat}
-Das \ac{NIfTI}-Format (\texttt{.nii}, \texttt{.nii.gz}) wurde in den frühen 2000er Jahren unter Förderung des \ac{NIH} entwickelt und hat sich seitdem als Standardformat in der neuroimaging-basierten Forschung etabliert. Es ist speziell auf volumetrische 3D-Bilddaten ausgelegt und eignet sich daher besonders für Anwendungen wie \ac{MRT}-Aufnahmen des Gehirns~\cite[vgl.][S.~203]{rajagopal_artificial_2026}.
+Das \acfi{NIfTI}-Format (\texttt{.nii}, \texttt{.nii.gz}) wurde in den frühen 2000er Jahren unter Förderung des \ac{NIH} entwickelt und hat sich seitdem als Standardformat in der neuroimaging-basierten Forschung etabliert. Es ist speziell auf volumetrische 3D-Bilddaten ausgelegt und eignet sich daher besonders für Anwendungen wie \ac{MRT}-Aufnahmen des Gehirns~\cite[vgl.][S.~203]{rajagopal_artificial_2026}.
 \abschnitt
 Als Rasterformat speichert \ac{NIfTI} die Bilddaten in Form von Voxeln, also Pixeln mit definierter Breite, Höhe und Tiefe~\cite[vgl.][S.~4] {elhadad_reduction_2024}. Die ersten drei Dimensionen kodieren die räumlichen Koordinaten $x$, $y$ und $z$, während die vierte Dimension den Zeitpunkt $t$ abbildet und etwa bei funktionellen \ac{MRT}-Aufnahmen genutzt wird~\cite[vgl.][S.~76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}. Der Header einer \ac{NIfTI}-Datei umfasst im \texttt{.nii}-Format 352~Byte und enthält alle Metadaten, die für die Interpretation der Bilddaten benötigt werden~\cite[vgl.][S.~76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}. \autoref{fig:nifti-header} zeigt einen solchen Header beispielhaft. Über den Parameter \texttt{ImageSize} lässt sich etwa die Auflösung des Scans ablesen, in diesem Fall \texttt{256x156x256} Voxel.
 %
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.6\textwidth]{./bilder/nifti/nifti-header.png}
-\caption{Darstellung eines beispielhaften \ac{NIfTI}-Header~\cite[S.~76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}}
+\frame{\includegraphics[width=0.6\textwidth]{./bilder/nifti/nifti-header.png}}
+\caption[Beispielhafter \acs{NIfTI}-Header]{Beispielhafter \acs{NIfTI}-Header mit den Metadaten eines Scans~\cite[vgl.][S.~76]{department_of_computer_applications_kalasalingam_academy_of_research_and_education_deemed_to_be_university_krishnankoil_tamil_nadu_india_medical_2019}.}
 \label{fig:nifti-header}
 \end{figure}
 %

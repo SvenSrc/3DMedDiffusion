@@ -1,72 +1,64 @@
-% Nach der Eigenständigkeitserklärung per \clearpage eingefügt.
-% Überschrift ohne TOC:
-\subsection*{Genutzter Funktionsumfang}
+% =====================================================================
+% Genutzter Funktionsumfang (KI-Nachweis) — DHBW Mosbach
+% Folgt nach der Selbstständigkeitserklärung (declaration.tex).
+% Benötigte Pakete: xcolor, array
+% =====================================================================
+\clearpage
+\subsection*{Genutzter Funktionsumfang im Hinblick auf}
 
-% -----------------------------
+\newcommand{\kiheader}{%
+  \textbf{Produktname des eingesetzten Hilfsmittels} &
+  \textbf{Link, URL} &
+  \textbf{Genutzter Funktionsumfang / Beschreibung der Verwendungsweise} \\\hline}
+\renewcommand{\arraystretch}{1.4}
+
 % 1) Themenerfassung und Strukturierung
-% -----------------------------
-{\textbf{Themenerfassung und Strukturierung} (Aufgabenstellung/Präzisierung, Forschungsansatz, Gliederung)\par}
+{\textbf{Themenerfassung und Strukturierung}
+(Aufgabenstellung oder Präzisierung, Forschungsansatz, Gliederung)\par}
 \smallskip
-{\renewcommand{\arraystretch}{1.4}%
-\noindent\begin{tabular}{|p{4cm}|p{10cm}|}\hline
-  {\textbf{Produkt/Tool}} &
-  {\textbf{Beschreibung / Verwendungsweise}} \\\hline
-  {\textcolor{red}{Tool}} &
-  {Ideenfindung und Grobgliederung der Arbeit. 
-  
-  Beispiel: Welche Themen existieren über \textcolor{red}{Thema}?}  \\\hline
-  % weitere Zeilen hier ergänzen ...
-\end{tabular}\par}
+\noindent\begin{tabular}{|p{3cm}|p{2.8cm}|p{8.2cm}|}\hline
+\kiheader
+Claude & \url{https://claude.ai/} & Erstellung möglicher Gliederungs- und Strukturvorschläge für die Studienarbeit. Die Ausgaben wurden manuell geprüft, überarbeitet und im Umfang deutlich erweitert. \\\hline
+ChatGPT & \url{https://chatgpt.com/} & Neutrale Zweitbewertung der überarbeiteten Gliederung durch ein anderes Modell. \\\hline
+\end{tabular}
 \medskip
 
-% % -----------------------------
-% % 2) Themenbearbeitung
-% % -----------------------------
-% {\textbf{Themenbearbeitung} (Problembeschreibung, Grundlagen, Schlussfolgerungen/Erkenntnisse, Evaluierung/AI-Feedback)\par}
-% \smallskip
-% {\renewcommand{\arraystretch}{1.4}%
-% \noindent\begin{tabular}{|p{4cm}|p{10cm}|}\hline
-%   {\textbf{Produkt/Tool}} \iflang{en}{\textbf{Product/Tool}} &
-%   {\textbf{Beschreibung / Verwendungsweise}} \iflang{en}{\textbf{Description / Usage}} \\\hline
-%   {Beispieltool XYZ} \iflang{en}{Example Tool XYZ} &
-%   {Entwurf der ersten Problembeschreibung; Review von Argumentationsketten.}%
-%   \iflang{en}{Drafting the initial problem statement; reviewing argument structure.} \\\hline
-%   % weitere Zeilen hier ergÃ¤nzen ...
-% \end{tabular}\par}
-% \medskip
+% 2) Themenbearbeitung
+{\textbf{Themenbearbeitung}
+(Darstellung/Beschreibung des Problems, wissenschaftliche Grundlagen,
+Schlussfolgerungen / Erkenntnisgewinn, Evaluierung des Textes / Feedback der KI)\par}
+\smallskip
+\noindent\begin{tabular}{|p{3cm}|p{2.8cm}|p{8.2cm}|}\hline
+\kiheader
+Claude & \url{https://claude.ai/} & Vereinfachte Erklärung komplexer Themenfelder (u.\,a. Diffusionsprozess, Sampling-Verfahren) und Übersetzung englischsprachiger Quellen zum Verständnis. \\\hline
+Claude & \url{https://claude.ai/} & Unterstützende Prüfung der Ergebniskapitel auf Konsistenz (Abgleich der Zahlenwerte mit den Tabellen, Kontrolle der Querverweise) sowie Hilfestellung bei der Umstrukturierung der Kapitel. Claude diente dabei ausschließlich als Hilfsmittel. Sämtliche Hinweise wurden manuell überprüft, eigenständig bewertet und nur bei Bestätigung übernommen.
+\\\hline
+\end{tabular}
+\medskip
 
-% -----------------------------
 % 3) Quellenrecherche, -auswahl und -auswertung
-% -----------------------------
-{\textbf{Quellenrecherche, -auswahl und -auswertung} (durch AI gefundene Quellen; Vorgehen der weiteren Recherche)\par}
+{\textbf{Quellenrecherche, -auswahl und -auswertung}
+(Welche Quellen wurden durch das KI-Tool gefunden, wie erfolgte die weitere Recherche)\par}
 \smallskip
-{\renewcommand{\arraystretch}{1.4}%
-\noindent\begin{tabular}{|p{4cm}|p{10cm}|}\hline
-  {\textbf{Produkt/Tool}} &
-  {\textbf{Beschreibung / Verwendungsweise}} \\\hline
-  {\textcolor{red}{Tool}} &
-  {Vorschläge relevanter Publikationen, anschließende manuelle Validierung. 
-  
-  Beispiel: Welche Bücher behandeln das Thema \textcolor{red}{Thema}?}%
-  \\\hline
-  % weitere Zeilen hier ergänzen ...
-\end{tabular}\par}
+\noindent\begin{tabular}{|p{3cm}|p{2.8cm}|p{8.2cm}|}\hline
+\kiheader
+Claude & \url{https://claude.ai/} & Erneute Überprüfung der manuell ausgewählten Quellen und Kontrolle eines einheitlichen Zitationsformats. \\\hline
+\end{tabular}
 \medskip
 
-% -----------------------------
 % 4) Formale Gestaltung, insbesondere Sprache
-% -----------------------------
-{\textbf{Formale Gestaltung, insbesondere Sprache} (Prompts/Eingaben; Textgenerierung, Korrektur, Paraphrasieren, Ãœbersetzen, kreatives Schreiben)\par}
+{\textbf{Formale Gestaltung, insbesondere Sprache}
+(Welche Eingabe wurde an die KI getätigt? Textgenerierung, Textkorrektur,
+Paraphrasieren und Umschreiben, Übersetzen, kreatives Schreiben)\par}
 \smallskip
-{\renewcommand{\arraystretch}{1.4}%
-\noindent\begin{tabular}{|p{4cm}|p{10cm}|}\hline
-  {\textbf{Produkt/Tool}} &
-  {\textbf{Beschreibung / Verwendungsweise}} \\\hline
-  {\textcolor{red}{Tool}}  &
-  {Grammatik-/Stilkorrektur einzelner Absätze; keine inhaltliche Neuerstellung.
-  
-  Beispiel: Ist der folgende Satz grammatikalisch richtig?}%
-  \\\hline
-  % weitere Zeilen hier ergänzen ...
-\end{tabular}\par}
- 
+\noindent\begin{tabular}{|p{3cm}|p{2.8cm}|p{8.2cm}|}\hline
+\kiheader
+Claude & \url{https://claude.ai/} & Grammatik- und Stilkorrektur einzelner Abschnitte, Vorschläge für Bildunterschriften (Kurz-/Langform) und Hilfe bei Terminologie-Fragen (z.\,B. „Diffusion Models`` vs. „Diffusionsmodelle``). Keine inhaltliche Neuerstellung; Vorschläge wurden geprüft und nur bei Zustimmung übernommen.
+\\\hline
+Gemini & \url{https://gemini.google.com/app} & Erzeugung einzelner illustrativer Abbildungen (z.\,B. \autoref{fig:cnn}). Die Bilder dienen ausschließlich der Veranschaulichung, enthalten keine wissenschaftlichen Ergebnisse. \\\hline
+\end{tabular}
+\medskip
+
+% \noindent\textit{\small Hinweis: Geben Sie in der jeweiligen Rubrik die Kapitel
+% in Ihrer wissenschaftlichen Arbeit an und erläutern Sie die Art und Weise sowie
+% den Umfang der von Ihnen genutzten generativen Systeme (Text, Bild, Code etc.).}
