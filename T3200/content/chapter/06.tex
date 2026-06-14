@@ -61,8 +61,8 @@ Die Formel~\autoref{eq:fid} besteht aus zwei Teilen. Der erste Term  $\|\mu_{dat
 %
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{./bilder/fid/fid-prozess.png}
-    \caption[Ablauf der \acs{FID}-Berechnung]{Ablauf der \acs{FID}-Berechnung über die Merkmalsvektoren eines vortrainierten \acs{CNN}~\cite[S. 130]{long_generative_2026}.}
+    \frame{\includegraphics[width=0.8\textwidth]{./bilder/fid/fid-prozess.png}}
+    \caption[Ablauf der \acs{FID}-Berechnung]{Ablauf der \acs{FID}-Berechnung über die Merkmalsvektoren eines vortrainierten \acs{CNN}~\cite[vgl.][S. 130]{long_generative_2026}.}
 
     \label{fig:fid-prozess}
 \end{figure}
@@ -77,12 +77,12 @@ Der \acfi{SSIM} ist eine Metrik zur Bewertung von Bildqualität, die sich an der 
 \label{eq:ssim}
 \end{equation}
 %
-In~\autoref{eq:ssim} stehen $\mu_x$ und $\mu_y$ für die mittleren Helligkeitswerte, $\sigma_x^2$ und $\sigma_y^2$ für die lokalen Varianzen und $\sigma_{xy}$ für die Kovarianz also das Maß, wie ähnlich sich die Helligkeitsverläufe der beiden Bilder in einem lokalen Bereich verhalten. Die Konstanten $C_1$ und $C_2$ verhindern numerische Instabilitäten bei sehr kleinen Nennerwerten und sind als $C_1 = (K_1 L)^2$ und $C_2 = (K_2 L)^2$ definiert, wobei $L$ den Wertebereich der Pixel angibt und typischerweise $K_1 = 0{,}01$ sowie $3K_2 = 0{,}03$ gewählt werden~\cite[vgl.][S. 1 f.]{nilsson_understanding_2020}~\cite[vgl.][S. 5]{zhou_wang_image_2004}~\cite[vgl.][S. 6]{civicioglu_image_2025}~\cite[vgl.][S. 1134]{maruyama_properties_2023}. Der berechnete \ac{SSIM}-Wert eines Bildes ergibt sich als Mittelwert aller lokal berechneten Fensterwerte und liegt stets zwischen $0$ und $1$, wobei $1$ für eine vollständige Übereinstimmung bedeutet~\cite[S. 1131]{maruyama_properties_2023}. Jedoch ist der \ac{SSIM} eine \ac{FR}-Metrik und benötigt somit ein fehlerfreies Referenzbild~\cite[S. 1]{zhou_wang_image_2004}. \autoref{fig:ssim-prozess} veranschaulicht den Aufbau der Berechnung.
+In~\autoref{eq:ssim} stehen $\mu_x$ und $\mu_y$ für die mittleren Helligkeitswerte, $\sigma_x^2$ und $\sigma_y^2$ für die lokalen Varianzen und $\sigma_{xy}$ für die Kovarianz also das Maß, wie ähnlich sich die Helligkeitsverläufe der beiden Bilder in einem lokalen Bereich verhalten. Die Konstanten $C_1$ und $C_2$ verhindern numerische Instabilitäten bei sehr kleinen Nennerwerten und sind als $C_1 = (K_1 L)^2$ und $C_2 = (K_2 L)^2$ definiert, wobei $L$ den Wertebereich der Pixel angibt und typischerweise $K_1 = 0{,}01$ sowie $3K_2 = 0{,}03$ gewählt werden~\cite[vgl.][S. 1 f.]{nilsson_understanding_2020}~\cite[vgl.][S. 5]{zhou_wang_image_2004}~\cite[vgl.][S. 6]{civicioglu_image_2025}~\cite[vgl.][S. 1134]{maruyama_properties_2023}. Der berechnete \ac{SSIM}-Wert eines Bildes ergibt sich als Mittelwert aller lokal berechneten Fensterwerte und liegt stets zwischen $0$ und $1$, wobei $1$ für eine vollständige Übereinstimmung bedeutet~\cite[S. 1131]{maruyama_properties_2023}. Jedoch ist der \ac{SSIM} eine \ac{FR}-Metrik und benötigt somit ein fehlerfreies Referenzbild~\cite[S. 1]{zhou_wang_image_2004}. \autoref{fig:ssid-prozess} veranschaulicht den Aufbau der Berechnung.
 %
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{./bilder/ssim/ssim.png}
-    \caption[Ablauf der \acs{SSIM}-Berechnung]{Ablauf der \acs{SSIM}-Berechnung aus Intensität, Kontrast und Struktur~\cite[S. 5]{zhou_wang_image_2004}.}
+    \frame{\includegraphics[width=0.8\textwidth]{./bilder/ssim/ssim.png}}
+    \caption[Ablauf der \acs{SSIM}-Berechnung]{Ablauf der \acs{SSIM}-Berechnung aus Intensität, Kontrast und Struktur~\cite[vgl.][S. 5]{zhou_wang_image_2004}.}
     \label{fig:ssid-prozess}
 \end{figure}
 %

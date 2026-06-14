@@ -39,7 +39,7 @@ Vereinzelte Loss-Spikes traten bei fünf der acht Modelle auf, jeweils ohne nachf
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\linewidth]{./results/loss_curves.pdf}
+    \frame{\includegraphics[width=1.0\linewidth]{./results/loss_curves.pdf}}
     \caption[Trainings- und Validierungs-Loss]
 {Trainings- (durchgezogen) und Validierungs-Loss (gestrichelt) über 300 Epochen für alle acht Modelle.}
     \label{fig:loss_curves}
@@ -205,7 +205,7 @@ Die statistischen Eigenschaften der generierten Volumina werden über zwei Vertei
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/intensity_histogram_real_vs_generated.pdf}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/intensity_histogram_real_vs_generated.pdf}}
     \caption[Voxel-Intensitätsverteilung pro Sampler]
 {Voxel-Intensitätsverteilung pro Sampler (DDPM, DDIM, DPM-Solver++, UniPC). Reale \ac{BraTS}-T1N-Volumina als graue Fläche (1251 Volumina), generierte Verteilungen als farbige Linien (je 1024 Volumina). Y-Achse logarithmisch skaliert.}
     \label{fig:intensity_hist}
@@ -249,7 +249,7 @@ Die $48^3$-Variante zeigt klar Details. Bei der $32^3$-Variante sind diese Detai
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/triplanar_views.png}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/triplanar_views.png}}
     \caption[Triplanare Ansicht der Baseline ($32^3$ und $48^3$)]{Triplanare Ansicht je eines generierten Volumens der Baseline $32^3$ und der Baseline $48^3$ in axialer, koronaler und sagittaler Schnittführung sowie als 3D-Ansicht. Zum Vergleich oben ein reales T1N-Volumen aus \ac{BraTS}-2023.}
     \label{fig:triplanar}
 \end{figure}
@@ -257,7 +257,7 @@ Die $48^3$-Variante zeigt klar Details. Bei der $32^3$-Variante sind diese Detai
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/isosurface_3d.png}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/isosurface_3d.png}}
     \caption[3D-Isoflächenrendering der Baseline]{3D-Isoflächenrendering der Baseline $32^3$, der Baseline $48^3$ und eines realen \ac{BraTS}-Volumens aus Vorder-, Seiten- und Hinteransicht.}
     \label{fig:isosurface}
 \end{figure}
@@ -270,7 +270,7 @@ Die Pipeline generiert eine räumlich konsistente Tumormaske innerhalb des Hirnvo
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/triplanar_pipeline.png}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/triplanar_pipeline.png}}
     \caption[Triplanare Ansicht eines Pipeline-Volumens]{Triplanare Ansicht eines Pipeline-Volumens mit Tumor-Overlay (untere Reihe), darüber ein reales \ac{BraTS}-T1N-Volumen mit Original-Segmentierung.}
     \label{fig:triplanar_pipeline}
 \end{figure}
@@ -278,7 +278,7 @@ Die Pipeline generiert eine räumlich konsistente Tumormaske innerhalb des Hirnvo
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/isosurface_pipeline.png}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/isosurface_pipeline.png}}
     \caption[3D-Isoflächenrendering eines Pipeline-Volumens]{3D-Isoflächenrendering eines Pipeline-Volumens und eines realen \ac{BraTS}-Volumens aus Vorder-, Seiten- und Hinteransicht. Tumormaske jeweils in rot hervorgehoben.}
     \label{fig:isosurface_pipeline}
 \end{figure}
@@ -292,7 +292,7 @@ Baseline und Data Augmentation erzeugen über alle Sampler hinweg visuell hirnähn
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/samples_appendix_model_x_sampler_32.png}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/samples_appendix_model_x_sampler_32.png}}
     \caption[Modellvergleich je Sampler ($32^3$)]{Generierte Volumen-Mittelschnitte der fünf $32^3$-Modelle (Zeilen) für die vier Sampler (Spalten). Identischer Seed pro Spalte.}
     \label{fig:samples_model_x_sampler}
 \end{figure}
@@ -305,7 +305,7 @@ Die $48^3$-Variante zeigt erkennbare Details. Bei der $32^3$-Variante sind diese
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{./results/samples_32_vs_48.png}
+    \frame{\includegraphics[width=0.85\linewidth]{./results/samples_32_vs_48.png}}
     \caption[Vergleich der Baseline-Auflösungen]{Vergleich der Baseline in $32^3$ (obere Reihe) und $48^3$ (untere Reihe), je sechs zufällig ausgewählte Samples mit \ac{DDPM}-Sampler.}
     \label{fig:samples_resolution_compare}
 \end{figure}
@@ -318,7 +318,7 @@ Trotz unterschiedlicher Schrittzahl ($10$ bis $250$) erzeugen alle vier Sampler 
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_48.png}
+    \frame{\includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_48.png}}
     \caption[Sampler-Vergleich der Baseline $48^3$]{Identisches Startrauschen für die Baseline $48^3$, dekodiert durch \ac{DDPM} (250 Schritte), \ac{DDIM} (50), DPM-Solver++ (25) und \ac{UniPC} (10).}
     \label{fig:samples_sampler_compare}
 \end{figure}
@@ -329,7 +329,7 @@ Trotz unterschiedlicher Schrittzahl ($10$ bis $250$) erzeugen alle vier Sampler 
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[height=1.35\linewidth]{./results/samples_pipeline_grid.png}
+    \frame{\includegraphics[height=1.35\linewidth]{./results/samples_pipeline_grid.png}}
     \caption[Pipeline-Ausgaben mit \acs{UniPC}]{Sechs Pipeline-Ausgaben mit \ac{UniPC}: generierte Tumormaske (links), zugehöriges generiertes T1N-Volumen (Mitte) und Überlagerung beider (rechts).}
     \label{fig:samples_pipeline}
 \end{figure}
@@ -342,8 +342,8 @@ Trotz unterschiedlicher Schrittzahl ($10$ bis $250$) erzeugen alle vier Sampler 
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/denoising_trajectory_48.png}
-    \caption[Denoising-Trajektorie der Baseline $48^3$]{Denoising-Trajektorie der Baseline $48^3$ für die vier Sampler. Jede Zeile zeigt acht äquidistante Zwischenschritte von $t=T$ (links, reines Rauschen) bis $t=0$ (rechts, finales Volumen) bei identischem Startrauschen.}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/denoising_trajectory_48.png}}
+    \caption[Denoising-Trajektorie der Baseline $48^3$]{Denoising-Trajektorie der Baseline $48^3$ für die vier Sampler. Jede Zeile zeigt acht Zwischenschritte von $t=T$ (links, reines Rauschen) bis $t=0$ (rechts, finales Volumen) bei identischem Startrauschen.}
     \label{fig:denoising_trajectory_48}
 \end{figure}
 

@@ -1,72 +1,67 @@
-% Nach der Eigenständigkeitserklärung per \clearpage eingefügt.
-% Überschrift ohne TOC:
-\subsection*{Genutzter Funktionsumfang}
+% =====================================================================
+% Genutzter Funktionsumfang (KI-Nachweis) — DHBW Mosbach
+% Folgt nach der Selbstständigkeitserklärung (declaration.tex).
+% Benötigte Pakete: xcolor, array
+% =====================================================================
+\clearpage
+\subsection*{Genutzter Funktionsumfang im Hinblick auf}
 
-% -----------------------------
-% 1) Themenerfassung und Strukturierung
-% -----------------------------
-{\textbf{Themenerfassung und Strukturierung} (Aufgabenstellung/Präzisierung, Forschungsansatz, Gliederung)\par}
+% --- Spaltenüberschriften (einmal definiert, mehrfach genutzt) ---
+\newcommand{\kiheader}{%
+  \textbf{Produktname des eingesetzten Hilfsmittels} &
+  \textbf{Link, URL} &
+  \textbf{Genutzter Funktionsumfang / Beschreibung der Verwendungsweise} \\\hline}
+
+\renewcommand{\arraystretch}{1.4}
+
+% 1) -------------------------------------------------------------------
+{\textbf{Themenerfassung und Strukturierung}
+(Aufgabenstellung oder Präzisierung, Forschungsansatz, Gliederung)\par}
 \smallskip
-{\renewcommand{\arraystretch}{1.4}%
-\noindent\begin{tabular}{|p{4cm}|p{10cm}|}\hline
-  {\textbf{Produkt/Tool}} &
-  {\textbf{Beschreibung / Verwendungsweise}} \\\hline
-  {\textcolor{red}{Tool}} &
-  {Ideenfindung und Grobgliederung der Arbeit. 
-  
-  Beispiel: Welche Themen existieren über \textcolor{red}{Thema}?}  \\\hline
-  % weitere Zeilen hier ergänzen ...
-\end{tabular}\par}
+\noindent\begin{tabular}{|p{3cm}|p{2.8cm}|p{8.2cm}|}\hline
+\kiheader
+\textcolor{red}{Tool} & \textcolor{red}{URL} & \textcolor{red}{Beschreibung} \\\hline
+ & & \\\hline
+\end{tabular}
 \medskip
 
-% % -----------------------------
-% % 2) Themenbearbeitung
-% % -----------------------------
-% {\textbf{Themenbearbeitung} (Problembeschreibung, Grundlagen, Schlussfolgerungen/Erkenntnisse, Evaluierung/AI-Feedback)\par}
-% \smallskip
-% {\renewcommand{\arraystretch}{1.4}%
-% \noindent\begin{tabular}{|p{4cm}|p{10cm}|}\hline
-%   {\textbf{Produkt/Tool}} \iflang{en}{\textbf{Product/Tool}} &
-%   {\textbf{Beschreibung / Verwendungsweise}} \iflang{en}{\textbf{Description / Usage}} \\\hline
-%   {Beispieltool XYZ} \iflang{en}{Example Tool XYZ} &
-%   {Entwurf der ersten Problembeschreibung; Review von Argumentationsketten.}%
-%   \iflang{en}{Drafting the initial problem statement; reviewing argument structure.} \\\hline
-%   % weitere Zeilen hier ergÃ¤nzen ...
-% \end{tabular}\par}
-% \medskip
-
-% -----------------------------
-% 3) Quellenrecherche, -auswahl und -auswertung
-% -----------------------------
-{\textbf{Quellenrecherche, -auswahl und -auswertung} (durch AI gefundene Quellen; Vorgehen der weiteren Recherche)\par}
+% 2) -------------------------------------------------------------------
+{\textbf{Themenbearbeitung}
+(Darstellung/Beschreibung des Problems, Darlegung von wissenschaftlichen
+Grundlagen, Schlussfolgerungen allgemein und für das konkrete Thema /
+Erkenntnisgewinn, Evaluierung des Textes / Feedback der KI)\par}
 \smallskip
-{\renewcommand{\arraystretch}{1.4}%
-\noindent\begin{tabular}{|p{4cm}|p{10cm}|}\hline
-  {\textbf{Produkt/Tool}} &
-  {\textbf{Beschreibung / Verwendungsweise}} \\\hline
-  {\textcolor{red}{Tool}} &
-  {Vorschläge relevanter Publikationen, anschließende manuelle Validierung. 
-  
-  Beispiel: Welche Bücher behandeln das Thema \textcolor{red}{Thema}?}%
-  \\\hline
-  % weitere Zeilen hier ergänzen ...
-\end{tabular}\par}
+\noindent\begin{tabular}{|p{3cm}|p{2.8cm}|p{8.2cm}|}\hline
+\kiheader
+\textcolor{red}{Tool} & \textcolor{red}{URL} & \textcolor{red}{Beschreibung} \\\hline
+ & & \\\hline
+\end{tabular}
 \medskip
 
-% -----------------------------
-% 4) Formale Gestaltung, insbesondere Sprache
-% -----------------------------
-{\textbf{Formale Gestaltung, insbesondere Sprache} (Prompts/Eingaben; Textgenerierung, Korrektur, Paraphrasieren, Ãœbersetzen, kreatives Schreiben)\par}
+% 3) -------------------------------------------------------------------
+{\textbf{Quellenrecherche, -auswahl und -auswertung}
+(Welche Quellen wurden durch das KI-Tool gefunden, wie erfolgte die weitere
+Recherche)\par}
 \smallskip
-{\renewcommand{\arraystretch}{1.4}%
-\noindent\begin{tabular}{|p{4cm}|p{10cm}|}\hline
-  {\textbf{Produkt/Tool}} &
-  {\textbf{Beschreibung / Verwendungsweise}} \\\hline
-  {\textcolor{red}{Tool}}  &
-  {Grammatik-/Stilkorrektur einzelner Absätze; keine inhaltliche Neuerstellung.
-  
-  Beispiel: Ist der folgende Satz grammatikalisch richtig?}%
-  \\\hline
-  % weitere Zeilen hier ergänzen ...
-\end{tabular}\par}
- 
+\noindent\begin{tabular}{|p{3cm}|p{2.8cm}|p{8.2cm}|}\hline
+\kiheader
+\textcolor{red}{Tool} & \textcolor{red}{URL} & \textcolor{red}{Beschreibung} \\\hline
+ & & \\\hline
+\end{tabular}
+\medskip
+
+% 4) -------------------------------------------------------------------
+{\textbf{Formale Gestaltung, insbesondere Sprache}
+(Welche Eingabe wurde an die KI getätigt? Textgenerierung, Textkorrektur,
+Paraphrasieren und Umschreiben, Übersetzen, kreatives Schreiben)\par}
+\smallskip
+\noindent\begin{tabular}{|p{3cm}|p{2.8cm}|p{8.2cm}|}\hline
+\kiheader
+\textcolor{red}{Tool} & \textcolor{red}{URL} & \textcolor{red}{Beschreibung} \\\hline
+ & & \\\hline
+\end{tabular}
+\medskip
+
+\noindent\textit{\small Hinweis: Geben Sie in der jeweiligen Rubrik die Kapitel
+in Ihrer wissenschaftlichen Arbeit an und erläutern Sie die Art und Weise sowie
+den Umfang der von Ihnen genutzten generativen Systeme (Text, Bild, Code etc.).}

@@ -7,7 +7,7 @@ Dieser Anhang enthält weiterführende Abbildungen und Tabellen zu den in~\autoref
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{./results/pipeline_t1n.png}
+    \frame{\includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{./results/pipeline_t1n.png}}
     \caption[Vorverarbeitungs-Pipeline]{Visualisierung der Vorverarbeitungs-Pipeline an einem \ac{BraTS}-Volumen in axialer, koronaler und sagittaler Schnittebene. Von links nach rechts: (1)~Originalvolumen, (2)~Perzentil-Clipping ($0{,}5$--$99{,}5\,\%$), (3)~Vordergrund-Cropping, (4)~kubisches Zero-Padding, (5)~trilineares Resizing auf $32^3$, (6)~Min-Max-Normalisierung auf $[-1,1]$.}
     \label{fig:preprocessing_pipeline}
 \end{figure}
@@ -44,7 +44,7 @@ Dieser Anhang enthält weiterführende Abbildungen und Tabellen zu den in~\autoref
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{./results/training_time.pdf}
+    \frame{\includegraphics[width=0.7\linewidth]{./results/training_time.pdf}}
     \caption[Trainingsdauer der Modelle]{Trainingsdauer der acht Modelle in GPU-Stunden auf einer NVIDIA GeForce GTX 1080 Ti.}
     \label{fig:training_time}
 \end{figure}
@@ -54,7 +54,7 @@ Während des Trainings werden zu festgelegten Epochen Checkpoints gespeichert (vg
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/training_progression.png}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/training_progression.png}}
     \caption[Trainings-Evolution der Baseline $32^3$]{Trainings-Evolution der Baseline $32^3$: Ein einzelner Sample mit identischem Seed, generiert nach 1, 10, 25, 50, 100, 150, 200, 250 und 300 Trainings-Epochen.}
     \label{fig:appendix_training_progression}
 \end{figure}
@@ -93,7 +93,7 @@ Die folgenden Boxplots zeigen die Verteilung der paarweisen Metriken \ac{SSIM}, 
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{./results/boxplot_quantitative_32_grid.pdf}
+    \frame{\includegraphics[width=\linewidth]{./results/boxplot_quantitative_32_grid.pdf}}
     \caption[Metrikverteilung der $32^3$-Modelle]{Verteilung der paarweisen Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} pro $32^3$-Modell und Sampler. Die Noise-Prediction-Spalte hat aufgrund extremer Werte eine eigene Y-Achsen-Skala.}
     \label{fig:appendix_boxplot_uncond_32}
 \end{figure}
@@ -101,14 +101,14 @@ Die folgenden Boxplots zeigen die Verteilung der paarweisen Metriken \ac{SSIM}, 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{./results/boxplot_quantitative_48.pdf}
+    \frame{\includegraphics[width=\linewidth]{./results/boxplot_quantitative_48.pdf}}
     \caption[Metrikverteilung der $48^3$-Baseline]{Verteilung der paarweisen Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} über 1024 Samples der $48^3$-Baseline, getrennt nach Sampler.}
     \label{fig:appendix_boxplot_48}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{./results/boxplot_quantitative_pipeline.pdf}
+    \frame{\includegraphics[width=\linewidth]{./results/boxplot_quantitative_pipeline.pdf}}
     \caption[Metrikverteilung der Pipeline]{Verteilung der paarweisen Metriken \ac{SSIM}, \ac{PSNR} und \ac{LPIPS} über 1024 Pipeline-Durchläufe in $32^3$, getrennt nach Sampler.}
     \label{fig:appendix_boxplot_pipeline}
 \end{figure}
@@ -123,7 +123,7 @@ Die Übersichtsdarstellung der Intensitätsverteilung in~\autoref{fig:intensity_hi
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{./results/intensity_histogram_detail.pdf}
+    \frame{\includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{./results/intensity_histogram_detail.pdf}}
     \caption[Intensitätsverteilung je Modell und Sampler]{Voxel-Intensitätsverteilung pro Sampler (Zeilen) und Konfiguration (Spalten) im Vergleich zur realen \ac{BraTS}-Verteilung (graue Fläche).}
     \label{fig:appendix_intensity_detail}
 \end{figure}
@@ -162,8 +162,9 @@ Im Hauptteil ist der Sampler-Vergleich nur für die Baseline $48^3$ dargestellt. 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_32.png}\\[1em]
-    \includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_48.png}
+    \frame{\includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_32.png}}
+    \\[1em]
+    \frame{\includegraphics[width=0.85\linewidth]{./results/samples_sampler_compare_48.png}}
     \caption[Sampler-Vergleich beider Auflösungen]{Direkte Gegenüberstellung der Sampler-Wirkung bei identischem Startrauschen für die Baseline $32^3$ (oben) und $48^3$ (unten). Sampler von links nach rechts: \ac{DDPM} (250 Schritte), \ac{DDIM} (50), DPM-Solver++ (25), \ac{UniPC} (10).}
     \label{fig:appendix_samples_sampler_compare}
 \end{figure}
@@ -171,12 +172,15 @@ Im Hauptteil ist der Sampler-Vergleich nur für die Baseline $48^3$ dargestellt. 
 \subsection{Denoising-Trajektorie ($32^3$)}
 \autoref{fig:denoising_trajectory_32} zeigt die Denoising-Trajektorie der Baseline $32^3$ analog zur im Hauptteil dargestellten $48^3$-Variante.
 
+\begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{./results/denoising_trajectory_32.png}
+    \frame{\includegraphics[width=0.95\linewidth]{./results/denoising_trajectory_32.png}}
     \caption[Denoising-Trajektorie der Baseline $32^3$]{Denoising-Trajektorie der Baseline $32^3$ für die vier Sampler. Jede Zeile zeigt acht äquidistante Zwischenschritte von $t=T$ (links, reines Rauschen) bis $t=0$ (rechts, finales Volumen) bei identischem Startrauschen.}
     \label{fig:denoising_trajectory_32}
 \end{figure}
+\end{landscape}
+
 
 \section{Erweiterte Sample-Galerien je Sampler}\label{Sec:appendix_samples_full}
 Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Ablationsvarianten, jeweils für einen der vier Sampler. Im Hauptteil (\autoref{fig:samples_model_x_sampler}) ist pro Modell-Sampler-Kombination lediglich ein Sample dargestellt; die hier folgenden Galerien geben einen breiteren Eindruck der Generierungs-Variabilität (\autoref{fig:appendix_samples_full_DDPM} bis \autoref{fig:appendix_samples_full_UniPC}).
@@ -184,7 +188,7 @@ Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Abla
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DDPM.png}
+    \frame{\includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DDPM.png}}
     \caption[Sample-Galerie ($32^3$, \acs{DDPM})]{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit \ac{DDPM} (250 Schritte).}
     \label{fig:appendix_samples_full_DDPM}
 \end{figure}
@@ -193,7 +197,7 @@ Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Abla
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DDIM.png}
+    \frame{\includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DDIM.png}}
     \caption[Sample-Galerie ($32^3$, \acs{DDIM})]{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit \ac{DDIM} (50 Schritte).}
     \label{fig:appendix_samples_full_DDIM}
 \end{figure}
@@ -202,7 +206,7 @@ Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Abla
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DPMSolverPP.png}
+    \frame{\includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_DPMSolverPP.png}}
     \caption[Sample-Galerie ($32^3$, DPM-Solver++)]{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit DPM-Solver++ (25 Schritte).}
     \label{fig:appendix_samples_full_DPMSolverPP}
 \end{figure}
@@ -211,7 +215,7 @@ Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Abla
 \begin{landscape}
 \begin{figure}[H]
     \centering
-    \includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_UniPC.png}
+    \frame{\includegraphics[height=0.85\textheight,keepaspectratio]{./results/samples_appendix_full_UniPC.png}}
     \caption[Sample-Galerie ($32^3$, \acs{UniPC})]{Vollständige Sample-Galerie der fünf $32^3$-Modelle, generiert mit \ac{UniPC} (10 Schritte).}
     \label{fig:appendix_samples_full_UniPC}
 \end{figure}
