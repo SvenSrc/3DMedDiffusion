@@ -14,15 +14,15 @@ Dieser Anhang enthält weiterführende Abbildungen und Tabellen zu den in~\autoref
 \end{landscape}
 
 \section{Digitaler Anhang}\label{App:digital}
-Der Quellcode und die trainierten Modelle dieser Arbeit sind öffentlich auf
+Die trainierten Modelle dieser Arbeit sind öffentlich auf
 Hugging Face verfügbar:
 \begin{center}
-\href{https://huggingface.co/SvenSrc/DHBW-diffusion-3d}{\texttt{huggingface.co/NUTZER/REPO}}
+\href{https://huggingface.co/SvenSrc/DHBW-diffusion-3d}{\texttt{https://huggingface.co/SvenSrc/DHBW-diffusion-3d}}
 \end{center}
 
 
 \section{Modellgrößen}\label{App:model_params}
-\autoref{tab:appendix_model_params} listet die Parameterzahl aller trainierten Modelle. Die fünf $32^3$-Ablationen und die $48^3$-Baseline teilen dieselbe 3D-U-Net-Architektur; das Modell ohne Self-Attention besitzt entsprechend weniger Parameter, die conditional Modelle durch den zusätzlichen Konditionierungs-Eingang geringfügig mehr.
+\autoref{tab:appendix_model_params} listet die Parameterzahl aller trainierten Modelle. Die fünf $32^3$-Ablationen und die $48^3$-Baseline teilen dieselbe 3D-U-Net-Architektur. Das Modell ohne Self-Attention besitzt entsprechend weniger Parameter, die conditional Modelle durch den zusätzlichen Konditionierungs-Eingang geringfügig mehr.
 
 \begin{table}[H]
     \centering
@@ -41,7 +41,7 @@ Hugging Face verfügbar:
         Baseline             & $48^3$ & 156\,012\,001 \\
         \bottomrule
     \end{tabular}
-    \caption[Parameterzahl der Modelle]{Parameterzahl der trainierten 3D-U-Net-Modelle ($\approx 156$\,M). Das Modell ohne Self-Attention hat rund $2{,}4$\,M Parameter weniger; die conditional Modelle einige Tausend mehr durch den Konditionierungs-Eingang.}
+    \caption[Parameterzahl der Modelle]{Parameterzahl der trainierten 3D-U-Net-Modelle ($\approx 156$\,M). Das Modell ohne Self-Attention hat rund $2{,}4$\,M Parameter weniger. Die conditional Modelle einige Tausend mehr durch den Konditionierungs-Eingang.}
     \label{tab:appendix_model_params}
 \end{table}
 
@@ -190,7 +190,7 @@ Im Hauptteil ist der Sampler-Vergleich nur für die Baseline $48^3$ dargestellt. 
 
 
 \section{Erweiterte Sample-Galerien je Sampler}\label{Sec:appendix_samples_full}
-Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Ablationsvarianten, jeweils für einen der vier Sampler. Im Hauptteil (\autoref{fig:samples_model_x_sampler}) ist pro Modell-Sampler-Kombination lediglich ein Sample dargestellt; die hier folgenden Galerien geben einen breiteren Eindruck der Generierungs-Variabilität (\autoref{fig:appendix_samples_full_DDPM} bis \autoref{fig:appendix_samples_full_UniPC}).
+Die folgenden Abbildungen zeigen umfassende Sample-Galerien der fünf $32^3$-Ablationsvarianten, jeweils für einen der vier Sampler. Im Hauptteil (\autoref{fig:samples_model_x_sampler}) ist pro Modell-Sampler-Kombination lediglich ein Sample dargestellt. Die hier folgenden Galerien geben einen breiteren Eindruck der Generierungs-Variabilität (\autoref{fig:appendix_samples_full_DDPM} bis \autoref{fig:appendix_samples_full_UniPC}).
 
 \begin{landscape}
 \begin{figure}[H]
