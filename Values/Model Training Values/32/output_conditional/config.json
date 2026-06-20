@@ -1,0 +1,38 @@
+{
+  "data_path": "/home/sven/Desktop/diffsuion/Processed/brats/32",
+  "seg_data_path": "/home/sven/Desktop/diffsuion/Processed/brats/32_seg",
+  "output_path": "output_conditional",
+  "image_size": 32,
+  "in_channels": 1,
+  "cond_channels": 1,
+  "model_channels": 96,
+  "channel_mult": [
+    1,
+    2,
+    4,
+    4
+  ],
+  "num_res_blocks": 2,
+  "attention_resolutions": [
+    8,
+    4
+  ],
+  "num_groups": 8,
+  "dropout": 0.0,
+  "num_timesteps": 250,
+  "beta_schedule": "cosine",
+  "prediction_type": "v",
+  "num_epochs": 300,
+  "batch_size": 10,
+  "learning_rate": 0.0002,
+  "warmup_steps": 500,
+  "ema_decay": 0.9999,
+  "grad_clip": 0.5,
+  "use_loss_aware_sampling": true,
+  "loss_history_size": 10,
+  "snr_gamma": 5.0,
+  "cfg_dropout_prob": 0.15,
+  "guidance_scale": 3.0,
+  "num_seg_classes": 4,
+  "device": "cuda"
+}

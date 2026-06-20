@@ -1,0 +1,2 @@
+mode,model,sampler,image_size,n_pairs,n_real_fid,fid,ssim_mean,ssim_std,psnr_mean,psnr_std,lpips_mean,lpips_std
+pipeline,pipeline,UniPC,32,1024,1251,25.464820,0.511082,0.088949,17.849712,1.588612,0.036465,0.011237

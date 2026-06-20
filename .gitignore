@@ -51,7 +51,6 @@ final/
 *.tcp
 *.pyc
 final/
-Values/
 output/
 
 __pycache__

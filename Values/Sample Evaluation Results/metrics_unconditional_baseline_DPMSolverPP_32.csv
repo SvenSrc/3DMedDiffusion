@@ -1,0 +1,2 @@
+mode,model,sampler,image_size,n_pairs,n_real_fid,fid,ssim_mean,ssim_std,psnr_mean,psnr_std,lpips_mean,lpips_std
+unconditional,baseline,DPMSolverPP,32,1024,1251,40.954553,0.503494,0.091206,17.847239,1.663862,0.036875,0.011109

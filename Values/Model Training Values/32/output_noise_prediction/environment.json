@@ -1,0 +1,11 @@
+{
+  "gpu_name": "NVIDIA GeForce GTX 1080 Ti",
+  "gpu_vram_gb": 11.7,
+  "cpu_model": "x86_64",
+  "ram_total_gb": null,
+  "pytorch_version": "2.7.1+cu118",
+  "cuda_version": "11.8",
+  "python_version": "3.12.3",
+  "os_info": "Linux-6.17.0-14-generic-x86_64-with-glibc2.39",
+  "random_seed": 42
+}

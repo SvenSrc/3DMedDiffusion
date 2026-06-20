@@ -1,0 +1,30 @@
+{
+  "data_path": "/home/sven/Desktop/diffsuion/Processed/brats/veryfast",
+  "output_path": "output_no_attention",
+  "image_size": 32,
+  "in_channels": 1,
+  "model_channels": 96,
+  "channel_mult": [
+    1,
+    2,
+    4,
+    4
+  ],
+  "num_res_blocks": 2,
+  "attention_resolutions": [],
+  "num_groups": 8,
+  "dropout": 0.0,
+  "num_timesteps": 250,
+  "beta_schedule": "cosine",
+  "prediction_type": "v",
+  "num_epochs": 300,
+  "batch_size": 10,
+  "learning_rate": 0.0002,
+  "warmup_steps": 500,
+  "ema_decay": 0.9999,
+  "grad_clip": 1.0,
+  "use_loss_aware_sampling": true,
+  "loss_history_size": 10,
+  "snr_gamma": 5.0,
+  "device": "cuda"
+}

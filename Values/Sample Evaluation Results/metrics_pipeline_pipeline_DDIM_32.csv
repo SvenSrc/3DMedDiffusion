@@ -1,0 +1,2 @@
+mode,model,sampler,image_size,n_pairs,n_real_fid,fid,ssim_mean,ssim_std,psnr_mean,psnr_std,lpips_mean,lpips_std
+pipeline,pipeline,DDIM,32,1024,1251,36.881040,0.507531,0.086137,17.785349,1.521897,0.037520,0.011072

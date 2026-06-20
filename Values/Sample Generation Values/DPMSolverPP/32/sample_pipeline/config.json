@@ -1,0 +1,24 @@
+{
+  "pipeline": "tumor -> placement -> brain",
+  "tumor_checkpoint": "/home/sven/Desktop/diffsuion/Diff 2/32/output_novel_conditional_segmentation_classified/checkpoints/final_model.pt",
+  "tumor_checkpoint_epoch": 300,
+  "seg2mri_checkpoint": "/home/sven/Desktop/diffsuion/Diff 2/32/output_conditional/checkpoints/final_model.pt",
+  "seg2mri_checkpoint_epoch": 300,
+  "sampler": "dpm_solver++",
+  "sampler_steps": 25,
+  "sampler_extra_kwargs": {
+    "algorithm_type": "dpmsolver++",
+    "solver_order": 2,
+    "lower_order_final": true
+  },
+  "sampler_library": "diffusers",
+  "tumor_guidance_scale": 1.0,
+  "brain_guidance_scale": 1.0,
+  "class_id": null,
+  "image_size": 32,
+  "num_samples": 1024,
+  "seed_base": 42,
+  "real_seg_dir": "/home/sven/Desktop/diffsuion/Processed/brats/32_seg",
+  "placement_strategy": "copy real-seg COM, clip shift to keep tumor bbox inside volume",
+  "use_ema": true
+}

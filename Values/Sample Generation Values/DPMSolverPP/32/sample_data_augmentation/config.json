@@ -1,0 +1,40 @@
+{
+  "model_name": "data_augmentation",
+  "checkpoint_path": "/home/sven/Desktop/diffsuion/Diff 2/32/output_data_augmentation/checkpoints/final_model.pt",
+  "checkpoint_epoch": 300,
+  "sampler": "dpm_solver++",
+  "sampler_steps": 25,
+  "sampler_extra_kwargs": {
+    "algorithm_type": "dpmsolver++",
+    "solver_order": 2,
+    "lower_order_final": true
+  },
+  "sampler_library": "diffusers",
+  "sampler_class": "DPMSolverMultistepScheduler",
+  "num_timesteps": 250,
+  "beta_schedule": "cosine",
+  "prediction_type": "v",
+  "image_size": 32,
+  "in_channels": 1,
+  "model_channels": 96,
+  "channel_mult": [
+    1,
+    2,
+    4,
+    4
+  ],
+  "num_res_blocks": 2,
+  "attention_resolutions": [
+    8,
+    4
+  ],
+  "num_groups": 8,
+  "dropout": 0.0,
+  "use_ema": true,
+  "num_samples": 1024,
+  "seed_base": 0,
+  "final_clamp": [
+    -1.0,
+    1.0
+  ]
+}

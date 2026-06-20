@@ -1,0 +1,2 @@
+mode,model,sampler,image_size,n_pairs,n_real_fid,fid,ssim_mean,ssim_std,psnr_mean,psnr_std,lpips_mean,lpips_std
+unconditional,baseline,UniPC,32,1024,1251,43.927142,0.503381,0.092067,17.853302,1.673926,0.036777,0.011148

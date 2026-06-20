@@ -1,0 +1,2 @@
+mode,model,sampler,image_size,n_pairs,n_real_fid,fid,ssim_mean,ssim_std,psnr_mean,psnr_std,lpips_mean,lpips_std
+unconditional,noise_prediction,DDPM,32,1024,1251,217.156275,-0.028903,0.145779,3.818942,4.246992,0.506566,0.229432

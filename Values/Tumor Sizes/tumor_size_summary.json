@@ -1,0 +1,30 @@
+{
+  "classification": "TNM T-stage (sphere volume approximation)",
+  "formula": "V = (4/3) * pi * (d/2)^3",
+  "tumor_definition": "Solid tumor only: label 1 (NCR) + label 3 (ET), excluding label 2 (edema)",
+  "threshold_T1_T2_cm3": 4.19,
+  "threshold_T1_T2_diameter_cm": 2.0,
+  "threshold_T2_T3_cm3": 65.45,
+  "threshold_T2_T3_diameter_cm": 5.0,
+  "num_classes": 3,
+  "label_names": {
+    "0": "small (T1)",
+    "1": "medium (T2)",
+    "2": "large (T3)"
+  },
+  "counts": {
+    "small (T1)": 117,
+    "medium (T2)": 939,
+    "large (T3)": 195
+  },
+  "total": 1251,
+  "voxel_spacing_mm": "1.0 x 1.0 x 1.0 (BraTS 2023 GLI, SRI24 template)",
+  "volume_stats_cm3": {
+    "min": 0.0,
+    "max": 190.19,
+    "mean": 35.75,
+    "median": 28.27,
+    "std": 30.0
+  },
+  "note": "TNM staging is not officially applied to primary brain tumors. Thresholds adapted from general TNM T-stage diameter cutoffs for demonstration purposes."
+}

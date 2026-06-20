@@ -1,0 +1,13 @@
+{
+  "gpu_name": "NVIDIA GeForce GTX 1080 Ti",
+  "gpu_vram_gb": 11.71,
+  "cpu_model": "AMD Athlon(tm) X4 860K Quad Core Processor",
+  "ram_total_gb": 15.6,
+  "pytorch_version": "2.7.1+cu118",
+  "cuda_version": "11.8",
+  "python_version": "3.12.3",
+  "diffusers_version": "0.37.1",
+  "os_info": "Linux 6.17.0-20-generic",
+  "generation_start_time": "2026-04-27T16:26:51.794438",
+  "generation_end_time": "2026-04-27T18:59:03.953389"
+}
